@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Shell Scholarship Programme",
+    "provider": "Shell Malaysia",
+    "application_link": "https://www.shell.com.my/about-us/careers/students-and-graduates/scholarships.html",
+    "application_deadline": null,
+    "source": "scraped",
+    "source_website": "shell",
+    "raw_eligibility": "Skip to main content\nCustomer\nBusiness\nAbout Us\nWho we are\nWhat we do\nSustainability\nCareers at Shell\nMedia\nHome\nAbout Us\nCareers at Shell\nStudents and Graduates\nScholarships\nScholarships\n\nSince its inception, the Shell Malaysia Scholarship Programme has benefitted more than 1500 students in pursuing their educational aspirations and provided a unique entrance into the energy industry.\n\nApplication will open on the day the SPM results are released in April or May 2026.\nShell Scholarship\n\nThe offering is for candidates to be sponsored by 2 tiers A-levels and undergraduates in prestigious colleges and universities locally and overseas. This is subject to the scholastic performance of the student.\n\nWe look to sponsor students intending to pursue higher education in the following fields of study:\n\nEngineering: Mechanical, Civil, Chemical, Petroleum, Electrical & Electronics, Environmental, Sustainable\nSciences: Geology, Geosciences, Data Science\nCommercial: Business & Management, Digital Marketing\nEligibility\nStrong leadership skills and active participation in extracurricular activities such as societies and clubs, sports, etc.\nNot presently holding other scholarships/loans\nConsistently strong academic achievements as follows:\nMinimum 8As (A/A+) in Sijil Pelajaran Malaysia (SPM) OR\nExcellent O-level grades at IGCSE (A*/A)\nBefore applying, ensure you are eligible to work in the country where the scholarship program is offered.\nMust be 2025 SPM or 2026 O-Level leavers\nWilling to pursue A-levels at selected boarding institution\nApplication Overview\n\nImportant information:\n\nApplication will open on the day the SPM results are released in April or May 2026.\nOnly shortlisted applicants will be notified to progress to the next steps of application.\n\nRead the transcript\nApplication Process\nApply\nStage 1\nStage 2\nMeet our Scholars\n\nFind out what life is like on the Shell MY Scholarship Programme from our previous scholars and now employees.\n\nRead their testimonials\n\nMore in Students and Graduates\nShell Graduate Programme\n\nDiscover the exciting and diverse world of Shell. See what you could do and where you could go.\n\nRead more\nAssessed Internships\n\nDiscover the exciting and diverse world of Shell. See what you could do and where you could go.\n\nRead more\nBenefits of working at Shell\nMeet our graduates\nTips to apply successfully\nHome\nAbout Us\nCareers at Shell\nStudents and Graduates\nScholarships\nCan we help?\nHelp and support\nContact us\nMore About Shell:\nBusiness customers\nAbout Us\nCareers\nNews and Publications\nShell tools:\nFind a Shell station\nFind the right engine oil\nChange market\nConnect with us\nInstagram\nYouTube\nFacebook\nX\nLinkedIn\nAccessibility\nTerms and conditions\nPrivacy notices\nCookie policy",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A3"
+      ],
+      "required_subjects": null,
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1",
+        "C3"
+      ],
+      "fields_of_study": [
+        "Engineering",
+        "Science",
+        "IT"
+      ],
+      "study_destination": "Overseas",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": null,
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": true,
+      "sports_achievement": true,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    },
+    "scraped_at": "2026-02-04T06:47:02.172Z"
+  }
+]

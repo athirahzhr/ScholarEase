@@ -1,0 +1,56 @@
+[
+  {
+    "title": "PETRONAS Education Sponsorship (SPM Leavers)",
+    "provider": "PETRONAS",
+    "application_link": "https://www.petronas.com/careers/students-graduates",
+    "application_deadline": null,
+    "source": "scraped",
+    "source_website": "petronas",
+    "raw_eligibility": "Global\n\nAbout Us\nNews & Media\nCareers\nSuppliers\nContact Us\nProgressing Energy\nSustainability\nInvestor Relations\nOur Stories\n\nStudents & Graduates\n\nWe Shape\nTomorrow's Bright Minds\n\nWe're paving the way for a new generation of leaders and innovators. Unlock your passion today!\n\nPowering Knowledge through Education\n\nPETRONAS believes that investing in education and human capital development at all levels will enable a continuous and sustainable pipeline of talent for PETRONAS, the industry, and the nation.\n\nWhile PETRONAS aspires to realise its business goals, PETRONAS continues to uphold its contributions to sustainable development through improving access to quality education, promoting learning and development activities as well as enabling deserving recipients to realise their careers aspirations.\n\nEducation Sponsorship\nInternship\nGraduate Employability Enhancement Scheme (GEES)\nTechnical and Vocational Education and Training (TVET)\n \n\n \n\nEducation Sponsorship (SPM Leavers)\n\nA sponsorship programme for deserving SPM leavers to pursue their tertiary education at Universiti Teknologi PETRONAS (UTP) and other top leading local and overseas universities in the United States, United Kingdom, Australia, New Zealand, China, Japan and South Korea.\n\n \n\n \n\n \n\nEligibility Criteria\n\n1. Outstanding Academic Achievements\n\nSPM of the current year\nLocal Programme: Obtained minimum SPM 8A & CEFR (B1)\nOverseas Programme: Obtained minimum SPM 4A+ & 4A & CEFR (C1)\n\nNote: Please note that the eligibility criteria for your application may vary depending on your selected discipline (technical or non-technical). For more detailed information, please refer to the PETRONAS education sponsorship application guidelines available at the Online Application System during application period.\n\n2. Strong Leadership\n\nWe look beyond academics and considers the impact that students have made outside of the classroom. Participation in clubs, sports, community service, leadership roles, and other activities can greatly enhance an application.\n\n3. Wholesome Assessment\n\nPersonality & Cognitive Assessment (Online assessment)\nAs part of our commitment to selecting the most deserving candidates, we have designed a comprehensive evaluation process to gain a deeper understanding of your unique qualities and capabilities.\n\nThe purpose of this assessment is to measure various aspects of your personality traits and cognitive abilities. By examining these factors, we aim to evaluate and identify the qualities that are aligned with the role of a scholar with PETRONAS.\n\n\nStudent Potential Assessment (Face-to-face assessment)\nThis is a face-to-face interview where candidates will be assessed by our own PETRONAS assessors. The assessment is designed to measure candidates' leadership and behavioural qualities.\n\n \n\nTerms & Conditions\n\nThis sponsorship opportunity is designed for individuals who exhibit outstanding talent, dedication, and potential.\n\nOur selection committee is committed to identifying and nurturing the most promising talent among the applicant pool. In selecting the deserving wholesome talents, each application is carefully reviewed, considering academic achievements, personal character, leadership potential, and community impact.\n\nAs it is highly competitive, we want to emphasize that only those who meet the requirements will be shortlisted and selected for final award.\n\n \n\nApplication Period\n\nThe application for the sponsorship is now closed. Please stay tuned for the latest updates and future openings.\n\nExplore our Disciplines\n\nChemical Engineering\n\nLearn more\n\nMechanical Engineering\n\nLearn more\n\nElectrical Engineering / Instrumentation Engineering\n\nLearn more\n\nPetroleum Engineering\n\nLearn more\n\nPetroleum Geoscience / Geology / Geophysics\n\nLearn more\n\nApplied Chemistry\n\nLearn more\n\nAccounting / Finance\n\nLearn more\n\nEconomics\n\nLearn more\n\nMarketing\n\nLearn more\n\nSoftware Engineering / Computer Science\n\nLearn more\n\nData Science\n\nLearn more\n\nActuarial Science (Financial Risk)\n\nLearn more\n\nPsychology / Sociology (Organisational Behaviour)\n\nLearn more\n\nLaw\n\nLearn more\n\n \n\n \n\n \n\nEducation Sponsorship (Mid-Education)\n\nA sponsorship programme for top-performing Malaysian students who are currently pursuing or have secured a conditional offer / firm acceptance to pursue degree programmes at approved universities in the United Kingdom.\n\n \n\n \n\nEligibility Criteria\n\n\nApplicant must be a Malaysian citizen NOT more than 22 years old.\nApplicant must NOT be under any other form of sponsorships.\nApplicant has NO disciplinary cases or suspension throughout studies\n\n1. Outstanding Academic Achievements\n\nUndergraduate Students:\nCurrently pursuing a degree programme at a PETRONAS-approved university in the UK\nLatest academic results equivalent to a minimum CGPA of 3.70 or First-Class Honours\nMust have at least one full academic year remaining\n\n  OR\n\nPre-University Students:\nHave secured a conditional offer or firm acceptance to pursue a degree programme at a PETRONAS-approved university in the UK\n\n2. Strong Leadership\n\nWe look beyond academic results. Active involvement in extracurricular activities, such as clubs, sports, competitions, community service, and leadership roles is highly valued and will strengthen your application.\n\n3. Wholesome Assessment\n\nPersonality, Cognitive & Leadership Assessment (Online Assessment)\nAs part of our commitment to selecting the most deserving candidates, we have designed a comprehensive online assessment to gain deeper insights into your personality, problem-solving abilities and leadership potential, including how you navigate challenges and learn through real-life experiences.\n\n\nMid Sponsorship Interview (MSI)\nThis is an online interview session conducted by our panel of PETRONAS assessors. It is designed to evaluate your behavioural traits, leadership qualities, and alignment with the values we uphold in our scholars.\n\n \n\nTerms & Conditions\n\nThis sponsorship is especially for students who demonstrate outs",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A3"
+      ],
+      "required_subjects": [
+        "Physics",
+        "Chemistry"
+      ],
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1",
+        "C3",
+        "C4"
+      ],
+      "fields_of_study": [
+        "Engineering",
+        "Science",
+        "IT",
+        "Finance"
+      ],
+      "study_destination": "Overseas",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": "Malaysian",
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": true,
+      "sports_achievement": true,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    },
+    "scraped_at": "2026-02-03T14:36:57.205Z"
+  }
+]

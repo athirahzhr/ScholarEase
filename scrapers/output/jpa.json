@@ -1,0 +1,127 @@
+[
+  {
+    "title": "Program Khas Lepasan Sijil Pelajaran Malaysia Dalam Negara (LSPM)",
+    "provider": "Jabatan Perkhidmatan Awam",
+    "application_link": "https://penajaan.jpa.gov.my/index.php/info-penajaan/latihan-sebelum-perkhidmatan/program-pelajar/program-khas-lepasan-sijil-pelajaran-malaysia-dalam-negara-lspm",
+    "raw_eligibility": "Program Khas Lepasan Sijil Pelajaran Malaysia Dalam Negara (LSPM)\n Latihan Sebelum Perkhidmatan (LSP)\nUtama  Info Penajaan  Latihan Sebelum Perkhidmatan (LSP)  Program Pelajar  Program Khas Lepasan Sijil Pelajaran Malaysia Dalam Negara (LSPM)\n\nProgram Khas Lepasan Sijil Pelajaran Malaysia Dalam Negara (LSPM) merupakan penajaan Jabatan Perkhidmatan Awam (JPA) kepada pelajar terbaik lepasan Sijil Pelajaran Malaysia (SPM) untuk melanjutkan pengajian di dalam negara. Calon-calon akan ditawarkan penajaan secara berpakej untuk mengikuti pengajian peringkat Persediaan hingga ke Ijazah Pertama, tertakluk kepada syarat-syarat yang ditetapkan.\n\n Bentuk penajaan : Pinjaman Boleh Ubah (PBU)\n\nSyarat Umum\nSyarat Khusus\nInstitusi Pengajian\nBidang Pengajian",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A3"
+      ],
+      "required_subjects": null,
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1",
+        "C3"
+      ],
+      "fields_of_study": null,
+      "study_destination": "Local",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": null,
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": false,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": true,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Eligibility details not explicitly stated on official page"
+    },
+    "scraped_at": "2026-02-03T14:36:28.323Z"
+  },
+  {
+    "title": "Program Penajaan Nasional (PPN)",
+    "provider": "Jabatan Perkhidmatan Awam",
+    "application_link": "https://penajaan.jpa.gov.my/index.php/info-penajaan/latihan-sebelum-perkhidmatan/program-pelajar/program-penajaan-nasional-ppn",
+    "raw_eligibility": "Program Penajaan Nasional (PPN)\n Latihan Sebelum Perkhidmatan (LSP)\nUtama  Info Penajaan  Latihan Sebelum Perkhidmatan (LSP)  Program Pelajar  Program Penajaan Nasional (PPN)\n\nProgram Penajaan Nasional (PPN) merupakan penajaan kepada pelajar terbaik lepasan Sijil Pelajaran Malaysia (SPM) untuk melanjutkan pelajaran ke universiti terkemuka dunia yang dikenal pasti. Calon-calon yang terpilih akan ditawarkan penajaan secara berpakej bagi mengikuti pengajian peringkat Persediaan sehingga ke peringkat Ijazah Pertama, tertakluk kepada syarat-syarat yang ditetapkan. \n\nBentuk penajaan : Pinjaman Boleh Ubah (PBU)\n\n \n\nSyarat Umum\nSyarat Khusus\nInstitusi Pengajian\nBidang Pengajian",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A3"
+      ],
+      "required_subjects": null,
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1",
+        "C3"
+      ],
+      "fields_of_study": null,
+      "study_destination": "Both",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": null,
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": false,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": true,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Eligibility details not explicitly stated on official page"
+    },
+    "scraped_at": "2026-02-03T14:36:31.032Z"
+  },
+  {
+    "title": "Program Dermasiswa B40 (DB40)",
+    "provider": "Jabatan Perkhidmatan Awam",
+    "application_link": "https://penajaan.jpa.gov.my/index.php/info-penajaan/latihan-sebelum-perkhidmatan/program-pelajar/program-dermasiswa-b40-db40",
+    "raw_eligibility": "Program Dermasiswa B40 (DB40)\n Latihan Sebelum Perkhidmatan (LSP)\nUtama  Info Penajaan  Latihan Sebelum Perkhidmatan (LSP)  Program Pelajar  Program Dermasiswa B40 (DB40)\n\nProgram Dermasiswa B40 (DB40) ini diwujudkan bagi membantu pelajar-pelajar lepasan Sijil Pelajaran Malaysia (SPM) dalam kalangan keluarga berpendapatan rendah iaitu golongan B40 untuk melanjutkan pengajian ke peringkat yang lebih tinggi, khususnya di peringkat Diploma dan Diploma dalam bidang Pendidikan Teknikal dan Latihan Vokasional (TVET) yang telah mendapat pengiktirafan penuh atau separa oleh Agensi Kelayakan Malaysia (MQA).\n\n Bentuk Penajaan : Dermasiswa\n\nSyarat Umum\nSyarat Khusus\nInstitusi Pengajian\nBidang Pengajian",
+    "rules": {
+      "min_spm_as": null,
+      "max_spm_as": null,
+      "academic_categories": null,
+      "required_subjects": null,
+      "income_categories": [
+        "B1"
+      ],
+      "income_strict": true,
+      "study_paths": [
+        "C2"
+      ],
+      "fields_of_study": null,
+      "study_destination": "Both",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": null,
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": false,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    },
+    "scraped_at": "2026-02-03T14:36:33.624Z"
+  }
+]

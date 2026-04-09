@@ -1,0 +1,57 @@
+[
+  {
+    "title": "BPMB Award of Group Undergraduate Scholarship (BAGUS)",
+    "provider": "Bank Pembangunan Malaysia Berhad",
+    "description": "BPMB Award of Group Undergraduate Scholarship (BAGUS)",
+    "raw_eligibility": "Transform Your Education\nwith BAGUS\n(BPMB Award of Group’s Undergraduate Scholarship)\n\nBank Pembangunan Malaysia Berhad (Bank Pembangunan) is dedicated to nurturing promising Malaysian talents who will play a pivotal role in advancing the nation’s development agenda through our BPMB Award of Group’s Undergraduate Scholarship (BAGUS) programme.\n\nApplication Process\n\nBAGUS\nScholarships for Malaysia's Outstanding Students\n\nOpen to Malaysia’s outstanding students, the BAGUS programme offers opportunities to pursue undergraduate degrees in banking-related disciplines at prestigious universities locally and abroad. To be eligible, applicants must meet the criteria listed below:\n\nCitizen of Malaysia\nAged at least 17 years old and not more than 23 years old\nCompleted Pre-university/Foundation/Matriculation/Diploma programme and achieved excellent examination results in any of the following:\nSTPM/A-Level: Minimum of 3As\nDiploma/Matriculation: Minimum Cumulative Grade Point Average (CGPA) of 3.50\nAustralian Matriculation: Minimum ATAR of 80%\nAmerican Foundation Programme: Minimum SAT score of 1,200\nSPM: Minimum 7As in Sijil Pelajaran Malaysia or equivalent\nPossess good interpersonal and communication skills\nAbility to demonstrate leadership qualities and potential\nActively involved in extra-curricular activities and sports\nApplicants must not be a recipient of any other scholarship or award from other organisations/foundations\nApplication from undergraduate students in year 1 will also be considered\n\nOur scholarship recipients will have access to world-class education, covering fields such as:\n\nBusiness (Accounting, Business & Finance, Business Administration, Human Resource Management, Economics)\nEngineering and Technology (Engineering, Information Systems, Information and Communication Technology (ICT), Computer Science, Data Analysis)\nOther Banking-related Studies (Actuarial Science, Mathematics, Statistics, Law, Shariah-related, Political Science, Philosophy, Psychology, etc)\n\n \nThe scholarship covers tuition fees, subsistence and related allowances.\n\nUpon successful completion of the undergraduate programme, scholars will have the opportunity for employment in Bank Pembangunan, with a commitment to serve the Bank for up to six (6) years. \n\nMaking Impact in Communities\nAt Bank Pembangunan, we are committed to making a meaningful impact in our communities, with a focus on diversity and inclusivity. In line with this commitment, the BAGUS scholarship programme is also available for Asnaf Fakir and Miskin students through zakat provision, ensuring that deserving students have the opportunity to pursue higher education without financial constraints. Our Group Shariah Management team oversees the scholarship programme under the zakat fund, working directly with selected public local universities to facilitate the process.\n\nPreferred Universities in UK\n\nUniversity of Oxford\nUniversity of Cambridge\nImperial College London\nUniversity College London (UCL)\nUniversity of Edinburgh\nKing’s College London\nLondon School of Economics and Political Science\nUniversity of Manchester\nUniversity of Bristol\nUniversity of Glasgow\nUniversity of Birmingham\nUniversity of Sheffield\nUniversity of Warwick\nUniversity of Southampton\nUniversity of Leeds\nUniversity of Nottingham\nQueen Mary University of London\nUniversity of York\nNewcastle University\nUniversity of Liverpool\n\nPreferred Universities in US\n\nMassachusetts Institute of Technology (MIT)\nHarvard University\nPrinceton University\nStanford University\nCalifornia Institute of Technology\nUniversity of California, Berkeley\nYale University\nThe University of Chicago\nUniversity of Pennsylvania\nJohns Hopkins University\nColumbia University\nUniversity of California, Los Angeles\nCornell University\nUniversity of Michigan-Ann Arbor\nCarnegie Mellon University\nUniversity of Washington\nDuke University\nNorthwestern University\nNew York University\nUniversity of California, San Diego\n\nPreferred Universities in Australia\n\nUniversity of Melbourne\nMonash University\nThe University of Sydney\nAustralian National University\nThe University of Queensland\nUNSW Sydney\nUniversity of Adelaide\nThe University of Western Australia\nUniversity of Technology Sydney\nMacquarie University\n\nPreferred Universities in Asia\n\nPeking University, China\nThe University of Hong Kong, Hong Kong\nNational University Singapore (NUS)\nNanyang Technological University, Singapore (NTU Singapore)\nFudan University, China\nThe Chinese University of Hong Kong (CUHK)\nTsinghua University, China\nZhejiang University, China\nYonsei University, South Korea\nCity University of Hong Kong (CityUHK)\n\nPreferred Universities in Malaysia\n\nUniversiti Malaya (UM)\nUniversiti Sains Malaysia (USM)\nUniversiti Putra Malaysia (UPM)\nClick to see the full universities list\nApplication\n\nThe BAGUS Scholarship application for 2025 is now officially closed. Bank Pembangunan thanks you for your application. BAGUS will reopen for new applications on 1 March 2026.\n\nChevening – BPMB Scholarship\nYour Path to the UK\n\nBank Pembangunan Malaysia Berhad is excited to partner with UK Government’s Chevening Scholarship Programme to offer a prestigious scholarship for talented Malaysians pursuing master’s degrees in the UK, focusing on critical areas such as finance, law, sustainability and economics. This initiative reflects Bank Pembangunan’s purpose of delivering impact capital for national development, empowering future leaders to contribute to Malaysia’s socio-economic growth.\n\nIf you are passionate about making a meaningful impact on the nation’s future, click the button below to find out more.\n\nChevening Scholarship",
+    "application_link": "https://www.bpmb.com.my/scholarship/",
+    "application_deadline": null,
+    "source": "scraped",
+    "source_website": "bpmb",
+    "rules": {
+      "min_spm_as": 3,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A3"
+      ],
+      "required_subjects": [
+        "Mathematics"
+      ],
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "fields_of_study": [
+        "Engineering",
+        "Science",
+        "IT",
+        "Finance"
+      ],
+      "study_destination": "Overseas",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": null,
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": true,
+      "sports_achievement": true,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    },
+    "scraped_at": "2026-02-03T14:37:24.655Z"
+  }
+]

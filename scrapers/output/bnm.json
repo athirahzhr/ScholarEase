@@ -1,0 +1,106 @@
+[
+  {
+    "title": "Kijang Pre-University Scholarship",
+    "provider": "Bank Negara Malaysia",
+    "application_link": "https://www.bnm.gov.my/careers/scholarships",
+    "application_deadline": null,
+    "raw_eligibility": "Navigation\nSkip to Content\nOur Scholarships\nMeet our Scholars\nHow to Apply\nFAQs\nMore Opportunities\nBM\n\nBank Negara Malaysia Scholarship\n\n \n\n Careers\nScholarship\n\n \n\nBank Negara Malaysia (BNM) is committed to nurturing young Malaysian talent through our scholarship programme. Our scholarship recipients will have access to the best learning experience at top universities per BNM's list of approved universities to study Economics, Accounting, Finance, Actuarial Science, Mathematics, Statistics, Data Science, Law and Computer Science.\n\n \n\nBNM offers two types of scholarship programmes:\n\nKijang Pre-University Scholarship\nKijang Undergraduate Scholarship\n\nKijang Pre-University Scholarship\n\nThe Kijang Pre-University Scholarship is awarded to eligible individuals to pursue pre-university programmes at BNM's approved pre-university colleges. This scholarship provides tuition fees, subsistence allowance, as well as related scholarship allowances.\n\nThe sponsorship to pursue an undergraduate programme is subject to the scholar meeting these requirements:\n\nExcellent examination result: A minimum of 8As (A and A+ only) obtained for SPM examinations\nStrong leadership qualities, proven teamwork capabilities, outstanding performance in extra-curricular activities\nExceptional interpersonal skills\nNot exceeding 19 years of age on 1 July 2025\n\nUpon successful completion of their undergraduate programmes, scholars will be required to serve their employment bond with BNM (i.e. ratio of one year of study to two years of service).\n\nOnly shortlisted candidates will be notified for further assessments.\n\nMeet Our Scholars\n\nSubmitting Your Application\n\nImportant note\n\nBy submitting an application, you will have declared that you have read, understood and accepted our Notice on the Personal Data Protection Act (2010) and give us full consent to process your personal information along with sensitive data.\n\nScholarship FAQs\n1. What do the scholarships offer to a successful applicant?\n2. How do I submit my application?\n3. When do I need to provide the supporting documents?\n4. I do not have SPM examination results because I studied overseas. Am I still eligible to apply?\n5. I am currently studying A-levels and will sit for the exams in June this year. Which examination results can I provide in the meantime?\n6. Is the Bank's scholarship limited to certain subjects only?\n7. Which universities are considered acceptable for undergraduate or postgraduate study?\n8. What does the selection process involve?\n9. How many scholarships are awarded every year?\n10. What is the minimum grade I am expected to achieve during my study programme?\n11. I just missed the application closing date. Can you accept my applications if I submit it now?\n12. I applied last year but was not successful. If I reapply, will my application be considered?\n13. Are the scholarship programmes offered by the Bank open only to Malaysian citizens?\n14. Upon completion of the study programme would I be contractually bounded to work at the Bank?\n15. I have more questions, whom should I speak to?\n\nMore Opportunities\n\nKijang Graduate Programme\n\nThe Kijang Graduate Programme provides a holistic exposure to the Bank's diverse roles in shaping the nation. You will be job-rotated across the Bank's sectors over 18 months, allowing you to discover the possible range of career paths with us.\n\nLearn More\n\nInternship\n\nOur internship programme offers the opportunity to gain invaluable working experience and transferable skills within a range of specialized fields, whilst contributing to central banking work that directly impacts the nation's progress.\n\nLearn More\n\nJob Vacancies\n\nWhat we do shapes the lives of Malaysians every day, and for years to come. This is why here in Bank Negara Malaysia, we look for the best and brightest, invest in our people, and offer diverse paths for professional growth.\n\nLearn More\n\nSubscribe to our email alerts\n\nFollow us on social media\n\nFor specific enquiries on :\n\nJob application\n\nrecruit@bnm.gov.my\n\nScholarship\n\nprofiling@bnm.gov.my\n\nKijang Graduate Programme\n\nkijang.GP@bnm.gov.my\n\nInternship\n\nbnminternship@bnm.gov.my\n\nFor general enquiries:\n\nBNMLINK Contact Centre\n\n1-300-88-5465\nMonday - Friday 9am - 5pm\nGeneral Line\n+603-2784-8888\n© 2026 Bank Negara Malaysia. All rights reserved. Terms of Use. Disclaimer. Privacy Policy.",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A4"
+      ],
+      "required_subjects": [
+        "Mathematics"
+      ],
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1",
+        "C3",
+        "C4"
+      ],
+      "fields_of_study": [
+        "Science",
+        "IT",
+        "Finance"
+      ],
+      "study_destination": "Overseas",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": "Malaysian",
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": 19,
+      "leadership_required": false,
+      "leadership_priority": true,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    },
+    "source": "scraped",
+    "source_website": "bnm",
+    "scraped_at": "2026-02-03T14:37:12.598Z"
+  },
+  {
+    "title": "Kijang Undergraduate Scholarship",
+    "provider": "Bank Negara Malaysia",
+    "application_link": "https://www.bnm.gov.my/careers/scholarships",
+    "application_deadline": null,
+    "raw_eligibility": "Navigation\nSkip to Content\nOur Scholarships\nMeet our Scholars\nHow to Apply\nFAQs\nMore Opportunities\nBM\n\nBank Negara Malaysia Scholarship\n\n \n\n Careers\nScholarship\n\n \n\nBank Negara Malaysia (BNM) is committed to nurturing young Malaysian talent through our scholarship programme. Our scholarship recipients will have access to the best learning experience at top universities per BNM's list of approved universities to study Economics, Accounting, Finance, Actuarial Science, Mathematics, Statistics, Data Science, Law and Computer Science.\n\n \n\nBNM offers two types of scholarship programmes:\n\nKijang Pre-University Scholarship\nKijang Undergraduate Scholarship\n\nKijang Pre-University Scholarship\n\nThe Kijang Pre-University Scholarship is awarded to eligible individuals to pursue pre-university programmes at BNM's approved pre-university colleges. This scholarship provides tuition fees, subsistence allowance, as well as related scholarship allowances.\n\nThe sponsorship to pursue an undergraduate programme is subject to the scholar meeting these requirements:\n\nExcellent examination result: A minimum of 8As (A and A+ only) obtained for SPM examinations\nStrong leadership qualities, proven teamwork capabilities, outstanding performance in extra-curricular activities\nExceptional interpersonal skills\nNot exceeding 19 years of age on 1 July 2025\n\nUpon successful completion of their undergraduate programmes, scholars will be required to serve their employment bond with BNM (i.e. ratio of one year of study to two years of service).\n\nOnly shortlisted candidates will be notified for further assessments.\n\nMeet Our Scholars\n\nSubmitting Your Application\n\nImportant note\n\nBy submitting an application, you will have declared that you have read, understood and accepted our Notice on the Personal Data Protection Act (2010) and give us full consent to process your personal information along with sensitive data.\n\nScholarship FAQs\n1. What do the scholarships offer to a successful applicant?\n2. How do I submit my application?\n3. When do I need to provide the supporting documents?\n4. I do not have SPM examination results because I studied overseas. Am I still eligible to apply?\n5. I am currently studying A-levels and will sit for the exams in June this year. Which examination results can I provide in the meantime?\n6. Is the Bank's scholarship limited to certain subjects only?\n7. Which universities are considered acceptable for undergraduate or postgraduate study?\n8. What does the selection process involve?\n9. How many scholarships are awarded every year?\n10. What is the minimum grade I am expected to achieve during my study programme?\n11. I just missed the application closing date. Can you accept my applications if I submit it now?\n12. I applied last year but was not successful. If I reapply, will my application be considered?\n13. Are the scholarship programmes offered by the Bank open only to Malaysian citizens?\n14. Upon completion of the study programme would I be contractually bounded to work at the Bank?\n15. I have more questions, whom should I speak to?\n\nMore Opportunities\n\nKijang Graduate Programme\n\nThe Kijang Graduate Programme provides a holistic exposure to the Bank's diverse roles in shaping the nation. You will be job-rotated across the Bank's sectors over 18 months, allowing you to discover the possible range of career paths with us.\n\nLearn More\n\nInternship\n\nOur internship programme offers the opportunity to gain invaluable working experience and transferable skills within a range of specialized fields, whilst contributing to central banking work that directly impacts the nation's progress.\n\nLearn More\n\nJob Vacancies\n\nWhat we do shapes the lives of Malaysians every day, and for years to come. This is why here in Bank Negara Malaysia, we look for the best and brightest, invest in our people, and offer diverse paths for professional growth.\n\nLearn More\n\nSubscribe to our email alerts\n\nFollow us on social media\n\nFor specific enquiries on :\n\nJob application\n\nrecruit@bnm.gov.my\n\nScholarship\n\nprofiling@bnm.gov.my\n\nKijang Graduate Programme\n\nkijang.GP@bnm.gov.my\n\nInternship\n\nbnminternship@bnm.gov.my\n\nFor general enquiries:\n\nBNMLINK Contact Centre\n\n1-300-88-5465\nMonday - Friday 9am - 5pm\nGeneral Line\n+603-2784-8888\n© 2026 Bank Negara Malaysia. All rights reserved. Terms of Use. Disclaimer. Privacy Policy.",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A4"
+      ],
+      "required_subjects": [
+        "Mathematics"
+      ],
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1",
+        "C3",
+        "C4"
+      ],
+      "fields_of_study": [
+        "Science",
+        "IT",
+        "Finance"
+      ],
+      "study_destination": "Overseas",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": "Malaysian",
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": 19,
+      "leadership_required": false,
+      "leadership_priority": true,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    },
+    "source": "scraped",
+    "source_website": "bnm",
+    "scraped_at": "2026-02-03T14:37:16.499Z"
+  }
+]

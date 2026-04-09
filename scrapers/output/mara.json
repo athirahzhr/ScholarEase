@@ -1,0 +1,53 @@
+[
+  {
+    "title": "MARA Young Talent Development Program (YTP)",
+    "provider": "Majlis Amanah Rakyat (MARA)",
+    "application_link": "https://www.mara.gov.my/en/index/education/education-financing/peringkat-persediaan-2/",
+    "application_deadline": null,
+    "raw_eligibility": "\t\n   \nBMEN\nMAJLIS AMANAH RAKYAT\nPORTAL\nRASMI\nKEMENTERIAN\nKEMAJUAN DESA DAN WILAYAH\nHOME\nMARA INFO\nEDUCATION\nENTREPRENEURSHIP\nINVESTMENT\nCONTACT US\nEDUCATION\n\nEDUCATION FINANCING\n\n\t\nAnda disini :»Laman Utama»Main Page»Education»Education Financing»Preparatory Level\nPREPARATORY LEVEL\nIntroduction to the Young Talent Development Program (YTP)\nSpecifically for students who have achieved excellent results at the Malaysian Certificate of Education (SPM) level to enrol in the First Degree Preparatory Program locally and abroad. Priority will be given to excellent students from the B40 and M40 groups especially the urban and rural poor.\nPreparatory Program: IB / A-Levels / Foundation / Pre-University / Non-Native English Speaking Countries University Preparatory Program.\nRoad to the Top 10 Universities by Country and Top 30 World Universities by Subjects upon completion of preparatory phase.\nTerms of Application\nExcellent at the Malaysian Certificate of Education (SPM) level within the current year\nPriority for the B40 Group\nPassed the MARA Student Assessment Program (MSAP)\nActive and excellent involvement in co-curriculum activities\nAged 18 in the year of application\n\t\t\nTerms of Sponsorship\nThe applicant and one of the parents are a citizen and of Bumiputera status.\nParents/ Guardians as well as students are NOT blacklisted by MARA.\nApplicants do not receive financial/ sponsorship assistance from any agency for the same degree (double sponsor).\nThe courses enrolled in are courses recognized by the Malaysian Government and the Professional Body of Malaysia.\nHas never been terminated by any sponsor for disciplinary action that is unlawful and has no criminal record.\nFree from chronic illnesses / infectious diseases / diseases that require follow-up treatment and are able to study until completion.\nSubject to the current policies and conditions in force.\nOthers\nPriority areas are Computing, Health Science and Medicine, Engineering, Arts and Design, Social Science (C.H.E.Ar.S)\nStudents who have successfully completed their studies and meet the eligibility requirements set will then further studies at the first degree level locally or abroad\n\ne-SERVICES\nAduan SISPAA\ne-Baki\nMARA EPS\nMyEduloan\nMyUsahawan\nMyPremis\ne-Potensi\nPortal Alumni\nKlinik Panel MARA\n\n\nMajlis Amanah Rakyat (MARA)\n21, Jalan MARA\n50609 Kuala Lumpur\nMARA Hotline : 03-26132000\n\nLINKS\nmyGoverment\nKKDW\nFELCRA\nKEMAS\nRISDA\nJAKOA\nKETENGAH\nPERDA\nKESEDAR\nKEDA\nKEJORA\n\n\nNUMBER OF VISITORS\n\nToday’s Visitors: 3332\n\nNumber of Visitors: 15897\n\nTotal Reach: 71844\n\nHakcipta Terpelihara 2025 © Majlis Amanah Rakyat (MARA)",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A3"
+      ],
+      "required_subjects": null,
+      "income_categories": [
+        "B1"
+      ],
+      "income_strict": false,
+      "study_paths": [
+        "C1",
+        "C3"
+      ],
+      "fields_of_study": [
+        "Engineering",
+        "Medicine",
+        "Science"
+      ],
+      "study_destination": "Overseas",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": true,
+      "gender_requirement": "Any",
+      "citizenship_required": null,
+      "state_requirement": "Kuala lumpur",
+      "rural_priority": true,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": false,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    },
+    "source": "scraped",
+    "source_website": "mara",
+    "scraped_at": "2026-02-03T14:37:04.589Z"
+  }
+]

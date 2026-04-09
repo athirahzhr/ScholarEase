@@ -1,0 +1,49 @@
+[
+  {
+    "title": "Axiata Equity in Education Fund",
+    "provider": "Axiata Foundation",
+    "description": "Axiata Equity in Education Fund",
+    "raw_eligibility": "ABOUT US\nEDUCATION\nCOMMUNITY INVESTMENTS\nENVIRONMENT\nFLAGSHIP\nOUR STORIES\nMEDIA\nGet In Touch\n/\nEducation\n/\nEquity In Education Fund\nAxiata Foundation All-Star Bestari Scholarship\n\nProgramme Overview\n\n \n\nProgramme Journey\n\n \n\nLearn More\n\nEnabling Education For All\n\nThe Axiata Foundation All-Star Bestari Scholarship empowers high-potential students from underprivileged backgrounds and marginalised communities to pursue and complete their studies, enabling them to fulfil their greatest potential. \n\n \n\nThe programme is offered at pre-university levels, providing scholarship recipients with financial support to cover their education and living expenses. The programme also nurtures their development beyond academics through structured interventions for holistic personal and professional growth. \n\nAbout the programme\n\nAxiata Foundation invites high-potential students from underprivileged and marginalised communities backgrounds who have demonstrated excellence in their academics and beyond to apply for the All-Star Bestari Scholarship. \n\n \n\nThrough the scholarship, they will be supported to pursue their pre-university education at local public institutions. \n\nWhat does the scholarship programme cover?\nA full scholarship for the duration of pre-university studies in a local public institution \nThe scholarship covers tuition fees, living and other related allowances \nStructured development interventions are provided to accelerate personal, academic and professional development \nWhat courses and institutions are covered?\n\nAll foundation and matriculation courses that are offered by local public institutions* \n\n \n\n*Maximum of 1 year \n\nHow many scholars will be selected each year?\n\nThere are a fixed number of scholarships provided every year. \n\nWho can apply?\n\nThis programme is only open to students who fulfil these four criteria: \n\nMalaysian citizens \nAged 19 and below \nFrom families with a monthly combined household income of RM4,850 and below \nHave a minimum of 6As* in Sijil Pelajaran Malaysia (SPM)\n*Includes grades of A+, A, or A- for any subjects. \n\n \n\nTerms & conditions: \n\n1) This selection criteria only applies to the year 2025. \n\n \n\n2) This scholarship is not applicable to employees (including family members) of Axiata Group Berhad or any of its subsidiaries and key associates. \n\n \n\n3) Subsidiaries include Axiata Digital Labs, ADA, Boost Holdings, EDOTCO, XL Axiata, Dialog, Robi, Smart, Ncell, and key associates include CelcomDigi \n\nMore Enquiries?\n\nShare your details, and our representative will be in touch soon \n\nGet in Touch\n\nA Foundation For Advancement\nQUICK LINKS\nAbout Us\nEducation\nCommunity Investments\nEnvironment\nAxiata Foundation Brand Kit\nGET IN TOUCH\nContact Us\nAXIATA FOUNDATION\nLevel 27, Axiata Tower, 9 Jalan Stesen Sentral 5, Kuala Lumpur Wilayah Persekutuan, Kuala Lumpur 50470, Malaysia\n\n© Copyright 2026 Axiata Foundation [201101011216 (939346-X)]. All Rights Reserved.\n\nPrivacy Notice\nTerms of Use\nCookie Notice\nSitemap",
+    "application_link": "https://www.axiata-foundation.com/education/equity-in-education-fund/application",
+    "application_deadline": null,
+    "source": "scraped",
+    "source_website": "axiata",
+    "is_official": 1,
+    "is_active": 1,
+    "scraped_at": "2026-02-03T14:37:33.123Z",
+    "rules": {
+      "min_spm_as": null,
+      "max_spm_as": null,
+      "academic_categories": [
+        "A4"
+      ],
+      "required_subjects": null,
+      "income_categories": null,
+      "income_strict": true,
+      "study_paths": [
+        "C1"
+      ],
+      "fields_of_study": null,
+      "study_destination": "Local",
+      "study_path_strict": true,
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": "Malaysian",
+      "state_requirement": "Kuala lumpur",
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": false,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": false,
+      "bond_years": null,
+      "match_all_criteria": true,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Auto-parsed by ruleParser"
+    }
+  }
+]
