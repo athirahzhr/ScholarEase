@@ -19,7 +19,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+Auth::routes (['verify' => true]);
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -29,6 +29,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
+    
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

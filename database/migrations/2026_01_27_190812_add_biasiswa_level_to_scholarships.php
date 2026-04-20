@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('scholarships', function (Blueprint $table) {
-            $table->string('biasiswa_level')->nullable()->after('study_path');
-        });
+       Schema::table('scholarships', function (Blueprint $table) {
+    $table->string('biasiswa_level')->nullable();
+});
     }
 
     public function down(): void

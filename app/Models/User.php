@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\Events\Verified;
 
-// 🔥 TAMBAH INI
 use App\Models\UserProfile;
 use App\Models\Bookmark;
 use App\Models\Application;
 
-class User extends Authenticatable
+class User extends Authenticatable 
+
 {
     use HasFactory, Notifiable;
 
@@ -34,6 +36,31 @@ class User extends Authenticatable
         'is_active' => 'boolean',
     ];
 
+public function markEmailAsVerified()
+{
+    if ($this->hasVerifiedEmail()) {
+        return false;
+    }
+
+    $this->forceFill([
+        'email_verified_at' => $this->freshTimestamp(),
+    ])->save();
+
+    event(new Verified($this));
+
+    return true;
+}
+
+public function hasVerifiedEmail()
+{
+    
+    if ($this->role === 'admin') {
+        return true;
+    }
+
+   
+    return ! is_null($this->email_verified_at);
+}
     public function isAdmin()
     {
         return $this->role === 'admin';
