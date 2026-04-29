@@ -18,7 +18,7 @@ class ScholarshipDeadlineNear extends Notification
 
     public function via($notifiable)
     {
-        return ['mail']; // 📧 EMAIL
+        return ['mail', 'database'];
     }
 
     public function toMail($notifiable)
@@ -35,4 +35,14 @@ class ScholarshipDeadlineNear extends Notification
             )
             ->line('Good luck with your application!');
     }
+
+    public function toArray($notifiable)
+{
+    return [
+        'scholarship_id' => $this->scholarship->id,
+        'scholarship_title' => $this->scholarship->title,
+        'days_left' => $this->daysLeft,
+        'message' => 'Scholarship deadline approaching',
+    ];
+}
 }

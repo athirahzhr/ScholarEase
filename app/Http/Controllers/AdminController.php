@@ -7,11 +7,13 @@ use App\Models\Scholarship;
 use App\Models\ScholarshipEligibilityCriteria;
 use App\Models\Bookmark;
 use App\Models\ScrapingLog;
+use App\Notifications\ScholarshipDeadlineNear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 use App\Services\ScholarshipRuleMatcher;
 
 class AdminController extends Controller
@@ -389,4 +391,77 @@ class AdminController extends Controller
         
         return response()->stream($callback, 200, $headers);
     }
+
+
+public function sendDeadlineNotification()
+{
+    Artisan::call('notify:scholarship-deadline');
+
+    return back()->with('success', 'Deadline notifications sent successfully!');
+}
+public function notifications()
+{
+    $totalBookmarks = Bookmark::count();
+
+    $pending = Bookmark::where('notification_status', 'pending')->count();
+    $sent = Bookmark::where('notification_status', 'success')->count();
+    $failed = Bookmark::where('notification_status', 'failed')->count();
+
+    $pendingList = Bookmark::with(['user', 'scholarship'])
+        ->where('notification_status', 'pending')
+        ->latest()
+        ->get();
+
+    $history = DB::table('notifications')
+        ->latest()
+        ->limit(20)
+        ->get();
+
+    return view('admin.notifications.index', compact(
+        'totalBookmarks',
+        'pending',
+        'sent',
+        'failed',
+        'pendingList',
+        'history'
+    ));
+}
+
+public function notifySingle(Request $request)
+{
+    $bookmark = Bookmark::with(['user', 'scholarship'])
+        ->findOrFail($request->bookmark_id);
+
+    if (!$bookmark->user || !$bookmark->scholarship) {
+        return back()->with('error', 'Invalid data');
+    }
+
+    $daysLeft = now()->diffInDays($bookmark->scholarship->deadline, false);
+
+try {
+    $bookmark->user->notify(
+        new ScholarshipDeadlineNear(
+            $bookmark->scholarship,
+            $daysLeft
+        )
+    );
+
+    $bookmark->update([
+        'notified_at' => now(),
+        'notification_status' => 'success',
+        'notification_error' => null
+    ]);
+
+    return back()->with('success', 'Notification sent successfully!');
+
+} catch (\Exception $e) {
+
+    $bookmark->update([
+        'notification_status' => 'failed',
+        'notification_error' => $e->getMessage()
+    ]);
+
+    return back()->with('error', 'Failed: ' . $e->getMessage());
+}
+}
 }

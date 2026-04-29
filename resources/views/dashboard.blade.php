@@ -325,55 +325,55 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h4 class="mb-3">Quick Actions</h4>
-                </div>
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="quick-action-card text-center">
-                        <div class="action-icon">
-                            <i class="fas fa-search"></i>
+        <!-- User Guideline -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card p-4 shadow-sm" style="border-left: 5px solid #3b82f6;">
+                    
+                    <h4 class="mb-3">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        How to Use ScholarEase
+                    </h4>
+
+                    <div class="row">
+
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="mb-2">
+                                <i class="fas fa-upload fa-2x text-primary"></i>
+                            </div>
+                            <h6>Step 1</h6>
+                            <p class="text-muted small">Upload SPM result / fill profile</p>
                         </div>
-                        <h5>Find Scholarships</h5>
-                        <p class="text-muted small">Upload SPM and get personalized recommendations</p>
-                        <a href="{{ route('scholarship.finder') }}" class="btn btn-primary w-100">Start Finding</a>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="quick-action-card text-center">
-                        <div class="action-icon">
-                            <i class="fas fa-graduation-cap"></i>
+
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="mb-2">
+                                <i class="fas fa-cogs fa-2x text-warning"></i>
+                            </div>
+                            <h6>Step 2</h6>
+                            <p class="text-muted small">System auto-match scholarships</p>
                         </div>
-                        <h5>View Matches</h5>
-                        <p class="text-muted small">See scholarships matching your profile</p>
-                        <a href="{{ route('scholarship.recommendations') }}" class="btn btn-outline-primary w-100">View Matches</a>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="quick-action-card text-center">
-                        <div class="action-icon">
-                            <i class="fas fa-bookmark"></i>
+
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="mb-2">
+                                <i class="fas fa-star fa-2x text-success"></i>
+                            </div>
+                            <h6>Step 3</h6>
+                            <p class="text-muted small">View recommended scholarships</p>
                         </div>
-                        <h5>Bookmarks</h5>
-                        <p class="text-muted small">Manage your saved scholarships</p>
-                        <a href="{{ route('bookmarks.index') }}" class="btn btn-outline-primary w-100">View Bookmarks</a>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="quick-action-card text-center">
-                        <div class="action-icon">
-                            <i class="fas fa-bell"></i>
+
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="mb-2">
+                                <i class="fas fa-bookmark fa-2x text-danger"></i>
+                            </div>
+                            <h6>Step 4</h6>
+                            <p class="text-muted small">Bookmark & track deadlines</p>
                         </div>
-                        <h5>Deadlines</h5>
-                        <p class="text-muted small">Upcoming scholarship deadlines</p>
-                        <a href="{{ route('bookmarks.index') }}" class="btn btn-warning w-100">View Deadlines</a>
+
                     </div>
+
                 </div>
             </div>
+        </div>
 
             <!-- Featured Scholarships -->
             <div class="row">

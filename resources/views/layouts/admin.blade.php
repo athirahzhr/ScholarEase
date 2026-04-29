@@ -234,6 +234,20 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                     <a class="nav-link {{ request()->routeIs('admin.scraper') ? 'active' : '' }}" 
+                        href="{{ route('admin.scraper.index') }}">
+                        <i class="fas fa-play-circle"></i>
+                        <span class="nav-text">Run Scraper</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.notifications') ? 'active' : '' }}" 
+                    href="{{ route('admin.notifications') }}">
+                        <i class="fas fa-bell"></i>
+                        <span class="nav-text">Notifications Center</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('scholarships.create') ? 'active' : '' }}" 
                        href="{{ route('admin.scholarships.create') }}">
                         <i class="fas fa-plus-circle"></i>

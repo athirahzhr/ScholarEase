@@ -73,7 +73,8 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])
+        ->name('dashboard');
 
     // Users
     Route::prefix('users')->name('users.')->group(function () {
@@ -92,19 +93,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/', [ScholarshipController::class, 'index'])->name('index');
         Route::get('/create', [ScholarshipController::class, 'create'])->name('create');
         Route::post('/', [ScholarshipController::class, 'store'])->name('store');
-        Route::get('/{id}', 
-            [ScholarshipController::class, 'showAdmin']
-        )->name('show');
-
+        Route::get('/{id}', [ScholarshipController::class, 'showAdmin'])->name('show');
         Route::get('/{id}/edit', [ScholarshipController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ScholarshipController::class, 'update'])->name('update');
         Route::delete('/{id}', [ScholarshipController::class, 'destroy'])->name('destroy');
         Route::patch('/{id}/toggle-status', [ScholarshipController::class, 'toggleStatus'])->name('toggle-status');
-
-    
     });
 
-    // Eligibility Management
+    // Eligibility
     Route::prefix('eligibility')->name('eligibility.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'eligibilityDashboard'])->name('dashboard');
         Route::post('/bulk-create', [AdminController::class, 'bulkCreateEligibility'])->name('bulkCreate');
@@ -120,23 +116,30 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/jpa', [ScrapingController::class, 'scrapeJPA'])->name('jpa');
         Route::post('/khazanah', [ScrapingController::class, 'scrapeKhazanah'])->name('khazanah');
         Route::post('/unienrol', [ScrapingController::class, 'scrapeUnienrol'])->name('unienrol');
-        
     });
 
-        // Admin Scraper Import
-     Route::get('/scraper', [AdminScraperController::class, 'index'])
-        ->name('scraper.index');
+    // Scraper
+    Route::get('/scraper', [AdminScraperController::class, 'index'])->name('scraper.index');
+    Route::post('/scraper/run', [AdminScraperController::class, 'run'])->name('scraper.run');
+    Route::get('/scraper/review', [AdminScraperController::class, 'review'])->name('scraper.review');
+    Route::post('/scraper/import', [AdminScraperController::class, 'import'])->name('scraper.import');
 
-    Route::post('/scraper/run', [AdminScraperController::class, 'run'])
-        ->name('scraper.run');
+    // Logs
+    Route::get('/scraping-logs', [ScrapingController::class, 'logs'])->name('scraping.logs');
 
-    Route::get('/scraper/review', [AdminScraperController::class, 'review'])
-        ->name('scraper.review');
 
-    Route::post('/scraper/import', [AdminScraperController::class, 'import'])
-        ->name('scraper.import');
+    // Notifications
+    Route::get('/notifications', [AdminController::class, 'notifications'])
+        ->name('notifications');
 
-    Route::get('/scraping-logs', [ScrapingController::class, 'logs'])
-        ->name('scraping.logs');
-    });
+    Route::post('/notifications/send-single', [AdminController::class, 'notifySingle'])
+        ->name('notifications.single');
+
+    Route::post('/notifications/send-all', [AdminController::class, 'sendDeadlineNotification'])
+        ->name('notifications.all');
+
+    Route::post('/notifications/deadline', [AdminController::class, 'sendDeadlineNotification'])
+        ->name('notify.deadline');
+
+});
 

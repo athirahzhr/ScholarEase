@@ -15,7 +15,7 @@ class SendDeadlineNotifications extends Command
     public function handle()
     {
         $today = Carbon::today();
-        $threshold = $today->copy()->addDays(3); // 🔥 3 hari sebelum deadline
+        $threshold = $today->copy()->addDays(3);
 
         $bookmarks = Bookmark::with(['user', 'scholarship'])
             ->whereNull('notified_at')
@@ -25,30 +25,41 @@ class SendDeadlineNotifications extends Command
             })
             ->get();
 
-        foreach ($bookmarks as $bookmark) {
-            $scholarship = $bookmark->scholarship;
+        $count = 0; 
 
-            if (!$scholarship || !$bookmark->user) {
+        foreach ($bookmarks as $bookmark) {
+
+            $scholarship = $bookmark->scholarship;
+            $user = $bookmark->user;
+
+            if (!$scholarship || !$user) {
                 continue;
             }
 
-            $daysLeft = $today->diffInDays(
-                Carbon::parse($scholarship->deadline)
-            );
+            $daysLeft = now()->diffInDays($scholarship->deadline, false);
 
-            $bookmark->user->notify(
-                new ScholarshipDeadlineNear($scholarship, $daysLeft)
-            );
+            // Prevent duplicate (extra safety)
+            $updated = Bookmark::where('id', $bookmark->id)
+                ->whereNull('notified_at')
+                ->update([
+                    'notified_at' => now()
+                ]);
 
-            // 🔒 MARK AS SENT
-            $bookmark->update([
-                'notified_at' => now()
-            ]);
+            if ($updated) {
+                $user->notify(
+                    new ScholarshipDeadlineNear($scholarship, $daysLeft)
+                );
 
-            $this->info(
-                "Email sent to {$bookmark->user->email} for {$scholarship->title}"
-            );
+                $count++;
+
+                $this->info(
+                    "[SUCCESS] {$user->email} → {$scholarship->title} ({$daysLeft} days left)"
+                );
+            }
         }
+
+       
+        $this->info("Total notifications sent: {$count}");
 
         return Command::SUCCESS;
     }

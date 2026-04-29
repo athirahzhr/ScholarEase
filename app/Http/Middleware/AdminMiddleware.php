@@ -18,17 +18,17 @@ class AdminMiddleware
 {
     $user = $request->user();
 
-    // 🔴 1. Kalau belum login
+    
     if (!$user) {
         return redirect()->route('login');
     }
 
-    // 🔴 2. Kalau bukan admin → block
+    
     if ($user->role !== 'admin') {
         abort(403, 'Unauthorized access. Admin only.');
     }
 
-    // 🟢 3. Admin allowed
+   
     return $next($request);
 }
 }

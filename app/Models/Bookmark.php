@@ -9,7 +9,7 @@ use App\Models\Scholarship;
 
 class Bookmark extends Model
 {
-    public $timestamps = false;
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'user_id',
