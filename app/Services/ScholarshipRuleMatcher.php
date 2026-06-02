@@ -5,73 +5,285 @@ namespace App\Services;
 class ScholarshipRuleMatcher
 {
     /**
-     * Confidence-based eligibility scoring
+     * Get scholarship recommendations
      */
-    private function calculateConfidenceScore($student, $rule)
-    {
-        $total = 0;
-        $matched = 0;
+    public function getRecommendations(
+        $student,
+        $scholarships
+    ) {
+        $results = [];
 
-        // ===== Academic =====
-        $total++;
-        if ($rule->min_spm_as === null || $student->spm_as >= $rule->min_spm_as) {
-            $matched++;
+        foreach ($scholarships as $scholarship) {
+
+            $criteria = $scholarship->eligibilityCriteria;
+
+            if (!$criteria) {
+                continue;
+            }
+
+            $result = $this->matchScholarship(
+                $student,
+                $criteria
+            );
+
+            // ONLY ELIGIBLE
+            if ($result['eligible']) {
+
+                $scholarship->match_score =
+                    $result['score'];
+
+                $scholarship->match_breakdown =
+                    $result['breakdown'];
+
+                $results[] = $scholarship;
+            }
         }
 
-        // ===== Income =====
-        $total++;
-        $incomeRules = $rule->income_categories
-            ? json_decode($rule->income_categories, true)
-            : null;
+        return collect($results)
+            ->sortByDesc('match_score')
+            ->values();
+    }
 
-        if ($incomeRules === null || in_array($student->income_category, $incomeRules)) {
-            $matched++;
-        }
+    /**
+     * Match student with scholarship rules
+     */
+    public function matchScholarship(
+        $student,
+        $criteria
+    ) {
 
-        // ===== Study Path =====
-        $total++;
-        $studyPaths = $rule->study_paths
-            ? json_decode($rule->study_paths, true)
-            : null;
+        $score = 0;
+        $maxScore = 0;
+        
 
-        if ($studyPaths === null || in_array($student->study_path, $studyPaths)) {
-            $matched++;
-        }
+        $eligible = true;
 
-        // ===== Citizenship =====
-        $total++;
-        if ($rule->citizenship_required === null ||
-            $student->citizenship === $rule->citizenship_required) {
-            $matched++;
-        }
+        $breakdown = [];
 
-        // ===== Age =====
-        $total++;
+        // =========================
+        // SPM RESULT
+        // =========================
+        $breakdown['spm'] = false;
+
+        $maxScore += 25;
+
         if (
-            ($rule->min_age === null || $student->age >= $rule->min_age) &&
-            ($rule->max_age === null || $student->age <= $rule->max_age)
+            $criteria->min_spm_as !== null &&
+            $student->total_as < $criteria->min_spm_as
         ) {
-            $matched++;
+
+            // Partial academic compatibility
+            $score += 10;
+
+        } else {
+
+            $score += 25;
+
+            $breakdown['spm'] = true;
         }
 
-        // ===== Base confidence =====
-        if ($total === 0) {
-            return 0;
+        // =========================
+        // MONTHLY INCOME
+        // =========================
+        $breakdown['income'] = false;
+
+        $maxScore += 20;
+
+        if (
+            $criteria->max_monthly_income !== null &&
+            $student->monthly_income >
+            $criteria->max_monthly_income
+        ) {
+
+            // Partial financial compatibility
+            $score += 8;
+
+        } else {
+
+            $score += 20;
+
+            $breakdown['income'] = true;
         }
 
-        $confidence = ($matched / $total) * $rule->max_score;
+        // =========================
+        // STUDY LEVEL
+        // =========================
+        $breakdown['study_level'] = false;
 
-        // ===== Priority bonus (weighted) =====
-        $weight = $rule->priority_weight ?? 1;
 
-        if ($rule->leadership_priority && $student->has_leadership) {
-            $confidence += 5 * $weight;
+        $studyLevels =
+            $criteria->study_paths ?? [];
+
+        $maxScore += 15;
+
+        if (
+            !empty($studyLevels) &&
+            !in_array(
+                $student->study_level,
+                $studyLevels
+            )
+        ) {
+            $eligible = false;
+
+        } else {
+
+            $score += 15;
+
+            $breakdown['study_level'] = true;
         }
 
-        if ($rule->bumiputera_priority && $student->is_bumiputera) {
-            $confidence += 5 * $weight;
+        // =========================
+        // FIELD OF STUDY
+        // =========================
+        $breakdown['field'] = false;
+
+        $fields =
+            $criteria->fields_of_study ?? [];
+
+            $maxScore += 15;
+
+        if (
+            !empty($fields) &&
+            !in_array(
+                $student->field_of_study,
+                $fields
+            )
+        ) {
+
+            // Related but different field
+            $score += 5;
+
+        } else {
+
+            $score += 15;
+
+            $breakdown['field'] = true;
         }
 
-        return min(round($confidence), $rule->max_score);
+        // =========================
+        // AGE
+        // =========================
+        $breakdown['age'] = false;
+
+        $maxScore += 10;
+
+        if (
+            ($criteria->min_age &&
+                $student->age <
+                $criteria->min_age)
+            ||
+            ($criteria->max_age &&
+                $student->age >
+                $criteria->max_age)
+        ) {
+            $eligible = false;
+
+        } else {
+
+            $score += 10;
+
+            $breakdown['age'] = true;
+        }
+
+        // =========================
+        // GENDER
+        // =========================
+        $breakdown['gender'] = false;
+
+        $maxScore += 5;
+
+        if (
+            $criteria->gender_requirement &&
+            $criteria->gender_requirement !== 'Any' &&
+            $student->gender !==
+            $criteria->gender_requirement
+        ) {
+            $eligible = false;
+
+        } else {
+
+            $score += 5;
+
+            $breakdown['gender'] = true;
+        }
+
+        // =========================
+        // BUMIPUTERA
+        // =========================
+        $breakdown['bumiputera'] = false;
+
+        $maxScore += 5;
+
+        if (
+            $criteria->bumiputera_required &&
+            !$student->bumiputera
+        ) {
+            $eligible = false;
+
+        } else {
+
+            $score += 5;
+
+            $breakdown['bumiputera'] = true;
+        }
+
+        // =========================
+        // CITIZENSHIP
+        // =========================
+        $breakdown['citizenship'] = false;
+
+        $maxScore += 5;
+
+        if (
+            $criteria->citizenship_required &&
+            strtolower($student->citizenship)
+            !== strtolower(
+                $criteria->citizenship_required
+            )
+        ) {
+            $eligible = false;
+
+        } else {
+
+            $score += 5;
+
+            $breakdown['citizenship'] = true;
+        }
+
+        // =========================
+        // PRIORITY BONUS
+        // =========================
+        $weight =
+            $criteria->priority_weight ?? 1;
+
+
+        // Leadership priority
+        if (
+            $criteria->leadership_priority &&
+            $student->has_leadership
+        ) {
+            $score += 5 * $weight;
+        }
+
+        // Bumiputera priority
+        if (
+            $criteria->bumiputera_priority &&
+            $student->bumiputera
+        ) {
+            $score += 5 * $weight;
+        }
+
+        // LIMIT 100
+        $percentage = $maxScore > 0
+        ? round(($score / $maxScore) * 100)
+        : 0;
+
+        $percentage = min($percentage, 100);
+
+        return [
+            'eligible' => $eligible,
+            'score' => $percentage,
+            'breakdown' => $breakdown,
+        ];
     }
 }

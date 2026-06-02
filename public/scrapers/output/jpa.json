@@ -7,19 +7,13 @@
     "rules": {
       "min_spm_as": 8,
       "max_spm_as": null,
-      "academic_categories": [
-        "A3"
-      ],
       "required_subjects": null,
-      "income_categories": null,
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": [
-        "C1",
-        "C3"
+        "Degree"
       ],
       "fields_of_study": null,
       "study_destination": "Local",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
@@ -34,12 +28,11 @@
       "min_community_hours": null,
       "bond_required": true,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Eligibility details not explicitly stated on official page"
     },
-    "scraped_at": "2026-04-27T07:00:48.920Z"
+    "scraped_at": "2026-05-15T14:51:06.468Z"
   },
   {
     "title": "Program Penajaan Nasional (PPN)",
@@ -49,19 +42,13 @@
     "rules": {
       "min_spm_as": 8,
       "max_spm_as": null,
-      "academic_categories": [
-        "A3"
-      ],
       "required_subjects": null,
-      "income_categories": null,
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": [
-        "C1",
-        "C3"
+        "Degree"
       ],
       "fields_of_study": null,
       "study_destination": "Both",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
@@ -76,12 +63,11 @@
       "min_community_hours": null,
       "bond_required": true,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Eligibility details not explicitly stated on official page"
     },
-    "scraped_at": "2026-04-27T07:00:51.586Z"
+    "scraped_at": "2026-05-15T14:51:09.075Z"
   },
   {
     "title": "Program Dermasiswa B40 (DB40)",
@@ -91,18 +77,14 @@
     "rules": {
       "min_spm_as": null,
       "max_spm_as": null,
-      "academic_categories": null,
       "required_subjects": null,
-      "income_categories": [
-        "B1"
-      ],
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": [
-        "C2"
+        "Diploma",
+        "TVET"
       ],
       "fields_of_study": null,
       "study_destination": "Both",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
@@ -117,11 +99,10 @@
       "min_community_hours": null,
       "bond_required": false,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Auto-parsed by ruleParser"
     },
-    "scraped_at": "2026-04-27T07:00:54.272Z"
+    "scraped_at": "2026-05-15T14:51:11.646Z"
   }
 ]

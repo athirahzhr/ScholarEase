@@ -4,24 +4,24 @@ export function parseRules(rawText) {
   const text = rawText.toLowerCase();
 
   const minAs = detectMinAs(text);
-  const academicCategory = detectAcademicCategory(text, minAs);
 
   return {
     // ===== Academic =====
     min_spm_as: minAs,
     max_spm_as: null,
-    academic_categories: academicCategory,
     required_subjects: detectSubjects(text),
 
     // ===== Income =====
-    income_categories: detectIncome(text),
-    income_strict: !/keutamaan|priority|digalakkan|preference/i.test(text),
+    max_monthly_income: detectMaxIncome(text),
+
+    income_categories:
+  detectIncomeCategory(text),
+    
 
     // ===== Study =====
     study_paths: detectStudyPath(text),
     fields_of_study: detectFields(text),
     study_destination: detectStudyDestination(text),
-    study_path_strict: true,
 
     // ===== Demographic =====
     bumiputera_required: /bumiputera\s+(sahaja|only)/i.test(text),
@@ -29,9 +29,10 @@ export function parseRules(rawText) {
 
     gender_requirement: detectGender(text),
 
-    citizenship_required: /warganegara malaysia|malaysian citizen/i.test(text)
-      ? 'Malaysian'
-      : null,
+    citizenship_required:
+    /warganegara malaysia|malaysian citizen|malaysian citizens|citizen of malaysia/i.test(text)
+    ? 'Malaysian'
+    : null,
 
     state_requirement: detectState(text),
     rural_priority: /luar bandar|rural/i.test(text),
@@ -52,7 +53,6 @@ export function parseRules(rawText) {
     bond_years: detectBondYears(text),
 
     // ===== System =====
-    match_all_criteria: true,
     priority_weight: 1,
     max_score: 100,
     notes: buildNotes(text)
@@ -62,34 +62,6 @@ export function parseRules(rawText) {
 /* ================= HELPER FUNCTIONS ================= */
 
 // ---------- ACADEMIC ----------
-
-function detectMinAs(text) {
-  // Tangkap hanya 1–10 A (elak CGPA 3.30 / 33)
-  const match = text.match(/(\d{1,2})\s*a[s]?/i);
-  if (match) {
-    const val = parseInt(match[1], 10);
-    if (val >= 1 && val <= 10) return val;
-  }
-
-  // JPA / excellence phrasing
-  if (/pelajar terbaik|cemerlang|berprestasi tinggi|excellent/i.test(text)) {
-    return 8;
-  }
-
-  return null;
-}
-
-function detectAcademicCategory(text, minAs) {
-  if (/9\s*a|10\s*a|straight a/i.test(text)) return ['A4'];
-  if (/7\s*a|8\s*a/i.test(text)) return ['A3'];
-  if (/3\s*a|5\s*a/i.test(text)) return ['A2'];
-
-  // fallback (conservative)
-  if (minAs >= 9) return ['A4'];
-  if (minAs >= 7) return ['A3'];
-
-  return null;
-}
 
 function detectSubjects(text) {
   const subjects = [];
@@ -104,61 +76,267 @@ function detectSubjects(text) {
   return subjects.length ? subjects : null;
 }
 
-// ---------- INCOME ----------
-
-function detectIncome(text) {
-  if (/b40|berpendapatan rendah|low income/i.test(text)) return ['B1'];
-  if (/m40/i.test(text)) return ['B3'];
-  return null;
-}
 
 // ---------- STUDY ----------
 
 function detectStudyPath(text) {
   const paths = [];
 
-  if (/persediaan|foundation|asasi|pre[- ]?university|a[- ]?level|matrikulasi/i.test(text)) {
-    paths.push('C1');
+  if (/foundation|asasi|pre[- ]?university|a[- ]?level/i.test(text)) {
+    paths.push('Foundation');
+  }
+
+  if (/matrikulasi|matriculation/i.test(text)) {
+    paths.push('Matriculation');
   }
 
   if (/diploma/i.test(text)) {
-    paths.push('C2');
+    paths.push('Diploma');
   }
 
   if (/ijazah|degree|sarjana muda|undergraduate/i.test(text)) {
-    paths.push('C3');
+    paths.push('Degree');
   }
 
-  if (/sarjana|master|phd|kedoktoran|postgraduate/i.test(text)) {
-    paths.push('C4');
+  if (/tvet|vocational/i.test(text)) {
+    paths.push('TVET');
   }
 
-  // JPA phrasing
-  if (/hingga ke ijazah|hingga ijazah/i.test(text)) {
-    return ['C1', 'C3'];
+  if (/master|phd|postgraduate/i.test(text)) {
+    paths.push('Postgraduate');
   }
 
-  return paths.length ? [...new Set(paths)] : null;
+  return paths.length
+    ? [...new Set(paths)]
+    : null;
+}
+
+function detectMaxIncome(text) {
+
+  const patterns = [
+
+    /income[\s\S]*?rm\s?([\d,]+)/i,
+
+    /household income[\s\S]*?rm\s?([\d,]+)/i,
+
+    /not exceeding\s*rm\s?([\d,]+)/i,
+
+    /rm\s?([\d,]+)\s*(and below|below)/i,
+
+    /rm\s?([\d,]+)/i,
+
+    /rm\s?([\d,]+(?:\.\d+)?)\s*sebulan/i,
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = text.match(pattern);
+
+    if (match) {
+
+      return parseInt(
+        match[1].replace(/,/g, ''),
+        10
+      );
+    }
+  }
+
+  return null;
+}
+
+function detectIncomeCategory(text) {
+
+  const categories = [];
+
+  if (/b40/i.test(text)) {
+    categories.push('B40');
+  }
+
+  if (/m40/i.test(text)) {
+    categories.push('M40');
+  }
+
+  if (/t20/i.test(text)) {
+    categories.push('T20');
+  }
+
+  return categories.length
+    ? categories
+    : null;
 }
 
 function detectFields(text) {
+
   const fields = [];
 
-  if (/engineering|kejuruteraan/i.test(text)) fields.push('Engineering');
-  if (/medicine|perubatan/i.test(text)) fields.push('Medicine');
-  if (/science|sains/i.test(text)) fields.push('Science');
+  // ================= ARCHITECTURE =================
+if (
+  /architecture|seni bina/i.test(text)
+) {
+  fields.push('Architecture');
+}
 
+  // ================= ENGINEERING =================
   if (
-    /\bit\b|computer|software|data science|computer science|teknologi maklumat/i.test(text)
+    /engineering|kejuruteraan/i.test(text)
   ) {
-    fields.push('IT');
+    fields.push('Engineering');
   }
 
-  if (/finance|accounting|economics|perakaunan/i.test(text)) {
+  // ================= MEDICINE =================
+  if (
+    /medicine|medical|perubatan/i.test(text)
+  ) {
+    fields.push('Medicine');
+  }
+
+  // ================= COMPUTER SCIENCE =================
+  if (
+    /computer science|software|it\b|information technology|teknologi maklumat/i.test(text)
+  ) {
+    fields.push('Computer Science');
+  }
+
+  // ================= DATA SCIENCE =================
+  if (
+    /data science|big data|machine learning|artificial intelligence/i.test(text)
+  ) {
+    fields.push('Data Science');
+  }
+
+  // ================= FINANCE =================
+  if (
+    /finance|financial/i.test(text)
+  ) {
     fields.push('Finance');
   }
 
-  return fields.length ? [...new Set(fields)] : null;
+  // ================= ACCOUNTING =================
+  if (
+    /accounting|perakaunan/i.test(text)
+  ) {
+    fields.push('Accounting');
+  }
+
+  // ================= ECONOMICS =================
+  if (
+    /economics|ekonomi/i.test(text)
+  ) {
+    fields.push('Economics');
+  }
+
+  // ================= LAW =================
+  if (
+    /law|undang-undang/i.test(text)
+  ) {
+    fields.push('Law');
+  }
+
+  // ================= ACTUARIAL =================
+  if (
+    /actuarial/i.test(text)
+  ) {
+    fields.push('Actuarial Science');
+  }
+
+  // ================= MATHEMATICS =================
+  if (
+    /mathematics|math/i.test(text)
+  ) {
+    fields.push('Mathematics');
+  }
+
+  // ================= STATISTICS =================
+  if (
+    /statistics|statistic/i.test(text)
+  ) {
+    fields.push('Statistics');
+  }
+
+  // ================= GENERAL SCIENCE =================
+  if (
+  /\bscience\b|sains/i.test(text) &&
+  !/computer science|data science/i.test(text)
+  ) {
+    fields.push('Science');
+  }
+
+  // ================= ARTS =================
+
+if (/archaeology/i.test(text))
+  fields.push('Archaeology');
+
+if (/architecture/i.test(text))
+  fields.push('Architecture');
+
+if (/art & design|art and design/i.test(text))
+  fields.push('Art & Design');
+
+if (/history/i.test(text))
+  fields.push('History');
+
+if (/linguistics/i.test(text))
+  fields.push('Linguistics');
+
+if (/performing arts/i.test(text))
+  fields.push('Performing Arts');
+
+if (/philosophy/i.test(text))
+  fields.push('Philosophy');
+
+// ================= SCIENCE =================
+
+if (/chemistry/i.test(text))
+  fields.push('Chemistry');
+
+if (/physics/i.test(text))
+  fields.push('Physics');
+
+if (/geography/i.test(text))
+  fields.push('Geography');
+
+if (/environmental sciences/i.test(text))
+  fields.push('Environmental Science');
+
+if (/biological science/i.test(text))
+  fields.push('Biological Science');
+
+if (/pharmacy/i.test(text))
+  fields.push('Pharmacy');
+
+// ================= SOCIAL SCIENCE =================
+
+if (/business/i.test(text))
+  fields.push('Business');
+
+if (/communication/i.test(text))
+  fields.push('Communication');
+
+if (/education/i.test(text))
+  fields.push('Education');
+
+if (/hospitality/i.test(text))
+  fields.push('Hospitality');
+
+if (/anthropology/i.test(text))
+  fields.push('Anthropology');
+
+if (
+  /social science|sains sosial|sastera/i.test(text)
+) {
+  fields.push('Social Science');
+}
+
+// ================= TECHNICAL =================
+if (
+  /technical|teknikal|teknologi/i.test(text)
+) {
+  fields.push('Technical');
+}
+
+  return fields.length
+    ? [...new Set(fields)]
+    : null;
 }
 
 function detectStudyDestination(text) {
@@ -176,29 +354,195 @@ function detectGender(text) {
 }
 
 function detectState(text) {
+
+  const lowered = text.toLowerCase();
+
+  // ignore contact/address sections
+  if (
+    lowered.includes('contact us') ||
+    lowered.includes('address') ||
+    lowered.includes('jalan') ||
+    lowered.includes('tower')
+  ) {
+    return null;
+  }
+
   const states = [
-    'selangor','johor','kelantan','terengganu','kedah',
-    'perak','pahang','negeri sembilan','melaka',
-    'pulau pinang','sabah','sarawak','perlis',
-    'kuala lumpur','putrajaya','labuan'
+    'johor',
+    'kedah',
+    'kelantan',
+    'melaka',
+    'negeri sembilan',
+    'pahang',
+    'perak',
+    'perlis',
+    'pulau pinang',
+    'penang',
+    'sabah',
+    'sarawak',
+    'selangor',
+    'terengganu',
+    'kuala lumpur',
+    'labuan',
+    'putrajaya'
   ];
 
-  const found = states.find(state => text.includes(state));
-  return found ? capitalize(found) : null;
+  const patterns = [
+
+    /anak negeri\s+([a-z\s]+)/i,
+
+    /from\s+([a-z\s]+)/i,
+
+    /students from\s+([a-z\s]+)/i,
+
+    /state\s*:\s*([a-z\s]+)/i,
+
+    /negeri\s+([a-z\s]+)/i
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = text.match(pattern);
+
+    if (match) {
+
+      const found =
+        states.find(state =>
+          match[1].toLowerCase().includes(state)
+        );
+
+      return found
+        ? capitalize(found)
+        : null;
+    }
+  }
+
+  return null;
 }
 
 // ---------- AGE ----------
 
 function detectMinAge(text) {
-  const match = text.match(/minimum\s*(\d+)\s*(tahun|years?)/i);
-  return match ? parseInt(match[1], 10) : null;
+
+  const rangeMatch = text.match(
+    /at least\s*(\d+)\s*years?.*not more than\s*(\d+)/i
+  );
+
+  if (rangeMatch) {
+    return parseInt(rangeMatch[1], 10);
+  }
+
+  const match = text.match(
+    /minimum\s*(\d+)\s*(tahun|years?)/i
+  );
+
+  return match
+    ? parseInt(match[1], 10)
+    : null;
 }
 
 function detectMaxAge(text) {
-  const match = text.match(
-    /tidak melebihi\s*(\d+)\s*(tahun|years?)|not exceeding\s*(\d+)\s*(years?)/i
-  );
-  return match ? parseInt(match[1] || match[3], 10) : null;
+
+  const patterns = [
+
+    /not exceeding\s*(\d+)\s*years?\s*of\s*age/i,
+
+    /aged\s*(\d+)\s*and below/i,
+
+    /age[d]?\s*(\d+)\s*(years?)?\s*and below/i,
+
+    /not exceeding\s*(\d+)/i,
+
+    /tidak melebihi\s*(\d+)/i,
+
+    /berumur\s*(\d+)\s*tahun/i,
+
+    /belum mencapai\s*(\d+)\s*tahun/i,
+
+    /umur\s*(\d+)\s*tahun/i,
+
+    /berusia\s*(\d+)\s*tahun/i,
+
+    /umur\s*belum\s*mencapai\s*(\d+)\s*tahun/i
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = text.match(pattern);
+
+    if (match) {
+
+      return parseInt(match[1], 10);
+    }
+  }
+
+  return null;
+}
+
+function detectMinAs(text) {
+
+  // ================= PRIORITIZE SPM =================
+
+  const spmPatterns = [
+
+    /spm[^.\n]*minimum\s*(\d{1,2})\s*a[s]?/i,
+
+    /spm[^.\n]*at least\s*(\d{1,2})\s*a[s]?/i,
+
+    /spm[^.\n]*(\d{1,2})\s*a[s]?/i
+  ];
+
+  for (const pattern of spmPatterns) {
+
+    const match = text.match(pattern);
+
+    if (match) {
+
+      const val = parseInt(match[1], 10);
+
+      if (val >= 1 && val <= 12) {
+        return val;
+      }
+    }
+  }
+
+  // ================= GENERAL FALLBACK =================
+
+  const patterns = [
+
+    /minimum\s*of\s*(\d{1,2})\s*a[s]?/i,
+
+    /minimum\s*(\d{1,2})\s*a[s]?/i,
+
+    /at least\s*(\d{1,2})\s*a[s]?/i,
+
+    /(\d{1,2})\s*a[s]?\s*(minimum|required)/i
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = text.match(pattern);
+
+    if (match) {
+
+      const val = parseInt(
+        match.find(v => /^\d+$/.test(v)),
+        10
+      );
+
+      if (val >= 1 && val <= 12) {
+        return val;
+      }
+    }
+  }
+
+  if (
+    /pelajar terbaik|cemerlang|berprestasi tinggi|excellent/i.test(text)
+  ) {
+    return 8;
+  }
+
+  return null;
 }
 
 // ---------- COMMUNITY / BOND ----------
@@ -216,11 +560,13 @@ function detectBondYears(text) {
 // ---------- NOTES ----------
 
 function buildNotes(text) {
+
   if (
-    !/(\d+)\s*a|b40|m40|umur|age|ikatan|bond|cgpa/i.test(text)
+    !/(\d+)\s*a|rm\s?[\d,]+|umur|age|ikatan|bond|cgpa/i.test(text)
   ) {
     return 'Eligibility details not explicitly stated on official page';
   }
+
   return 'Auto-parsed by ruleParser';
 }
 
@@ -228,4 +574,190 @@ function capitalize(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
+export function detectDeadline(text) {
 
+  // ================= PETRONAS MALAY RANGE =================
+// Example:
+// 31 Mac 2026 sehingga 10 April 2026
+
+const malayRangeMatch = text.match(
+  /(\d{1,2})\s+(januari|februari|mac|march|april|mei|may|jun|june|julai|july|ogos|august|september|oktober|october|november|disember|december)\s+(20\d{2})[\s\S]*?(\d{1,2})\s+(januari|februari|mac|march|april|mei|may|jun|june|julai|july|ogos|august|september|oktober|october|november|disember|december)\s+(20\d{2})/i
+);
+
+if (malayRangeMatch) {
+
+  const day = malayRangeMatch[4];
+  const month = malayRangeMatch[5];
+  const year = malayRangeMatch[6];
+
+  return formatMalayDate(
+    `${day} ${month} ${year}`
+  );
+}
+
+  // ================= RANGE FORMAT =================
+  // Example:
+  // 17 April - 26 April 2026
+
+  const rangeMatch = text.match(
+    /(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s*-\s*(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i
+  );
+
+  if (rangeMatch) {
+
+    const day = rangeMatch[3];
+    const month = rangeMatch[4];
+    const year = rangeMatch[5];
+
+    return formatDate(
+      `${day} ${month} ${year}`
+    );
+  }
+
+  // ================= ORDINAL RANGE FORMAT =================
+// Example:
+// 31st March - 14th April 2026
+
+const ordinalRangeMatch = text.match(
+  /(\d{1,2})(st|nd|rd|th)\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s*-\s*(\d{1,2})(st|nd|rd|th)\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(20\d{2})/i
+);
+
+if (ordinalRangeMatch) {
+
+  const day =
+    ordinalRangeMatch[4];
+
+  const month =
+    ordinalRangeMatch[6];
+
+  const year =
+    ordinalRangeMatch[7];
+
+  return formatDate(
+    `${day} ${month} ${year}`
+  );
+}
+
+  // ================= 13th April 2026 =================
+
+const ordinalMatch = text.match(
+  /(\d{1,2})(st|nd|rd|th)\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(20\d{2})/i
+);
+
+if (ordinalMatch) {
+
+  const day =
+    ordinalMatch[1];
+
+  const month =
+    ordinalMatch[3];
+
+  const year =
+    ordinalMatch[4];
+
+  const parsed =
+    new Date(`${day} ${month} ${year}`);
+
+  if (!isNaN(parsed)) {
+
+    return parsed
+      .toISOString()
+      .split('T')[0];
+  }
+}
+
+  // ================= SINGLE DATE FORMAT =================
+  // Example:
+  // 18 May 2026
+
+  const match = text.match(
+    /(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i
+  );
+
+  if (!match) {
+    return null;
+  }
+
+  const day = match[1];
+  const month = match[2];
+  const year = match[3];
+
+  return formatDate(
+    `${day} ${month} ${year}`
+  );
+}
+
+function formatDate(dateString) {
+
+  const months = {
+    january: '01',
+    february: '02',
+    march: '03',
+    april: '04',
+    may: '05',
+    june: '06',
+    july: '07',
+    august: '08',
+    september: '09',
+    october: '10',
+    november: '11',
+    december: '12'
+  };
+
+  const parts = dateString
+    .trim()
+    .split(' ');
+
+  const day = parts[0]
+    .padStart(2, '0');
+
+  const month =
+    months[
+      parts[1].toLowerCase()
+    ];
+
+  const year = parts[2];
+
+  return `${year}-${month}-${day}`;
+}
+
+function formatMalayDate(dateString) {
+
+  const months = {
+
+    januari: '01',
+    februari: '02',
+    mac: '03',
+    march: '03',
+    april: '04',
+    mei: '05',
+    may: '05',
+    june: '06',
+    july: '07',
+    august: '08',
+    october: '10',
+    december: '12',
+    jun: '06',
+    julai: '07',
+    ogos: '08',
+    september: '09',
+    oktober: '10',
+    november: '11',
+    disember: '12'
+  };
+
+  const parts =
+    dateString.trim().split(' ');
+
+  const day =
+    parts[0].padStart(2, '0');
+
+  const month =
+    months[
+      parts[1].toLowerCase()
+    ];
+
+  const year = parts[2];
+
+  return `${year}-${month}-${day}`;
+}

@@ -10,23 +10,18 @@
     "rules": {
       "min_spm_as": 8,
       "max_spm_as": null,
-      "academic_categories": [
-        "A3"
-      ],
       "required_subjects": null,
-      "income_categories": null,
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": [
-        "C1",
-        "C3"
+        "Foundation",
+        "Degree"
       ],
       "fields_of_study": [
         "Engineering",
         "Science",
-        "IT"
+        "Computer Science"
       ],
       "study_destination": "Overseas",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
@@ -41,11 +36,10 @@
       "min_community_hours": null,
       "bond_required": false,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Auto-parsed by ruleParser"
     },
-    "scraped_at": "2026-04-27T07:02:07.019Z"
+    "scraped_at": "2026-05-15T14:52:11.808Z"
   }
 ]

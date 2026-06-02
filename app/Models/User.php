@@ -7,15 +7,16 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Events\Verified;
+use Laravel\Sanctum\HasApiTokens;
 
 use App\Models\UserProfile;
 use App\Models\Bookmark;
 use App\Models\Application;
 
-class User extends Authenticatable 
+class User extends Authenticatable
 
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -51,6 +52,7 @@ public function markEmailAsVerified()
     return true;
 }
 
+
 public function hasVerifiedEmail()
 {
     
@@ -80,4 +82,5 @@ public function hasVerifiedEmail()
     {
         return $this->hasMany(Application::class);
     }
+    
 }

@@ -4,9 +4,9 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 import mysql from 'mysql2/promise';
-import { parseRules } from './utils/ruleParser.js';
+import {parseRules,detectDeadline} from './utils/ruleParser.js';
 
-// DB connection for scraping_logs
+// ================= DB CONNECTION =================
 const db = await mysql.createConnection({
   host: '127.0.0.1',
   user: 'root',
@@ -14,82 +14,550 @@ const db = await mysql.createConnection({
   database: 'scholarease_db'
 });
 
+// ================= PROGRAM CONFIG =================
+const programs = [
+  {
+    title: 'Shell Malaysia Scholarship Programme',
+    provider: 'Shell Malaysia',
+    url: 'https://www.shell.com.my/about-us/careers/students-and-graduates/scholarships.html'
+  }
+];
+
 (async () => {
-  console.log('🚀 Scraping SHELL');
+
+  console.log('🚀 Scraping SHELL Foundation');
 
   const startTime = new Date();
+
   let success = 0;
   let failed = 0;
+  let inserted = 0;
+  let updated = 0;
+  let skipped = 0;
+  
+
   const results = [];
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: true
+  });
+
   const page = await browser.newPage();
 
-  try {
-    await page.goto(
-      'https://www.shell.com.my/about-us/careers/students-and-graduates/scholarships.html',
-      {
+  for (const program of programs) {
+
+    try {
+
+      console.log(`🔍 Scraping: ${program.title}`);
+
+      await page.goto(program.url, {
         waitUntil: 'domcontentloaded',
         timeout: 60000
+      });
+
+      // allow rendering
+      await page.waitForTimeout(3000);
+
+      // extract content
+      const rawText = await page.evaluate(() => {
+
+        const main =
+          document.querySelector('main') ||
+          document.querySelector('article') ||
+          document.body;
+
+        return main.innerText;
+
+      });
+
+      if (!rawText || rawText.length < 300) {
+        throw new Error('No usable text extracted');
       }
+
+      // ================= PARSE RULES =================
+
+      const rules = parseRules(rawText);
+      const deadline = detectDeadline(rawText);
+
+      // ================= STORE JSON =================
+
+      results.push({
+
+        title: program.title,
+
+        provider: program.provider,
+
+        description: program.title,
+
+        raw_eligibility: rawText.slice(0, 8000),
+
+        application_link: program.url,
+
+        application_deadline: deadline,
+
+        source: 'scraped',
+
+        source_website: 'shell',
+
+        is_official: 1,
+
+        is_active: 1,
+
+        scraped_at: new Date().toISOString(),
+
+        rules
+      });
+
+// ================= CHECK EXISTING SCHOLARSHIP =================
+
+const [existingRows] = await db.execute(
+  `
+  SELECT id, deadline, raw_eligibility
+  FROM scholarships
+  WHERE title = ?
+  LIMIT 1
+  `,
+  [program.title]
+);
+
+let scholarshipId = null;
+
+// =====================================================
+// UPDATE EXISTING
+// =====================================================
+
+if (existingRows.length > 0) {
+
+  const existing = existingRows[0];
+
+  scholarshipId = existing.id;
+
+  const contentChanged = false;
+
+  const existingDeadline =
+  existing.deadline
+    ? [
+        existing.deadline.getFullYear(),
+        String(existing.deadline.getMonth() + 1).padStart(2, '0'),
+        String(existing.deadline.getDate()).padStart(2, '0')
+      ].join('-')
+    : null;
+
+console.log('DB Deadline:', existingDeadline);
+console.log('Parsed Deadline:', deadline);
+
+const deadlineChanged =
+  existingDeadline !== deadline;
+
+  // ================= UPDATE SCHOLARSHIP =================
+
+  if (contentChanged || deadlineChanged) {
+
+console.log('DB Deadline:', existingDeadline);
+console.log('Parsed Deadline:', deadline);
+console.log('Deadline Changed:', deadlineChanged);
+
+    await db.execute(
+      `
+      UPDATE scholarships
+      SET
+        raw_eligibility = ?,
+        deadline = ?,
+        updated_at = NOW()
+      WHERE id = ?
+      `,
+      [
+        rawText.slice(0, 8000),
+        deadline,
+        scholarshipId
+      ]
     );
 
-    await page.waitForTimeout(3000);
+    console.log(
+      `🔄 Updated scholarship: ${program.title}`
+    );
 
-    const rawText = await page.evaluate(() => document.body.innerText);
+    updated++;
 
-    if (!rawText || rawText.length < 300) {
-      throw new Error('No usable text found');
+  } else {
+
+    console.log(
+      `⏩ No scholarship changes: ${program.title}`
+    );
+
+    skipped++;
+  }
+
+  // ================= UPDATE ELIGIBILITY =================
+
+  await db.execute(
+    `
+    UPDATE scholarship_eligibility_criteria
+    SET
+
+      min_spm_as = ?,
+      max_spm_as = ?,
+
+      required_subjects = ?,
+
+      max_monthly_income = ?,
+
+      study_paths = ?,
+
+      fields_of_study = ?,
+
+      study_destination = ?,
+
+      bumiputera_required = ?,
+      bumiputera_priority = ?,
+
+      gender_requirement = ?,
+
+      citizenship_required = ?,
+
+      state_requirement = ?,
+
+      rural_priority = ?,
+
+      min_age = ?,
+      max_age = ?,
+
+      leadership_required = ?,
+      leadership_priority = ?,
+
+      sports_achievement = ?,
+
+      min_community_hours = ?,
+
+      bond_required = ?,
+      bond_years = ?,
+
+      priority_weight = ?,
+
+      max_score = ?,
+
+      notes = ?,
+
+      updated_at = NOW()
+
+    WHERE scholarship_id = ?
+    `,
+    [
+
+      rules.min_spm_as,
+
+      rules.max_spm_as,
+
+      JSON.stringify(rules.required_subjects),
+
+      rules.max_monthly_income,
+
+      JSON.stringify(rules.study_paths),
+
+      JSON.stringify(rules.fields_of_study),
+
+      rules.study_destination,
+
+      rules.bumiputera_required,
+
+      rules.bumiputera_priority,
+
+      rules.gender_requirement,
+
+      rules.citizenship_required,
+
+      rules.state_requirement,
+
+      rules.rural_priority,
+
+      rules.min_age,
+
+      rules.max_age,
+
+      rules.leadership_required,
+
+      rules.leadership_priority,
+
+      rules.sports_achievement,
+
+      rules.min_community_hours,
+
+      rules.bond_required,
+
+      rules.bond_years,
+
+      rules.priority_weight,
+
+      rules.max_score,
+
+      rules.notes,
+
+      scholarshipId
+    ]
+  );
+
+  console.log(
+    `♻️ Eligibility synced: ${program.title}`
+  );
+
+} else {
+
+  // =====================================================
+  // INSERT NEW SCHOLARSHIP
+  // =====================================================
+
+  const [scholarshipResult] = await db.execute(
+    `
+    INSERT INTO scholarships (
+      title,
+      provider,
+      description,
+      raw_eligibility,
+      application_link,
+      deadline,
+      source,
+      source_website,
+      is_official,
+      is_active,
+      created_at,
+      updated_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+    `,
+    [
+      program.title,
+
+      program.provider,
+
+      program.title,
+
+      rawText.slice(0, 8000),
+
+      program.url,
+
+      deadline,
+
+      'scraped',
+
+      'shell',
+
+      1,
+
+      1
+    ]
+  );
+
+  scholarshipId =
+    scholarshipResult.insertId;
+
+  // ================= INSERT ELIGIBILITY =================
+
+  await db.execute(
+    `
+    INSERT INTO scholarship_eligibility_criteria (
+
+      scholarship_id,
+
+      min_spm_as,
+      max_spm_as,
+
+      required_subjects,
+
+      max_monthly_income,
+
+      study_paths,
+
+      fields_of_study,
+
+      study_destination,
+
+      bumiputera_required,
+      bumiputera_priority,
+
+      gender_requirement,
+
+      citizenship_required,
+
+      state_requirement,
+
+      rural_priority,
+
+      min_age,
+      max_age,
+
+      leadership_required,
+      leadership_priority,
+
+      sports_achievement,
+
+      min_community_hours,
+
+      bond_required,
+      bond_years,
+
+      priority_weight,
+
+      max_score,
+
+      notes,
+
+      created_at,
+      updated_at
+
+    )
+    VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW()
+    )
+    `,
+    [
+
+      scholarshipId,
+
+      rules.min_spm_as,
+
+      rules.max_spm_as,
+
+      JSON.stringify(rules.required_subjects),
+
+      rules.max_monthly_income,
+
+      JSON.stringify(rules.study_paths),
+
+      JSON.stringify(rules.fields_of_study),
+
+      rules.study_destination,
+
+      rules.bumiputera_required,
+
+      rules.bumiputera_priority,
+
+      rules.gender_requirement,
+
+      rules.citizenship_required,
+
+      rules.state_requirement,
+
+      rules.rural_priority,
+
+      rules.min_age,
+
+      rules.max_age,
+
+      rules.leadership_required,
+
+      rules.leadership_priority,
+
+      rules.sports_achievement,
+
+      rules.min_community_hours,
+
+      rules.bond_required,
+
+      rules.bond_years,
+
+      rules.priority_weight,
+
+      rules.max_score,
+
+      rules.notes
+    ]
+  );
+
+  console.log(
+    `✅ Inserted new scholarship: ${program.title}`
+  );
+
+  inserted++;
+}
+
+success++;
+
+console.log(
+  `✅ Parsed & synchronized: ${program.title}`
+);
+
+    } catch (err) {
+
+      failed++;
+
+      console.error(
+        `❌ Failed: ${program.title} → ${err.message}`
+      );
     }
-
-    results.push({
-      title: 'Shell Scholarship Programme',
-      provider: 'Shell Malaysia',
-      application_link: page.url(),
-      application_deadline: null,
-      source: 'scraped',
-      source_website: 'shell',
-      raw_eligibility: rawText.slice(0, 6000),
-      rules: parseRules(rawText),
-      scraped_at: new Date().toISOString()
-    });
-
-    success++;
-    console.log('✅ Parsed: Shell Scholarship Programme');
-
-  } catch (err) {
-    failed++;
-    console.error('❌ SHELL failed:', err.message);
   }
 
   await browser.close();
 
-  // Save JSON
-  const outputPath = path.resolve('scrapers/output/shell.json');
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, JSON.stringify(results, null, 2));
+  // ================= SAVE JSON FILE =================
 
-  // Insert scraping log
+  const outputDir =
+    path.resolve('scrapers/output');
+
+  fs.mkdirSync(outputDir, {
+    recursive: true
+  });
+
+  const outputPath =
+    path.join(outputDir, 'shell.json');
+
+  fs.writeFileSync(
+    outputPath,
+    JSON.stringify(results, null, 2)
+  );
+
+  console.log(`📄 JSON saved → ${outputPath}`);
+
+  // ================= SAVE SCRAPING LOG =================
+
   const status =
-    failed === 0 ? 'success' :
-    success === 0 ? 'failed' : 'partial';
+    failed === 0
+      ? 'success'
+      : success === 0
+      ? 'failed'
+      : 'partial';
 
   await db.execute(
-    `INSERT INTO scraping_logs
-     (source_website, total_scraped, success_count, failed_count, status, started_at, finished_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `
+    INSERT INTO scraping_logs (
+      source_website,
+      total_scraped,
+      success_count,
+      failed_count,
+      status,
+      started_at,
+      finished_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    `,
     [
       'shell',
-      1,
+
+      programs.length,
+
       success,
+
       failed,
+
       status,
+
       startTime,
+
       new Date()
     ]
   );
 
   await db.end();
 
-  console.log('🎉 SHELL scraping completed with log');
+console.log(`
+==============================
+SCRAPING SUMMARY
+==============================
+Inserted : ${inserted}
+Updated  : ${updated}
+Skipped  : ${skipped}
+==============================
+`);
+
+  console.log('🎉 SHELL scraping completed');
+
 })();

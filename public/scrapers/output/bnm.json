@@ -8,26 +8,21 @@
     "rules": {
       "min_spm_as": 8,
       "max_spm_as": null,
-      "academic_categories": [
-        "A4"
-      ],
       "required_subjects": [
         "Mathematics"
       ],
-      "income_categories": null,
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": [
-        "C1",
-        "C3",
-        "C4"
+        "Foundation",
+        "Degree",
+        "Postgraduate"
       ],
       "fields_of_study": [
         "Science",
-        "IT",
+        "Computer Science",
         "Finance"
       ],
       "study_destination": "Overseas",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
@@ -42,14 +37,13 @@
       "min_community_hours": null,
       "bond_required": false,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Auto-parsed by ruleParser"
     },
     "source": "scraped",
     "source_website": "bnm",
-    "scraped_at": "2026-04-27T07:01:38.103Z"
+    "scraped_at": "2026-05-15T14:51:46.640Z"
   },
   {
     "title": "Kijang Undergraduate Scholarship",
@@ -60,26 +54,21 @@
     "rules": {
       "min_spm_as": 8,
       "max_spm_as": null,
-      "academic_categories": [
-        "A4"
-      ],
       "required_subjects": [
         "Mathematics"
       ],
-      "income_categories": null,
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": [
-        "C1",
-        "C3",
-        "C4"
+        "Foundation",
+        "Degree",
+        "Postgraduate"
       ],
       "fields_of_study": [
         "Science",
-        "IT",
+        "Computer Science",
         "Finance"
       ],
       "study_destination": "Overseas",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
@@ -94,13 +83,12 @@
       "min_community_hours": null,
       "bond_required": false,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Auto-parsed by ruleParser"
     },
     "source": "scraped",
     "source_website": "bnm",
-    "scraped_at": "2026-04-27T07:01:43.606Z"
+    "scraped_at": "2026-05-15T14:51:53.311Z"
   }
 ]

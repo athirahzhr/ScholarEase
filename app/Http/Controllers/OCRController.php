@@ -29,7 +29,6 @@ class OCRController extends Controller
                 'raw_grades' => $results['grades'],
                 'grades' => $results['grades'],
                 'total_as' => $results['total_as'],
-                'academic_category' => $results['academic_category'],
                 'detected_subjects' => array_keys($results['grades']),
                 'timestamp' => now()
             ]);
@@ -38,7 +37,6 @@ class OCRController extends Controller
                 'success' => true,
                 'grades' => $results['grades'],
                 'totalAs' => $results['total_as'],
-                'academicCategory' => $results['academic_category'],
                 'detectedSubjects' => array_keys($results['grades']),
                 'message' => 'SPM results extracted successfully!',
                 'allowEdit' => true
@@ -170,7 +168,7 @@ class OCRController extends Controller
         return [
             'grades' => $grades,
             'total_as' => $totalAs,
-            'academic_category' => $this->determineAcademicCategory($totalAs)
+            
         ];
     }
 
@@ -205,11 +203,10 @@ class OCRController extends Controller
         }
 
         $totalAs = $this->countAsFromGrades($updatedGrades);
-        $academicCategory = $this->determineAcademicCategory($totalAs);
+        
 
         $tempData['grades'] = $updatedGrades;
         $tempData['total_as'] = $totalAs;
-        $tempData['academic_category'] = $academicCategory;
         $tempData['user_edited'] = true;
 
         Session::put('ocr_temp_data', $tempData);
@@ -218,7 +215,6 @@ class OCRController extends Controller
             'success' => true,
             'message' => 'Grades updated successfully!',
             'totalAs' => $totalAs,
-            'academicCategory' => $academicCategory,
             'updatedGrades' => $updatedGrades
         ]);
     }
@@ -251,7 +247,6 @@ class OCRController extends Controller
         Session::put('verified_ocr_data', [
             'grades' => $tempData['grades'],
             'total_as' => $tempData['total_as'],
-            'academic_category' => $tempData['academic_category'],
             'detected_subjects' => $tempData['detected_subjects'],
             'verified_at' => now()
         ]);
@@ -261,7 +256,6 @@ class OCRController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'SPM results verified successfully!',
-            'academicCategory' => $tempData['academic_category'],
             'totalAs' => $tempData['total_as']
         ]);
     }
@@ -291,7 +285,7 @@ class OCRController extends Controller
         $totalAs = $this->countAsFromGrades($tempData['grades']);
 
         $tempData['total_as'] = $totalAs;
-        $tempData['academic_category'] = $this->determineAcademicCategory($totalAs);
+        
 
         Session::put('ocr_temp_data', $tempData);
 
@@ -299,7 +293,7 @@ class OCRController extends Controller
             'success' => true,
             'message' => 'Subject added successfully!',
             'totalAs' => $totalAs,
-            'academicCategory' => $tempData['academic_category']
+            
         ]);
     }
 
@@ -328,7 +322,7 @@ class OCRController extends Controller
         $totalAs = $this->countAsFromGrades($tempData['grades']);
 
         $tempData['total_as'] = $totalAs;
-        $tempData['academic_category'] = $this->determineAcademicCategory($totalAs);
+        
 
         Session::put('ocr_temp_data', $tempData);
 
@@ -336,7 +330,7 @@ class OCRController extends Controller
             'success' => true,
             'message' => 'Subject removed successfully!',
             'totalAs' => $totalAs,
-            'academicCategory' => $tempData['academic_category']
+        
         ]);
     }
 
@@ -347,11 +341,4 @@ class OCRController extends Controller
         })->count();
     }
 
-    private function determineAcademicCategory($totalAs)
-    {
-        if ($totalAs >= 10) return 'A4';
-        if ($totalAs >= 7) return 'A3';
-        if ($totalAs >= 4) return 'A2';
-        return 'A1';
-    }
 }

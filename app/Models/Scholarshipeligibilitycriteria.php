@@ -14,39 +14,74 @@ class ScholarshipEligibilityCriteria extends Model
     protected $fillable = [
         'scholarship_id',
 
+        // Academic
         'min_spm_as',
         'max_spm_as',
+        'required_subjects',
 
-        'academic_categories',
+        // Financial
+        'max_monthly_income',
         'income_categories',
+
+        // Study
         'study_paths',
         'fields_of_study',
+        'study_destination',
 
-        'max_monthly_income',
+        // Demographic
         'gender_requirement',
+        'citizenship_required',
+        'state_requirement',
 
+        // Age
         'min_age',
         'max_age',
 
+        // Bumiputera
         'bumiputera_required',
         'bumiputera_priority',
 
-        'match_all_criteria',
+        // Leadership
+        'leadership_required',
+        'leadership_priority',
+
+        // Scoring
         'priority_weight',
+        'max_score',
+
+        // Extra
+        'notes',
     ];
 
     protected $casts = [
-        'academic_categories' => 'array',
-        'income_categories'   => 'array',
-        'study_paths'         => 'array',
-        'fields_of_study'     => 'array',
 
+        // Arrays / JSON
+        'required_subjects' => 'array',
+        'study_paths' => 'array',
+        'fields_of_study' => 'array',
+        'income_categories' => 'array',
+
+        // Boolean
         'bumiputera_required' => 'boolean',
         'bumiputera_priority' => 'boolean',
+
+        'leadership_required' => 'boolean',
+        'leadership_priority' => 'boolean',
+
+        // Numeric
+        'max_monthly_income' => 'decimal:2',
+
+        'priority_weight' => 'integer',
+        'max_score' => 'integer',
     ];
 
+    /**
+     * Scholarship relationship
+     */
     public function scholarship()
     {
-        return $this->belongsTo(Scholarship::class);
+        return $this->belongsTo(
+            Scholarship::class
+        );
     }
 }

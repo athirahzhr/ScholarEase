@@ -1,0 +1,46 @@
+[
+  {
+    "title": "Program Penajaan Nasional (PPN)",
+    "provider": "Jabatan Perkhidmatan Awam (JPA)",
+    "description": "Program Penajaan Nasional (PPN)",
+    "raw_eligibility": "Program Penajaan Nasional (PPN)\n Latihan Sebelum Perkhidmatan (LSP)\nUtama  Info Penajaan  Latihan Sebelum Perkhidmatan (LSP)  Program Pelajar  Program Penajaan Nasional (PPN)\n\nProgram Penajaan Nasional (PPN) merupakan penajaan kepada pelajar terbaik lepasan Sijil Pelajaran Malaysia (SPM) untuk melanjutkan pelajaran ke universiti terkemuka dunia yang dikenal pasti. Calon-calon yang terpilih akan ditawarkan penajaan secara berpakej bagi mengikuti pengajian peringkat Persediaan sehingga ke peringkat Ijazah Pertama, tertakluk kepada syarat-syarat yang ditetapkan. \n\nBentuk penajaan : Pinjaman Boleh Ubah (PBU) Berasaskan Merit Akademik\n\nSyarat Umum\nSyarat Khusus\nInstitusi Pengajian\nBidang Pengajian",
+    "application_link": "https://penajaan.jpa.gov.my/info-penajaan/latihan-sebelum-perkhidmatan/program-pelajar/program-penajaan-nasional-ppn.html",
+    "application_deadline": null,
+    "source": "scraped",
+    "source_website": "jpa_ppn",
+    "is_official": 1,
+    "is_active": 1,
+    "scraped_at": "2026-05-16T17:07:22.918Z",
+    "rules": {
+      "min_spm_as": 8,
+      "max_spm_as": null,
+      "required_subjects": null,
+      "max_monthly_income": null,
+      "income_categories": null,
+      "study_paths": [
+        "Degree"
+      ],
+      "fields_of_study": [
+        "Computer Science"
+      ],
+      "study_destination": "Both",
+      "bumiputera_required": false,
+      "bumiputera_priority": false,
+      "gender_requirement": "Any",
+      "citizenship_required": null,
+      "state_requirement": null,
+      "rural_priority": false,
+      "min_age": null,
+      "max_age": null,
+      "leadership_required": false,
+      "leadership_priority": false,
+      "sports_achievement": false,
+      "min_community_hours": null,
+      "bond_required": true,
+      "bond_years": null,
+      "priority_weight": 1,
+      "max_score": 100,
+      "notes": "Eligibility details not explicitly stated on official page"
+    }
+  }
+]

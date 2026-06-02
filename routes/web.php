@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
@@ -11,39 +10,67 @@ use App\Http\Controllers\ScrapingController;
 use App\Http\Controllers\OCRController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\AdminScraperController;
+use App\Http\Controllers\ProfileController;
+use App\Models\Scholarship;
+use App\Models\Feedback;
+use App\Http\Controllers\FeedbackController;
 
+/*
+|--------------------------------------------------------------------------
+| Public Routes (No Authentication Required)
+|--------------------------------------------------------------------------
+*/
 
-
-
+// Welcome Page - FIXED: Properly fetch scholarships and feedbacks
 Route::get('/', function () {
-    return view('welcome');
-});
+    $today = \Carbon\Carbon::today();
+    
+    // Get active scholarships (not expired)
+    $scholarships = Scholarship::where('is_active', 1)
+        ->where(function($query) use ($today) {
+            $query->whereNull('deadline')
+                  ->orWhere('deadline', '>=', $today);
+        })
+        ->latest()
+        ->take(10)
+        ->get();
+    
+    // Get approved feedbacks for testimonials
+    $feedbacks = Feedback::with('user')
+        ->where('approved', 1)
+        ->latest()
+        ->take(6)
+        ->get();
+    
+    return view('welcome', compact('scholarships', 'feedbacks'));
+})->name('welcome');
 
-Auth::routes (['verify' => true]);
+// Authentication Routes
+Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
-| USER ROUTES
+| USER ROUTES (Authenticated)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
     
-
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // User Profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile/create', [ProfileController::class, 'create'])->name('profile.create');
+    Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
+
     // Scholarship Finder
     Route::get('/find-scholarship', [ScholarshipController::class, 'showFinder'])->name('scholarship.finder');
-    Route::post('/save-profile', [ScholarshipController::class, 'saveProfile'])->name('save.profile');
+    Route::post('/save-profile', [ProfileController::class, 'store'])->name('save.profile');
     Route::get('/recommendations', [ScholarshipController::class, 'getRecommendations'])->name('scholarship.recommendations');
 
-    // Scholarship Matching
-    Route::post('/scholarships/find-matches', [ScholarshipController::class, 'findMatches'])
-        ->name('scholarships.findMatches');
-
-    // OCR
+    // OCR Routes
     Route::post('/upload-spm', [OCRController::class, 'uploadSPM'])->name('upload.spm');
     Route::post('/update-ocr-results', [OCRController::class, 'updateOCRResults'])->name('update.ocr.results');
     Route::post('/verify-ocr-results', [OCRController::class, 'verifyOCRResults'])->name('verify.ocr.results');
@@ -59,10 +86,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/scholarships', [ScholarshipController::class, 'browse'])->name('scholarships.browse');
     Route::get('/scholarships/search', [ScholarshipController::class, 'search'])->name('scholarships.search');
 
-    // 🔧 FIX #1: USER scholarship show → PUBLIC view
-    Route::get('/scholarships/{id}', 
-        [ScholarshipController::class, 'showPublic']
-    )->name('scholarships.show');
+    // User scholarship show
+    Route::get('/scholarships/{id}', [ScholarshipController::class, 'showPublic'])->name('scholarships.show');
+
+    // Feedback Routes
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 });
 
 /*
@@ -73,10 +102,9 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])
-        ->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Users
+    // Users Management
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
         Route::get('/create', [AdminController::class, 'create'])->name('create');
@@ -88,7 +116,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{user}/toggle-status', [AdminController::class, 'toggleStatus'])->name('toggle-status');
     });
 
-    // Scholarships
+    // Scholarships Management
     Route::prefix('scholarships')->name('scholarships.')->group(function () {
         Route::get('/', [ScholarshipController::class, 'index'])->name('index');
         Route::get('/create', [ScholarshipController::class, 'create'])->name('create');
@@ -100,7 +128,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::patch('/{id}/toggle-status', [ScholarshipController::class, 'toggleStatus'])->name('toggle-status');
     });
 
-    // Eligibility
+    // Eligibility Management
     Route::prefix('eligibility')->name('eligibility.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'eligibilityDashboard'])->name('dashboard');
         Route::post('/bulk-create', [AdminController::class, 'bulkCreateEligibility'])->name('bulkCreate');
@@ -110,7 +138,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/export', [AdminController::class, 'exportEligibility'])->name('export');
     });
 
-    // Scraping
+    // Scraping Management
     Route::prefix('scraping')->name('scraping.')->group(function () {
         Route::get('/logs', [ScrapingController::class, 'logs'])->name('logs');
         Route::post('/jpa', [ScrapingController::class, 'scrapeJPA'])->name('jpa');
@@ -118,28 +146,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/unienrol', [ScrapingController::class, 'scrapeUnienrol'])->name('unienrol');
     });
 
-    // Scraper
+    // Scraper Controller
     Route::get('/scraper', [AdminScraperController::class, 'index'])->name('scraper.index');
     Route::post('/scraper/run', [AdminScraperController::class, 'run'])->name('scraper.run');
     Route::get('/scraper/review', [AdminScraperController::class, 'review'])->name('scraper.review');
     Route::post('/scraper/import', [AdminScraperController::class, 'import'])->name('scraper.import');
 
-    // Logs
+    // Scraping Logs
     Route::get('/scraping-logs', [ScrapingController::class, 'logs'])->name('scraping.logs');
 
-
     // Notifications
-    Route::get('/notifications', [AdminController::class, 'notifications'])
-        ->name('notifications');
+    Route::get('/notifications', [AdminController::class, 'notifications'])->name('notifications');
+    Route::post('/notifications/send-single', [AdminController::class, 'notifySingle'])->name('notifications.single');
+    Route::post('/notifications/send-all', [AdminController::class, 'sendDeadlineNotification'])->name('notifications.all');
+    Route::post('/notifications/deadline', [AdminController::class, 'sendDeadlineNotification'])->name('notify.deadline');
 
-    Route::post('/notifications/send-single', [AdminController::class, 'notifySingle'])
-        ->name('notifications.single');
-
-    Route::post('/notifications/send-all', [AdminController::class, 'sendDeadlineNotification'])
-        ->name('notifications.all');
-
-    Route::post('/notifications/deadline', [AdminController::class, 'sendDeadlineNotification'])
-        ->name('notify.deadline');
-
+    // Feedback Management
+    Route::get('/feedbacks', [AdminController::class, 'feedbacks'])->name('feedbacks');
+    Route::post('/feedbacks/{id}/approve', [AdminController::class, 'approveFeedback'])->name('feedbacks.approve');
+    Route::delete('/feedbacks/{id}/reject', [AdminController::class, 'rejectFeedback'])->name('feedbacks.reject');
+    Route::post('/feedbacks/bulk-approve', [AdminController::class, 'bulkApproveFeedbacks'])->name('feedbacks.bulk-approve');
 });
-

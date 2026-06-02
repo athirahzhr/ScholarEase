@@ -5,36 +5,39 @@
 @section('content')
 <style>
     :root {
-        --primary-blue: #1e40af;
-        --secondary-blue: #3b82f6;
-        --light-blue: #dbeafe;
-        --dark-gray: #374151;
-        --medium-gray: #6b7280;
-        --light-gray: #f9fafb;
-        --white: #ffffff;
+        --maroon: #7A0019;
+        --maroon-dark: #4e0010;
+        --maroon-light: #9e1e32;
+        --gold: #F4C542;
+        --gold-light: #ffda77;
+        --cream: #FFF8EE;
+        --cream-dark: #f5ebe0;
+        --gray-800: #1f2937;
+        --gray-600: #4b5563;
         --success: #10b981;
         --warning: #f59e0b;
-        --gradient-primary: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --gradient-primary: linear-gradient(135deg, #7A0019 0%, #4e0010 100%);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
     
     .dashboard-header {
         background: var(--gradient-primary);
         color: white;
-        border-radius: 15px;
+        border-radius: 24px;
         padding: 2rem;
         margin-bottom: 2rem;
         box-shadow: var(--shadow);
+        border-bottom: 3px solid var(--gold);
     }
     
     .stat-card {
-        background: var(--white);
-        border-radius: 12px;
+        background: white;
+        border-radius: 20px;
         padding: 1.5rem;
         box-shadow: var(--shadow);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border-left: 4px solid var(--secondary-blue);
+        transition: all 0.3s ease;
+        border-top: 4px solid var(--gold);
         height: 100%;
     }
     
@@ -44,102 +47,45 @@
     }
     
     .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
+        width: 55px;
+        height: 55px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
         margin-bottom: 1rem;
+        background: linear-gradient(135deg, rgba(122,0,25,0.1), rgba(244,197,66,0.1));
+        color: var(--maroon);
     }
     
-    .icon-graduation {
-        background: linear-gradient(135deg, #3b82f6, #60a5fa);
-        color: white;
-    }
-    
-    .icon-bookmark {
-        background: linear-gradient(135deg, #10b981, #34d399);
-        color: white;
-    }
-    
-    .icon-profile {
-        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-        color: white;
-    }
-    
-    .icon-recommend {
-        background: linear-gradient(135deg, #f59e0b, #fbbf24);
-        color: white;
-    }
-    
-    .quick-action-card {
-        background: var(--white);
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: var(--shadow);
-        transition: all 0.3s ease;
-        height: 100%;
-        border-top: 3px solid var(--secondary-blue);
-    }
-    
-    .quick-action-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-    }
-    
-    .action-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--secondary-blue);
-    }
-    
-    .weather-widget {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-        color: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: var(--shadow);
-    }
-    
-    .scholarship-card {
-        background: var(--white);
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: var(--shadow);
-        transition: all 0.3s ease;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .scholarship-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-        border-color: var(--secondary-blue);
+    .stat-card h5 {
+        color: var(--maroon);
+        font-weight: 700;
     }
     
     .badge-category {
-        background: var(--light-blue);
-        color: var(--primary-blue);
+        background: linear-gradient(135deg, rgba(244,197,66,0.15), rgba(244,197,66,0.08));
+        color: #92400e;
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 600;
     }
     
     .sidebar-nav {
-        background: var(--white);
-        border-radius: 12px;
+        background: white;
+        border-radius: 20px;
         padding: 1rem;
         box-shadow: var(--shadow);
     }
     
     .nav-item {
         padding: 0.75rem 1rem;
-        border-radius: 8px;
+        border-radius: 12px;
         margin-bottom: 0.5rem;
         transition: all 0.3s ease;
-        color: var(--dark-gray);
+        color: var(--gray-600);
         text-decoration: none;
         display: flex;
         align-items: center;
@@ -147,85 +93,190 @@
     }
     
     .nav-item:hover, .nav-item.active {
-        background: var(--light-blue);
-        color: var(--primary-blue);
+        background: linear-gradient(135deg, rgba(122,0,25,0.08), rgba(244,197,66,0.08));
+        color: var(--maroon);
     }
     
     .nav-item i {
-        width: 20px;
+        width: 22px;
         text-align: center;
     }
     
     .greeting-text {
-        font-size: 1.1rem;
+        font-size: 1rem;
         opacity: 0.9;
     }
     
     .time-date-widget {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
         padding: 1rem;
         text-align: center;
         backdrop-filter: blur(10px);
+    }
+    
+    .alert-warning {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: none;
+        border-left: 4px solid #f59e0b;
+        border-radius: 16px;
+        color: #92400e;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
+        border: none;
+        border-radius: 40px;
+        padding: 0.5rem 1.2rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(122, 0, 25, 0.3);
+        background: linear-gradient(115deg, var(--maroon-dark), var(--maroon));
+    }
+    
+    .btn-outline-primary {
+        border: 2px solid var(--maroon);
+        color: var(--maroon);
+        border-radius: 40px;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: transparent;
+    }
+    
+    .btn-outline-primary:hover {
+        background: var(--maroon);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .scholarship-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.25rem;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .scholarship-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gold), var(--maroon));
+    }
+    
+    .scholarship-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--gold);
+    }
+    
+    .guidance-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        border-left: 4px solid var(--gold);
+        box-shadow: var(--shadow);
+    }
+    
+    .step-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.75rem;
+        font-size: 1.2rem;
+    }
+    
+    .step-icon.upload { background: linear-gradient(135deg, rgba(122,0,25,0.1), rgba(122,0,25,0.05)); color: var(--maroon); }
+    .step-icon.match { background: linear-gradient(135deg, rgba(244,197,66,0.15), rgba(244,197,66,0.08)); color: #92400e; }
+    .step-icon.view { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+    .step-icon.bookmark { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+    
+    .progress-bar-custom {
+        background: linear-gradient(90deg, var(--maroon), var(--gold));
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 1.5rem;
+        }
+        
+        .stat-card {
+            padding: 1rem;
+        }
+        
+        .greeting-text {
+            font-size: 0.9rem;
+        }
     }
 </style>
 
 <div class="container-fluid py-4">
     <!-- Dashboard Header -->
-    <div class="dashboard-header">
+    <div class="dashboard-header" data-aos="fade-down">
         <div class="row align-items-center">
-            <div class="col-md-8">
+            <div class="col-md-7 mb-3 mb-md-0">
                 <h1 class="h2 mb-2">Welcome, {{ auth()->user()->name }}! 👋</h1>
                 <p class="greeting-text mb-0">Here's what's happening with your scholarship journey today.</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <div class="time-date-widget">
                     <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
                         <span><i class="fas fa-sun me-2"></i> 24°C</span>
                         <span class="px-2">•</span>
                         <span>Partly Cloudy</span>
                     </div>
-                    <div class="d-flex align-items-center justify-content-center gap-3">
-                        <span><i class="fas fa-clock me-2"></i> 6:38 AM</span>
+                    <div class="d-flex align-items-center justify-content-center gap-3" id="datetime-widget">
+                        <span><i class="fas fa-clock me-2"></i> <span id="currentTime">--:--</span></span>
                         <span class="px-2">•</span>
-                        <span><i class="fas fa-calendar me-2"></i> 24/1/2026</span>
+                        <span><i class="fas fa-calendar me-2"></i> <span id="currentDate">--/--/----</span></span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-@if(auth()->user()->unreadNotifications->count())
+    @if(auth()->user()->unreadNotifications->count())
     <div class="row mb-4">
         <div class="col-12">
             @foreach(auth()->user()->unreadNotifications->take(3) as $notification)
-                <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                <div class="alert alert-warning d-flex justify-content-between align-items-center" data-aos="fade-right">
                     <div>
-                        <strong>{{ $notification->data['title'] }}</strong><br>
-                        {{ $notification->data['message'] }}
+                        <strong>{{ $notification->data['title'] ?? 'New Notification' }}</strong><br>
+                        {{ $notification->data['message'] ?? 'You have a new notification' }}
                     </div>
-
                     @if(!empty($notification->data['action_url']))
-                        <a href="{{ $notification->data['action_url'] }}"
-                           target="_blank"
-                           class="btn btn-sm btn-danger">
-                            Apply Now
+                        <a href="{{ $notification->data['action_url'] }}" target="_blank" class="btn btn-sm btn-primary">
+                            Apply Now →
                         </a>
                     @endif
                 </div>
             @endforeach
         </div>
     </div>
-@endif
-
-
-
+    @endif
 
     <div class="row">
         <!-- Sidebar Navigation -->
         <div class="col-lg-3 col-md-4 mb-4">
             <div class="sidebar-nav sticky-top" style="top: 20px;">
-                <h5 class="mb-3 px-2">Navigation</h5>
+                <h5 class="mb-3 px-2" style="color: var(--maroon);">Navigation</h5>
                 <a href="{{ route('dashboard') }}" class="nav-item active">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
@@ -238,12 +289,16 @@
                     <i class="fas fa-bookmark"></i>
                     <span>Bookmarks</span>
                     @if(auth()->user()->bookmarks()->count() > 0)
-                        <span class="badge bg-primary ms-auto">{{ auth()->user()->bookmarks()->count() }}</span>
+                        <span class="badge ms-auto" style="background: var(--maroon); color: white;">{{ auth()->user()->bookmarks()->count() }}</span>
                     @endif
                 </a>
                 <a href="{{ route('scholarship.recommendations') }}" class="nav-item">
                     <i class="fas fa-star"></i>
                     <span>Recommendations</span>
+                </a>
+                <a href="{{ route('feedback.create') }}" class="nav-item">
+                    <i class="fas fa-star me-2" style="color: var(--gold);"></i>
+                    <span>Give Feedback</span>
                 </a>
                 @if(auth()->user()->isAdmin())
                     <div class="mt-4 pt-3 border-top">
@@ -262,125 +317,137 @@
             <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stat-card">
-                        <div class="stat-icon icon-graduation">
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="stat-icon">
                             <i class="fas fa-user-graduate"></i>
                         </div>
                         <h5 class="mb-1">Your Profile</h5>
                         @if(auth()->user()->profile)
-                            <p class="text-muted mb-2">Complete ✓</p>
+                            <p class="text-success mb-2">Complete ✓</p>
                             <div class="d-flex flex-wrap gap-1">
-                                <span class="badge-category">{{ auth()->user()->profile->academic_category }}</span>
-                                <span class="badge-category">{{ auth()->user()->profile->income_category }}</span>
-                                <span class="badge-category">{{ auth()->user()->profile->study_path }}</span>
+                                <span class="badge-category">{{ auth()->user()->profile->academic_category ?? 'N/A' }}</span>
+                                <span class="badge-category">{{ auth()->user()->profile->income_category ?? 'N/A' }}</span>
+                                <span class="badge-category">{{ auth()->user()->profile->study_level ?? 'N/A' }}</span>
                             </div>
                         @else
                             <p class="text-muted mb-3">Incomplete</p>
-                            <a href="{{ route('scholarship.finder') }}" class="btn btn-sm btn-primary">Complete Profile</a>
+                            <a href="{{ route('scholarship.finder') }}" class="btn btn-primary btn-sm">Complete Profile</a>
                         @endif
                     </div>
                 </div>
                 
                 <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stat-card">
-                        <div class="stat-icon icon-bookmark">
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="stat-icon">
                             <i class="fas fa-bookmark"></i>
                         </div>
                         <h5 class="mb-1">Bookmarks</h5>
-                        <p class="display-6 fw-bold mb-2">{{ auth()->user()->bookmarks()->count() }}</p>
+                        <p class="display-6 fw-bold mb-2" style="color: var(--maroon);">{{ auth()->user()->bookmarks()->count() }}</p>
                         <p class="text-muted mb-0">Saved Scholarships</p>
-                        <a href="{{ route('bookmarks.index') }}" class="btn btn-sm btn-outline-primary mt-2">View All</a>
+                        <a href="{{ route('bookmarks.index') }}" class="btn btn-outline-primary btn-sm mt-2">View All</a>
                     </div>
                 </div>
                 
                 <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stat-card">
-                        <div class="stat-icon icon-recommend">
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="stat-icon">
                             <i class="fas fa-star"></i>
                         </div>
                         <h5 class="mb-1">Recommendations</h5>
                         @if(auth()->user()->profile)
-                            <p class="display-6 fw-bold mb-2">{{ $recommendationCount }}</p>
+                            <p class="display-6 fw-bold mb-2" style="color: var(--maroon);">{{ $recommendationCount ?? 0 }}</p>
                             <p class="text-muted mb-0">Matching Scholarships</p>
-                            <a href="{{ route('scholarship.recommendations') }}" class="btn btn-sm btn-outline-primary mt-2">View Matches</a>
+                            <a href="{{ route('scholarship.recommendations') }}" class="btn btn-outline-primary btn-sm mt-2">View Matches</a>
                         @else
                             <p class="text-muted mb-3">Complete profile to see matches</p>
-                            <a href="{{ route('scholarship.finder') }}" class="btn btn-sm btn-primary">Get Started</a>
+                            <a href="{{ route('scholarship.finder') }}" class="btn btn-primary btn-sm">Get Started</a>
                         @endif
                     </div>
                 </div>
                 
                 <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stat-card">
-                        <div class="stat-icon icon-profile">
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+                        <div class="stat-icon">
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <h5 class="mb-1">Scholarship Status</h5>
-                        <p class="display-6 fw-bold mb-2">{{ \App\Models\Scholarship::count() }}</p>
+                        <p class="display-6 fw-bold mb-2" style="color: var(--maroon);">{{ \App\Models\Scholarship::count() }}</p>
                         <p class="text-muted mb-0">Total Available</p>
                         <div class="progress mt-2" style="height: 6px;">
-                            <div class="progress-bar bg-success" style="width: 85%"></div>
+                            <div class="progress-bar" style="width: 85%; background: linear-gradient(90deg, var(--maroon), var(--gold));"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-        <!-- User Guideline -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card p-4 shadow-sm" style="border-left: 5px solid #3b82f6;">
-                    
-                    <h4 class="mb-3">
-                        <i class="fas fa-info-circle text-primary me-2"></i>
-                        How to Use ScholarEase
-                    </h4>
-
-                    <div class="row">
-
-                        <div class="col-md-3 text-center mb-3">
-                            <div class="mb-2">
-                                <i class="fas fa-upload fa-2x text-primary"></i>
+            <!-- Feedback Card -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card" style="background: linear-gradient(135deg, #FFF8EE, #f5ebe0); border-left: 4px solid var(--gold);">
+                        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <h5 class="mb-1" style="color: var(--maroon);">
+                                    <i class="fas fa-star me-2" style="color: var(--gold);"></i>
+                                    Share Your Experience
+                                </h5>
+                                <p class="text-muted mb-0">Your feedback helps us improve ScholarEase and serve you better!</p>
                             </div>
-                            <h6>Step 1</h6>
-                            <p class="text-muted small">Upload SPM result / fill profile</p>
+                            <a href="{{ route('feedback.create') }}" class="btn btn-primary">
+                                <i class="fas fa-comment me-2"></i> Give Feedback
+                            </a>
                         </div>
-
-                        <div class="col-md-3 text-center mb-3">
-                            <div class="mb-2">
-                                <i class="fas fa-cogs fa-2x text-warning"></i>
-                            </div>
-                            <h6>Step 2</h6>
-                            <p class="text-muted small">System auto-match scholarships</p>
-                        </div>
-
-                        <div class="col-md-3 text-center mb-3">
-                            <div class="mb-2">
-                                <i class="fas fa-star fa-2x text-success"></i>
-                            </div>
-                            <h6>Step 3</h6>
-                            <p class="text-muted small">View recommended scholarships</p>
-                        </div>
-
-                        <div class="col-md-3 text-center mb-3">
-                            <div class="mb-2">
-                                <i class="fas fa-bookmark fa-2x text-danger"></i>
-                            </div>
-                            <h6>Step 4</h6>
-                            <p class="text-muted small">Bookmark & track deadlines</p>
-                        </div>
-
                     </div>
-
                 </div>
             </div>
-        </div>
+
+            <!-- User Guideline -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="guidance-card" data-aos="fade-up">
+                        <h4 class="mb-3">
+                            <i class="fas fa-info-circle me-2" style="color: var(--maroon);"></i>
+                            How to Use ScholarEase
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="step-icon upload mx-auto">
+                                    <i class="fas fa-upload fa-lg"></i>
+                                </div>
+                                <h6>Step 1</h6>
+                                <p class="text-muted small">Upload SPM result / fill profile</p>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="step-icon match mx-auto">
+                                    <i class="fas fa-cogs fa-lg"></i>
+                                </div>
+                                <h6>Step 2</h6>
+                                <p class="text-muted small">System auto-match scholarships</p>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="step-icon view mx-auto">
+                                    <i class="fas fa-star fa-lg"></i>
+                                </div>
+                                <h6>Step 3</h6>
+                                <p class="text-muted small">View recommended scholarships</p>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="step-icon bookmark mx-auto">
+                                    <i class="fas fa-bookmark fa-lg"></i>
+                                </div>
+                                <h6>Step 4</h6>
+                                <p class="text-muted small">Bookmark & track deadlines</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Featured Scholarships -->
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4>Featured Scholarships</h4>
-                        <a href="{{ route('scholarship.recommendations') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                        <h4 style="color: var(--maroon);">Featured Scholarships</h4>
+                        <a href="{{ route('scholarship.recommendations') }}" class="btn btn-outline-primary btn-sm">View All</a>
                     </div>
                     
                     <div class="row">
@@ -392,34 +459,36 @@
                         @endphp
                         
                         @foreach($featuredScholarships as $scholarship)
-                        <div class="col-md-4 mb-4">
+                        <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
                             <div class="scholarship-card">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge bg-primary">{{ $scholarship->provider }}</span>
-                                    @if($scholarship->deadline->diffInDays(now()) < 7)
-                                        <span class="badge bg-danger">Closing Soon</span>
+                                    <span class="badge" style="background: var(--maroon); color: white;">{{ $scholarship->provider }}</span>
+                                    @if($scholarship->deadline && $scholarship->deadline->diffInDays(now()) < 7)
+                                        <span class="badge" style="background: #f59e0b; color: white;">Closing Soon</span>
                                     @endif
                                 </div>
-                                <h6 class="mb-2">{{ Str::limit($scholarship->name, 40) }}</h6>
-                                <p class="text-muted small mb-3">{{ Str::limit($scholarship->description, 80) }}</p>
+                                <h6 class="mb-2" style="color: var(--maroon);">{{ Str::limit($scholarship->title, 40) }}</h6>
+                                <p class="text-muted small mb-3">{{ Str::limit($scholarship->description ?? 'No description available', 80) }}</p>
                                 
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
                                         @if($scholarship->amount)
-                                            <span class="fw-bold text-success">RM {{ number_format($scholarship->amount) }}</span>
+                                            <span class="fw-bold" style="color: #10b981;">RM {{ number_format($scholarship->amount) }}</span>
                                         @endif
                                     </div>
                                     <div class="text-end">
                                         <small class="text-muted d-block">Deadline:</small>
-                                        <small class="fw-bold">{{ $scholarship->deadline->format('d M Y') }}</small>
+                                        <small class="fw-bold">{{ $scholarship->deadline ? $scholarship->deadline->format('d M Y') : 'Rolling' }}</small>
                                     </div>
                                 </div>
                                 
                                 <div class="d-flex gap-2">
-                                    <a href="{{ $scholarship->application_link }}" target="_blank" class="btn btn-sm btn-primary flex-grow-1">Apply</a>
+                                    @if($scholarship->application_link)
+                                        <a href="{{ $scholarship->application_link }}" target="_blank" class="btn btn-primary btn-sm flex-grow-1">Apply</a>
+                                    @endif
                                     <form action="{{ route('bookmarks.toggle', $scholarship->id) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-bookmark"></i>
                                         </button>
                                     </form>
@@ -434,32 +503,29 @@
     </div>
 </div>
 
-
 <!-- Add FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+@push('scripts')
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
+    AOS.init({ duration: 800, once: true });
+
     // Update time and date dynamically
     function updateDateTime() {
         const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const dateStr = now.toLocaleDateString('en-US', options);
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         
-        // Update elements if they exist
-        const timeElement = document.querySelector('.time-date-widget .fa-clock').parentElement;
-        const dateElement = document.querySelector('.time-date-widget .fa-calendar').parentElement;
+        const timeElement = document.getElementById('currentTime');
+        const dateElement = document.getElementById('currentDate');
         
-        if(timeElement) {
-            timeElement.innerHTML = `<i class="fas fa-clock me-2"></i> ${timeStr}`;
-        }
-        if(dateElement) {
-            dateElement.innerHTML = `<i class="fas fa-calendar me-2"></i> ${now.toLocaleDateString()}`;
-        }
+        if(timeElement) timeElement.textContent = timeStr;
+        if(dateElement) dateElement.textContent = dateStr;
     }
     
-    // Update every minute
+    updateDateTime();
     setInterval(updateDateTime, 60000);
-    updateDateTime(); // Initial call
 </script>
+@endpush
 @endsection

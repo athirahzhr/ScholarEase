@@ -14,30 +14,54 @@ class AdminScraperController extends Controller
             'scrape:all',
             'scrape:axiata',
             'scrape:bnm',
-            'scrape:bpmp',
-            'scrape:jpa',
-            'scrape:khazanah',
+            'scrape:bpmb',
+            'scrape:k.watan',
+            'scrape:k.paynet',
+            'scrape:k.equity',
             'scrape:mara',
             'scrape:petronas',
             'scrape:shell',
-            'scrape:yp',
+            'scrape:jpa.db40',
+            'scrape:jpa.ppn',
+            'scrape:jpa.lspm',
+
+
         ];
 
         return view('admin.scraper.index', compact('commands'));
     }
 
     public function run(Request $request)
-    {
-        $request->validate([
-            'command' => 'required|string'
-        ]);
+{
+    $request->validate([
+        'command' => 'required|string'
+    ]);
 
-        try {
-            Artisan::call($request->command);
+    $command = $request->command;
 
-            return back()->with('success', 'Scraper executed successfully!');
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+    try {
+
+        // run scraper and capture output
+        $output = shell_exec("npm run {$command} 2>&1");
+
+        if (!$output) {
+            return back()->with(
+                'error',
+                'No output returned from scraper.'
+            );
         }
+
+        return back()->with(
+            'success',
+            $output
+        );
+
+    } catch (\Exception $e) {
+
+        return back()->with(
+            'error',
+            $e->getMessage()
+        );
     }
+}
 }

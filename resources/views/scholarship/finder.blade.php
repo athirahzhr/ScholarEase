@@ -4,6 +4,24 @@
 
 @section('content')
 <style>
+    :root {
+        --maroon: #7A0019;
+        --maroon-dark: #4e0010;
+        --maroon-light: #9e1e32;
+        --gold: #F4C542;
+        --gold-light: #ffda77;
+        --cream: #FFF8EE;
+        --cream-dark: #f5ebe0;
+        --gray-800: #1f2937;
+        --gray-600: #4b5563;
+    }
+
+    .finder-container {
+        background: linear-gradient(135deg, var(--cream) 0%, var(--cream-dark) 100%);
+        min-height: calc(100vh - 200px);
+        padding: 2rem 0;
+    }
+
     .step-container {
         max-width: 900px;
         margin: 0 auto;
@@ -11,8 +29,8 @@
     
     .step-card {
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
         padding: 2rem;
         margin-bottom: 2rem;
     }
@@ -22,436 +40,490 @@
         align-items: center;
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid var(--gold);
     }
     
     .step-number {
-        width: 40px;
-        height: 40px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        background: linear-gradient(135deg, var(--maroon), var(--maroon-dark));
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
+        font-size: 1.2rem;
         margin-right: 1rem;
+        box-shadow: 0 4px 12px rgba(122, 0, 25, 0.3);
     }
     
+    .step-header h4 {
+        color: var(--maroon);
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    
+    .step-header p {
+        color: var(--gray-600);
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+    
+    /* Progress Bar */
+    .progress-custom {
+        background: #e5e7eb;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+    }
+    
+    .progress-bar-custom {
+        background: linear-gradient(90deg, var(--maroon), var(--gold));
+        width: 33%;
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    
+    .step-indicator {
+        color: var(--gray-600);
+        font-size: 0.85rem;
+        padding: 0.25rem 0;
+    }
+    
+    .step-indicator.active {
+        color: var(--maroon);
+        font-weight: 700;
+    }
+    
+    /* Upload Area */
     .upload-area {
-        border: 2px dashed #3b82f6;
-        border-radius: 12px;
+        border: 2px dashed var(--maroon);
+        border-radius: 20px;
         padding: 3rem;
         text-align: center;
-        background: #f8fafc;
+        background: linear-gradient(135deg, #faf5ff, #f3e8ff);
         cursor: pointer;
         transition: all 0.3s ease;
     }
     
     .upload-area:hover {
-        background: #eff6ff;
-        border-color: #1e40af;
+        background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+        border-color: var(--gold);
+        transform: scale(1.02);
     }
     
     .upload-area.dragover {
-        background: #dbeafe;
-        border-color: #1e40af;
+        background: #e9d5ff;
+        border-color: var(--gold);
         transform: scale(1.02);
     }
     
     .upload-icon {
         font-size: 3rem;
-        color: #3b82f6;
+        color: var(--maroon);
         margin-bottom: 1rem;
     }
     
+    /* Grade Badges */
     .grade-badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
-        border-radius: 6px;
+        border-radius: 20px;
         margin: 0.25rem;
         font-weight: 600;
         font-size: 0.875rem;
-        min-width: 40px;
+        min-width: 50px;
         text-align: center;
     }
     
-    .grade-a-plus {
-        background: linear-gradient(135deg, #059669, #10b981);
-        color: white;
-    }
+    .grade-a-plus { background: linear-gradient(135deg, var(--maroon), var(--maroon-dark)); color: white; }
+    .grade-a { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+    .grade-a-minus { background: linear-gradient(135deg, #34d399, #10b981); color: white; }
+    .grade-b-plus { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+    .grade-b { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; }
+    .grade-b-minus { background: linear-gradient(135deg, #93c5fd, #60a5fa); color: white; }
+    .grade-c-plus { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+    .grade-c { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+    .grade-other { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
     
-    .grade-a {
-        background: linear-gradient(135deg, #10b981, #34d399);
-        color: white;
-    }
-    
-    .grade-a-minus {
-        background: linear-gradient(135deg, #34d399, #6ee7b7);
-        color: white;
-    }
-    
-    .grade-b-plus {
-        background: linear-gradient(135deg, #3b82f6, #60a5fa);
-        color: white;
-    }
-    
-    .grade-b {
-        background: linear-gradient(135deg, #60a5fa, #93c5fd);
-        color: white;
-    }
-    
-    .grade-b-minus {
-        background: linear-gradient(135deg, #93c5fd, #bfdbfe);
-        color: white;
-    }
-    
-    .grade-c-plus {
-        background: linear-gradient(135deg, #f59e0b, #fbbf24);
-        color: white;
-    }
-    
-    .grade-c {
-        background: linear-gradient(135deg, #fbbf24, #fcd34d);
-        color: white;
-    }
-    
-    .grade-other {
-        background: linear-gradient(135deg, #6b7280, #9ca3af);
-        color: white;
-    }
-    
-    #gradesTable th {
-        background-color: #f8fafc;
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
+        border: none;
+        border-radius: 40px;
+        padding: 0.6rem 1.5rem;
         font-weight: 600;
-        color: #374151;
-        padding: 0.75rem;
+        transition: all 0.3s ease;
     }
     
-    #gradesTable td {
-        padding: 0.75rem;
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(122, 0, 25, 0.3);
+        background: linear-gradient(115deg, var(--maroon-dark), var(--maroon));
+    }
+    
+    .btn-outline-primary {
+        border: 2px solid var(--maroon);
+        color: var(--maroon);
+        border-radius: 40px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background: var(--maroon);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Tables */
+    .table th {
+        background: linear-gradient(135deg, var(--cream), var(--cream-dark));
+        color: var(--maroon);
+        font-weight: 700;
+        border-bottom: 2px solid var(--gold);
+    }
+    
+    .table td {
         vertical-align: middle;
     }
     
-    .form-select-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-    }
-    
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-    }
-    
-    .badge.bg-info {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.35rem;
-    }
-    
-    .income-option, .study-option {
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-    
-    .income-option:hover, .study-option:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    
-    .income-option.border-primary, .study-option.border-primary {
-        background: #eff6ff;
-    }
-    
+    /* Verified Grades */
     .verified-grades {
         border: 2px solid #10b981;
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 1.5rem;
-        background: #f0fdf4;
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    }
+    
+    /* Form Controls */
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        padding: 0.6rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.2);
+        outline: none;
+    }
+    
+    /* Alerts */
+    .alert-info {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        border: none;
+        border-left: 4px solid #3b82f6;
+        border-radius: 12px;
+        color: #1e40af;
+    }
+    
+    .alert-warning {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: none;
+        border-left: 4px solid #f59e0b;
+        border-radius: 12px;
+        color: #92400e;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        border: none;
+        border-left: 4px solid #10b981;
+        border-radius: 12px;
+        color: #065f46;
+    }
+    
+    @media (max-width: 768px) {
+        .step-card {
+            padding: 1.5rem;
+        }
+        
+        .upload-area {
+            padding: 2rem;
+        }
+        
+        .table {
+            font-size: 0.8rem;
+        }
+        
+        .btn-primary, .btn-outline-primary {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
     }
 </style>
 
-<div class="container py-5">
-    <div class="step-container">
-        <!-- Progress Bar -->
-        <div class="mb-5">
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-primary fw-bold" id="step1Text">Step 1: Upload SPM</span>
-                <span class="text-muted" id="step2Text">Step 2: Review Results</span>
-                <span class="text-muted" id="step3Text">Step 3: Profile Info</span>
+<div class="finder-container">
+    <div class="container py-4">
+        <div class="step-container">
+            <!-- Progress Bar -->
+            <div class="mb-5" data-aos="fade-down">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="step-indicator active" id="step1Text">
+                        <i class="fas fa-upload me-2"></i>Step 1: Upload SPM
+                    </span>
+                    <span class="step-indicator" id="step2Text">
+                        <i class="fas fa-edit me-2"></i>Step 2: Review Results
+                    </span>
+                    <span class="step-indicator" id="step3Text">
+                        <i class="fas fa-user me-2"></i>Step 3: Profile Info
+                    </span>
+                </div>
+                <div class="progress-custom">
+                    <div class="progress-bar-custom" id="progressBar" style="width: 33%;"></div>
+                </div>
             </div>
-            <div class="progress" style="height: 8px;">
-                <div class="progress-bar" id="progressBar" style="width: 33%; background: linear-gradient(135deg, #3b82f6, #1e40af);"></div>
-            </div>
-        </div>
 
-        <!-- Step 1: Upload SPM -->
-        <div class="step-card" id="step1">
-            <div class="step-header">
-                <div class="step-number">1</div>
-                <div>
-                    <h4 class="mb-1">Upload Your SPM Certificate</h4>
-                    <p class="text-muted mb-0">Upload a clear photo or scan of your SPM results</p>
-                </div>
-            </div>
-            
-            <form id="uploadForm">
-                @csrf
-                <div class="upload-area" id="dropArea">
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                    <h5>Drag & Drop or Click to Upload</h5>
-                    <p class="text-muted">Supported formats: JPG, PNG, PDF (Max: 5MB)</p>
-                    <input type="file" class="form-control d-none" id="spmFile" name="spm_file" accept="image/*,.pdf" required>
-                    <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('spmFile').click()">
-                        <i class="fas fa-upload me-2"></i> Choose File
-                    </button>
-                </div>
-                
-                <div id="fileInfo" class="mt-3 d-none">
-                    <div class="alert alert-info d-flex align-items-center">
-                        <i class="fas fa-file-alt me-3 fa-2x"></i>
-                        <div>
-                            <strong id="fileName"></strong>
-                            <div class="progress mt-2" style="height: 6px;">
-                                <div class="progress-bar" id="fileProgress" style="width: 0%"></div>
-                            </div>
-                        </div>
+            <!-- Step 1: Upload SPM -->
+            <div class="step-card" id="step1" data-aos="fade-up">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h4 class="mb-1">Upload Your SPM Certificate</h4>
+                        <p class="text-muted mb-0">Upload a clear photo or scan of your SPM results slip</p>
                     </div>
                 </div>
                 
-                <div class="text-center mt-4">
-                    <button type="button" class="btn btn-primary btn-lg px-5" onclick="processUpload()" id="processBtn">
-                        <i class="fas fa-cogs me-2"></i> Process SPM Results
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Step 2: Review & Edit OCR Results -->
-        <div class="step-card d-none" id="step2">
-            <div class="step-header">
-                <div class="step-number">2</div>
-                <div>
-                    <h4 class="mb-1">Review & Edit Extracted Results</h4>
-                    <p class="text-muted mb-0">Please verify and edit the extracted grades if needed</p>
-                </div>
-            </div>
-            
-            <div id="ocrResultsContainer">
-                <!-- Results will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Step 3: Additional Information -->
-        <div class="step-card d-none" id="step3">
-            <div class="step-header">
-                <div class="step-number">3</div>
-                <div>
-                    <h4 class="mb-1">Additional Information</h4>
-                    <p class="text-muted mb-0">Complete your profile for personalized recommendations</p>
-                </div>
-            </div>
-            
-            <form id="profileForm" action="{{ route('save.profile') }}" method="POST">
-                @csrf
-                
-                <!-- Extracted Grades Display -->
-                <div class="mb-4">
-                    <h6 class="mb-3">Verified SPM Results</h6>
-                    <div class="p-3 bg-light rounded" id="extractedGrades">
-                        <div class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2">Loading verified grades...</p>
+                <form id="uploadForm">
+                    @csrf
+                    <div class="upload-area" id="dropArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
                         </div>
+                        <h5 class="text-maroon">Drag & Drop or Click to Upload</h5>
+                        <p class="text-muted">Supported formats: JPG, PNG, PDF (Max: 5MB)</p>
+                        <input type="file" class="form-control d-none" id="spmFile" name="spm_file" accept="image/*,.pdf" required>
+                        <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('spmFile').click()">
+                            <i class="fas fa-folder-open me-2"></i> Browse Files
+                        </button>
                     </div>
-                    <input type="hidden" name="academic_category" id="academicCategory">
-                </div>
-                
-                <!-- Family Income -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Family Income Category</label>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="card income-option" data-value="B1" onclick="selectIncome('B1')">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2">
-                                        <i class="fas fa-home fa-2x text-primary"></i>
-                                    </div>
-                                    <h6 class="mb-1">B40</h6>
-                                    <small class="text-muted">Below RM 4,850/month</small>
-                                    <input type="radio" name="income_category" value="B1" class="d-none" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card income-option" data-value="B3" onclick="selectIncome('B3')">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2">
-                                        <i class="fas fa-building fa-2x text-warning"></i>
-                                    </div>
-                                    <h6 class="mb-1">M40</h6>
-                                    <small class="text-muted">RM 4,851 - RM 10,959/month</small>
-                                    <input type="radio" name="income_category" value="B3" class="d-none">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card income-option" data-value="B4" onclick="selectIncome('B4')">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2">
-                                        <i class="fas fa-landmark fa-2x text-success"></i>
-                                    </div>
-                                    <h6 class="mb-1">T20</h6>
-                                    <small class="text-muted">Above RM 10,960/month</small>
-                                    <input type="radio" name="income_category" value="B4" class="d-none">
+                    
+                    <div id="fileInfo" class="mt-3 d-none">
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-file-alt me-3 fa-2x"></i>
+                            <div class="flex-grow-1">
+                                <strong id="fileName"></strong>
+                                <div class="progress mt-2" style="height: 6px;">
+                                    <div class="progress-bar bg-success" id="fileProgress" style="width: 0%"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="text-danger mt-1" id="incomeError"></div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-primary btn-lg px-5" onclick="processUpload()" id="processBtn">
+                            <i class="fas fa-cogs me-2"></i> Process SPM Results
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 2: Review & Edit OCR Results -->
+            <div class="step-card d-none" id="step2" data-aos="fade-up">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h4 class="mb-1">Review & Edit Extracted Results</h4>
+                        <p class="text-muted mb-0">Please edit the extracted grades if needed</p>
+                    </div>
                 </div>
                 
-                <!-- Study Path -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Intended Study Path</label>
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <div class="card study-option" data-value="C1" onclick="selectStudy('C1')">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2">
-                                        <i class="fas fa-university fa-2x text-info"></i>
-                                    </div>
-                                    <h6 class="mb-1">Pre-University</h6>
-                                    <input type="radio" name="study_path" value="C1" class="d-none" required>
+                <div id="ocrResultsContainer">
+                    <!-- Results will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Step 3: Additional Information -->
+            <div class="step-card d-none" id="step3" data-aos="fade-up">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h4 class="mb-1">Additional Information</h4>
+                        <p class="text-muted mb-0">Complete your profile for personalized recommendations</p>
+                    </div>
+                </div>
+                
+                <form id="profileForm" action="{{ route('save.profile') }}" method="POST">
+                    @csrf
+                    
+                    <!-- Extracted Grades Display -->
+                    <div class="mb-4">
+                        <h6 class="mb-3 fw-bold text-maroon">Verified SPM Results</h6>
+                        <div id="extractedGrades">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-maroon" role="status">
+                                    <span class="visually-hidden">Loading...</span>
                                 </div>
+                                <p class="mt-2 text-muted">Loading verified grades...</p>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card study-option" data-value="C2" onclick="selectStudy('C2')">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2">
-                                        <i class="fas fa-graduation-cap fa-2x text-primary"></i>
-                                    </div>
-                                    <h6 class="mb-1">Diploma</h6>
-                                    <input type="radio" name="study_path" value="C2" class="d-none">
-                                </div>
-                            </div>
+                        <input type="hidden" name="total_as" id="totalAsInput">
+                    </div>
+                    
+                    <div class="row g-3">
+                        <!-- Income Category -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-chart-line me-2 text-maroon"></i>Family Income Category
+                            </label>
+                            <select name="income_category" class="form-select" required>
+                                <option value="">-- Select Income Category --</option>
+                                <option value="B40">B40 (Below RM 5,351)</option>
+                                <option value="M40">M40 (RM 5,351 - RM 11,819)</option>
+                                <option value="T20">T20 (Above RM 11,819)</option>
+                            </select>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card study-option" data-value="C3" onclick="selectStudy('C3')">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2">
-                                        <i class="fas fa-book-open fa-2x text-warning"></i>
-                                    </div>
-                                    <h6 class="mb-1">Matriculation</h6>
-                                    <input type="radio" name="study_path" value="C3" class="d-none">
-                                </div>
-                            </div>
+
+                        <!-- Study Path -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-road me-2 text-maroon"></i>Intended Study Path
+                            </label>
+                            <select name="study_path" class="form-select" required>
+                                <option value="">-- Select Study Path --</option>
+                                <option value="Foundation">Foundation</option>
+                                <option value="Matriculation">Matriculation</option>
+                                <option value="Diploma">Diploma</option>
+                                <option value="Degree">Degree</option>
+                                <option value="TVET">TVET</option>
+                                <option value="Postgraduate">Postgraduate</option>
+                            </select>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card study-option" data-value="C4" onclick="selectStudy('C4')">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2">
-                                        <i class="fas fa-tools fa-2x text-success"></i>
-                                    </div>
-                                    <h6 class="mb-1">TVET</h6>
-                                    <input type="radio" name="study_path" value="C4" class="d-none">
-                                </div>
-                            </div>
+
+                        <!-- Field of Study -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-book me-2 text-maroon"></i>Field of Study
+                            </label>
+                            <select name="field_of_study" class="form-select" required>
+                                <option value="">-- Select Field --</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Business">Business</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Education">Education</option>
+                                <option value="Data Science">Data Science</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="Economics">Economics</option>
+                                <option value="Law">Law</option>
+                                <option value="Science">Science</option>
+                                <option value="Architecture">Architecture</option>
+                                <option value="Social Science">Social Science</option>
+                                <option value="Communication">Communication</option>
+                                <option value="Hospitality">Hospitality</option>
+                                <option value="Art & Design">Art & Design</option>
+                            </select>
+                        </div>
+
+                        <!-- Bumiputera Status -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-star-of-life me-2 text-maroon"></i>Bumiputera Status
+                            </label>
+                            <select name="bumiputera" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                        <!-- Age -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-birthday-cake me-2 text-maroon"></i>Age
+                            </label>
+                            <input type="number" name="age" class="form-control" min="15" max="30" placeholder="Enter your age" required>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-venus-mars me-2 text-maroon"></i>Gender
+                            </label>
+                            <select name="gender" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+
+                        <!-- State -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-map-marker-alt me-2 text-maroon"></i>State of Origin
+                            </label>
+                            <select name="state" class="form-select" required>
+                                <option value="">-- Select State --</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Pulau Pinang">Pulau Pinang</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                <option value="Putrajaya">Putrajaya</option>
+                                <option value="Labuan">Labuan</option>
+                            </select>
+                        </div>
+
+                        <!-- Citizenship -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-passport me-2 text-maroon"></i>Citizenship
+                            </label>
+                            <select name="citizenship" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="Malaysia">Malaysia</option>
+                                <option value="International">International</option>
+                            </select>
+                        </div>
+
+                        <!-- Leadership Experience -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-trophy me-2 text-maroon"></i>Leadership Experience
+                            </label>
+                            <select name="has_leadership" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="text-danger mt-1" id="studyError"></div>
-                </div>
-
-                <!-- Bumiputera Status -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Bumiputera Status</label>
-                    <select name="bumiputera" class="form-select" required>
-                        <option value="">-- Select --</option>
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-
-                <!-- Age -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Age</label>
-                    <input type="number"
-                        name="age"
-                        class="form-control"
-                        min="15"
-                        max="30"
-                        placeholder="Enter your age"
-                        required>
-                </div>
-
-                <!-- Gender -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Gender</label>
-                    <select name="gender" class="form-select" required>
-                        <option value="">-- Select --</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                </div>
-
-                <!-- State -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">State of Origin</label>
-                    <select name="state" class="form-select" required>
-                        <option value="">-- Select State --</option>
-                        <option value="Johor">Johor</option>
-                        <option value="Kedah">Kedah</option>
-                        <option value="Kelantan">Kelantan</option>
-                        <option value="Melaka">Melaka</option>
-                        <option value="Negeri Sembilan">Negeri Sembilan</option>
-                        <option value="Pahang">Pahang</option>
-                        <option value="Perak">Perak</option>
-                        <option value="Perlis">Perlis</option>
-                        <option value="Pulau Pinang">Pulau Pinang</option>
-                        <option value="Sabah">Sabah</option>
-                        <option value="Sarawak">Sarawak</option>
-                        <option value="Selangor">Selangor</option>
-                        <option value="Terengganu">Terengganu</option>
-                        <option value="Kuala Lumpur">Kuala Lumpur</option>
-                        <option value="Putrajaya">Putrajaya</option>
-                        <option value="Labuan">Labuan</option>
-                    </select>
-                </div>
-
-                <!-- Leadership Experience -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Leadership Experience</label>
-                    <select name="has_leadership" class="form-select" required>
-                        <option value="">-- Select --</option>
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-
-
-
-                
-                <!-- Navigation -->
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-outline-primary" onclick="goBackToStep2()">
-                        <i class="fas fa-arrow-left me-2"></i> Back
-                    </button>
-                    <button type="submit" class="btn btn-primary btn-lg px-5">
-                        Get Recommendations <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
-                </div>
-            </form>
+                    
+                    <!-- Navigation -->
+                    <div class="d-flex justify-content-between mt-4 pt-3">
+                        <button type="button" class="btn btn-outline-primary" onclick="goBackToStep2()">
+                            <i class="fas fa-arrow-left me-2"></i> Back
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            Get Recommendations <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
+    AOS.init({ duration: 800, once: true });
+
     // Current step tracking
     let currentStep = 1;
     let ocrData = null;
@@ -504,7 +576,6 @@
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileInfo').classList.remove('d-none');
             
-            // Simulate upload progress
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 10;
@@ -526,10 +597,9 @@
         
         const formData = new FormData(document.getElementById('uploadForm'));
         
-        // Show loading
         Swal.fire({
             title: 'Processing SPM Certificate',
-            html: '<div class="text-center"><div class="spinner-border text-primary mb-3" role="status"></div><p>Extracting grades using OCR...</p></div>',
+            html: '<div class="text-center"><div class="spinner-border text-maroon mb-3" role="status"></div><p>Extracting grades using OCR...</p></div>',
             allowOutsideClick: false,
             showConfirmButton: false
         });
@@ -562,14 +632,13 @@
     // Display OCR results in editable table
     function displayOCRResults(data) {
         let html = `
-            <div class="alert alert-info">
+            <div class="alert alert-info mb-4">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-info-circle me-3 fa-2x"></i>
                     <div>
                         <h6 class="mb-1">OCR Results Summary</h6>
                         <p class="mb-0">Detected <strong>${Object.keys(data.grades).length}</strong> subjects | 
-                        Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span> | 
-                        Academic Category: <span class="badge bg-primary" id="academicCategoryBadge">${data.academicCategory}</span></p>
+                        Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span></p>
                     </div>
                 </div>
             </div>
@@ -578,7 +647,7 @@
             
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0">Edit Detected Grades:</h6>
+                    <h6 class="mb-0 fw-bold text-maroon">Edit Detected Grades:</h6>
                     <div>
                         <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="showAddSubjectModal()">
                             <i class="fas fa-plus me-1"></i> Add Missing Subject
@@ -602,7 +671,6 @@
                         <tbody id="gradesTableBody">
         `;
         
-        // Sort subjects alphabetically
         const subjects = Object.keys(data.grades);
         subjects.sort();
         
@@ -614,11 +682,9 @@
             html += `
                 <tr id="subject-row-${safeSubjectId}">
                     <td class="fw-bold">${subject}</td>
+                    <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
                     <td>
-                        <span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span>
-                    </td>
-                    <td>
-                        <select class="form-select form-select-sm grade-select" data-subject="${subject}" onchange="updateGrade('${subject}', this.value)" id="select-${safeSubjectId}" style="max-width: 120px;">
+                        <select class="form-select form-select-sm grade-select" data-subject="${subject}" onchange="updateGrade('${subject}', this.value)" id="select-${safeSubjectId}" style="max-width: 140px;">
                             <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
                             <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
                             <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
@@ -650,7 +716,7 @@
                 <div class="row mt-3">
                     <div class="col-md-8">
                         <div class="alert alert-warning">
-                            <h6><i class="fas fa-exclamation-triangle me-2"></i>OCR Accuracy Note:</h6>
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i> OCR Accuracy Note:</h6>
                             <p class="mb-0 small">OCR may not detect all subjects or may misread grades. 
                             Please verify each subject and grade. Add any missing subjects using the button above.</p>
                         </div>
@@ -658,7 +724,7 @@
                     <div class="col-md-4 text-end">
                         <div class="d-grid gap-2">
                             <button type="button" class="btn btn-primary" onclick="verifyAndContinue()">
-                                <i class="fas fa-check-circle me-2"></i> Verify & Continue
+                                <i class="fas fa-check-circle me-2"></i> Continue
                             </button>
                             <button type="button" class="btn btn-outline-secondary" onclick="goBackToUpload()">
                                 <i class="fas fa-redo me-2"></i> Upload Again
@@ -671,39 +737,30 @@
         
         document.getElementById('ocrResultsContainer').innerHTML = html;
 
-        // 🔍 Render OCR Confidence Bar
-if (data.confidence !== undefined) {
-    const confidence = data.confidence;
+        if (data.confidence !== undefined) {
+            const confidence = data.confidence;
+            let confidenceColor = 'bg-danger';
+            let confidenceText = 'Low confidence – manual verification recommended';
 
-    let confidenceColor = 'bg-danger';
-    let confidenceText = 'Low confidence – manual verification recommended';
+            if (confidence >= 80) {
+                confidenceColor = 'bg-success';
+                confidenceText = 'High confidence – OCR result is reliable';
+            } else if (confidence >= 60) {
+                confidenceColor = 'bg-warning';
+                confidenceText = 'Medium confidence – please double-check grades';
+            }
 
-    if (confidence >= 80) {
-        confidenceColor = 'bg-success';
-        confidenceText = 'High confidence – OCR result is reliable';
-    } else if (confidence >= 60) {
-        confidenceColor = 'bg-warning';
-        confidenceText = 'Medium confidence – please double-check grades';
-    }
-
-    document.getElementById('ocrConfidenceBar').innerHTML = `
-        <label class="form-label fw-bold">OCR Confidence Level</label>
-        <div class="progress" style="height: 22px;">
-            <div class="progress-bar ${confidenceColor}"
-                 role="progressbar"
-                 style="width: ${confidence}%"
-                 aria-valuenow="${confidence}"
-                 aria-valuemin="0"
-                 aria-valuemax="100">
-                ${confidence}%
-            </div>
-        </div>
-        <small class="text-muted mt-1 d-block">${confidenceText}</small>
-    `;
-}
-
+            document.getElementById('ocrConfidenceBar').innerHTML = `
+                <label class="form-label fw-bold">OCR Confidence Level</label>
+                <div class="progress" style="height: 22px;">
+                    <div class="progress-bar ${confidenceColor}" role="progressbar" style="width: ${confidence}%" aria-valuenow="${confidence}" aria-valuemin="0" aria-valuemax="100">
+                        ${confidence}%
+                    </div>
+                </div>
+                <small class="text-muted mt-1 d-block">${confidenceText}</small>
+            `;
+        }
         
-        // Move to step 2
         goToStep(2);
     }
     
@@ -719,14 +776,10 @@ if (data.confidence !== undefined) {
         return 'grade-other';
     }
     
-    // Update single grade locally
     function updateGrade(subject, newGrade) {
         if (!ocrData) return;
-        
-        // Update local data
         ocrData.grades[subject] = newGrade;
         
-        // Update badge display
         const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
         const badge = document.getElementById(`grade-${safeSubjectId}`);
         if (badge) {
@@ -734,36 +787,21 @@ if (data.confidence !== undefined) {
             badge.className = `grade-badge ${getGradeClass(newGrade)}`;
         }
         
-        // Recalculate total A's
         let totalAs = 0;
         Object.values(ocrData.grades).forEach(grade => {
-            if (grade.startsWith('A')) {
-                totalAs++;
-            }
+            if (grade.startsWith('A')) totalAs++;
         });
         
-        // Update academic category
-        let academicCategory = 'A1';
-        if (totalAs >= 10) academicCategory = 'A4';
-        else if (totalAs >= 7) academicCategory = 'A3';
-        else if (totalAs >= 4) academicCategory = 'A2';
-        
-        // Update display
         document.getElementById('totalAsBadge').textContent = totalAs;
-        document.getElementById('academicCategoryBadge').textContent = academicCategory;
-        
-        // Update data
         ocrData.totalAs = totalAs;
-        ocrData.academicCategory = academicCategory;
     }
     
-    // Save all grades to server
     function saveAllGrades() {
         if (!ocrData) return;
         
         Swal.fire({
             title: 'Saving Changes',
-            html: '<div class="text-center"><div class="spinner-border text-primary mb-3" role="status"></div><p>Saving grade changes...</p></div>',
+            html: '<div class="text-center"><div class="spinner-border text-maroon mb-3" role="status"></div><p>Saving grade changes...</p></div>',
             allowOutsideClick: false,
             showConfirmButton: false
         });
@@ -779,23 +817,10 @@ if (data.confidence !== undefined) {
         .then(response => response.json())
         .then(data => {
             Swal.close();
-            
             if (data.success) {
-                // Update local data with server response
                 ocrData.totalAs = data.totalAs;
-                ocrData.academicCategory = data.academicCategory;
-                
-                // Update display
                 document.getElementById('totalAsBadge').textContent = data.totalAs;
-                document.getElementById('academicCategoryBadge').textContent = data.academicCategory;
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Grades Saved!',
-                    text: data.message,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                Swal.fire({ icon: 'success', title: 'Grades Saved!', text: data.message, timer: 2000, showConfirmButton: false });
             } else {
                 Swal.fire('Error', data.message, 'error');
             }
@@ -806,7 +831,6 @@ if (data.confidence !== undefined) {
         });
     }
     
-    // Show modal to add missing subject
     function showAddSubjectModal() {
         Swal.fire({
             title: 'Add Missing Subject',
@@ -815,387 +839,201 @@ if (data.confidence !== undefined) {
                     <div class="mb-3">
                         <label class="form-label">Subject Name</label>
                         <input type="text" id="newSubjectName" class="form-control" placeholder="e.g., BAHASA ARAB" required>
-                        <small class="text-muted">Enter subject name in capital letters (e.g., BAHASA MELAYU)</small>
+                        <small class="text-muted">Enter subject name in capital letters</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Grade</label>
                         <select id="newSubjectGrade" class="form-select">
-                            <option value="A+">A+</option>
-                            <option value="A">A</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B">B</option>
-                            <option value="B-">B-</option>
-                            <option value="C+">C+</option>
-                            <option value="C">C</option>
-                            <option value="C-">C-</option>
-                            <option value="D">D</option>
-                            <option value="E">E</option>
-                            <option value="G">G</option>
+                            <option value="A+">A+</option><option value="A">A</option><option value="A-">A-</option>
+                            <option value="B+">B+</option><option value="B">B</option><option value="B-">B-</option>
+                            <option value="C+">C+</option><option value="C">C</option><option value="C-">C-</option>
+                            <option value="D">D</option><option value="E">E</option><option value="G">G</option>
                         </select>
                     </div>
                 </div>
             `,
             showCancelButton: true,
             confirmButtonText: 'Add Subject',
-            cancelButtonText: 'Cancel',
-            focusConfirm: false,
             preConfirm: () => {
                 const subject = document.getElementById('newSubjectName').value;
                 const grade = document.getElementById('newSubjectGrade').value;
-                
-                if (!subject.trim()) {
-                    Swal.showValidationMessage('Please enter subject name');
-                    return false;
-                }
-                
-                if (subject.trim().length < 3) {
-                    Swal.showValidationMessage('Subject name must be at least 3 characters');
-                    return false;
-                }
-                
+                if (!subject.trim()) { Swal.showValidationMessage('Please enter subject name'); return false; }
+                if (subject.trim().length < 3) { Swal.showValidationMessage('Subject name must be at least 3 characters'); return false; }
                 return { subject: subject.trim().toUpperCase(), grade: grade };
             }
         }).then((result) => {
-            if (result.isConfirmed) {
-                addSubject(result.value.subject, result.value.grade);
-            }
+            if (result.isConfirmed) addSubject(result.value.subject, result.value.grade);
         });
     }
     
-    // Add new subject
     function addSubject(subject, grade) {
         if (!ocrData) return;
-        
-        // Check if subject already exists
         if (ocrData.grades[subject]) {
             Swal.fire('Warning', `Subject "${subject}" already exists!`, 'warning');
             return;
         }
         
-        Swal.fire({
-            title: 'Adding Subject',
-            html: '<div class="text-center"><div class="spinner-border text-primary mb-3" role="status"></div><p>Adding new subject...</p></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false
-        });
+        Swal.fire({ title: 'Adding Subject', html: '<div class="spinner-border text-maroon"></div>', allowOutsideClick: false, showConfirmButton: false });
         
         fetch("{{ route('add.ocr.subject') }}", {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             body: JSON.stringify({ subject: subject, grade: grade })
         })
         .then(response => response.json())
         .then(data => {
             Swal.close();
-            
             if (data.success) {
-                // Update local data
                 ocrData.grades[subject] = grade;
                 ocrData.totalAs = data.totalAs;
-                ocrData.academicCategory = data.academicCategory;
-                
-                // Add new row to table
-                addSubjectToTable(subject, grade, data.totalAs, data.academicCategory);
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Subject Added!',
-                    text: `${subject} added successfully.`,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                addSubjectToTable(subject, grade, data.totalAs);
+                Swal.fire({ icon: 'success', title: 'Subject Added!', timer: 2000, showConfirmButton: false });
             } else {
                 Swal.fire('Error', data.message, 'error');
             }
         })
-        .catch(error => {
-            Swal.close();
-            Swal.fire('Error', 'Failed to add subject', 'error');
-        });
+        .catch(error => { Swal.close(); Swal.fire('Error', 'Failed to add subject', 'error'); });
     }
     
-    // Add new subject row to table
-    function addSubjectToTable(subject, grade, totalAs, academicCategory) {
+    function addSubjectToTable(subject, grade, totalAs) {
         const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
         const gradeClass = getGradeClass(grade);
-        
         const newRow = `
             <tr id="subject-row-${safeSubjectId}">
                 <td class="fw-bold">${subject} <span class="badge bg-info ms-2">Added</span></td>
-                <td>
-                    <span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span>
-                </td>
-                <td>
-                    <select class="form-select form-select-sm grade-select" data-subject="${subject}" onchange="updateGrade('${subject}', this.value)" id="select-${safeSubjectId}" style="max-width: 120px;">
-                        <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
-                        <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
-                        <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
-                        <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
-                        <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
-                        <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
-                        <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
-                        <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
-                        <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
-                        <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
-                        <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
-                        <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')" title="Remove this subject">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
+                <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
+                <td><select class="form-select form-select-sm" onchange="updateGrade('${subject}', this.value)" style="max-width: 140px;">
+                    <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option><option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
+                    <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option><option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
+                    <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option><option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
+                    <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option><option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
+                    <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option><option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
+                    <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option><option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
+                </select></td>
+                <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')"><i class="fas fa-trash"></i></button></td>
+            </table>
         `;
-        
-        // Add to table body
         const tbody = document.getElementById('gradesTableBody');
-        if (tbody) {
-            tbody.innerHTML += newRow;
-        }
-        
-        // Update summary
+        if (tbody) tbody.innerHTML += newRow;
         document.getElementById('totalAsBadge').textContent = totalAs;
-        document.getElementById('academicCategoryBadge').textContent = academicCategory;
     }
     
-    // Remove subject
     function removeSubject(subject) {
         Swal.fire({
-            title: 'Remove Subject?',
-            text: `Are you sure you want to remove "${subject}"?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Remove',
-            cancelButtonText: 'Cancel',
-            confirmButtonColor: '#d33'
+            title: 'Remove Subject?', text: `Remove "${subject}"?`, icon: 'warning',
+            showCancelButton: true, confirmButtonText: 'Yes, Remove', confirmButtonColor: '#d33'
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch("{{ route('remove.ocr.subject') }}", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                     body: JSON.stringify({ subject: subject })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Remove from local data
-                        if (ocrData && ocrData.grades[subject]) {
-                            delete ocrData.grades[subject];
-                            ocrData.totalAs = data.totalAs;
-                            ocrData.academicCategory = data.academicCategory;
-                        }
-                        
-                        // Remove row from table
+                        if (ocrData && ocrData.grades[subject]) delete ocrData.grades[subject];
+                        ocrData.totalAs = data.totalAs;
                         const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
                         const row = document.getElementById(`subject-row-${safeSubjectId}`);
-                        if (row) {
-                            row.remove();
-                        }
-                        
-                        // Update summary
+                        if (row) row.remove();
                         document.getElementById('totalAsBadge').textContent = data.totalAs;
-                        document.getElementById('academicCategoryBadge').textContent = data.academicCategory;
-                        
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Removed!',
-                            text: `Subject "${subject}" removed successfully.`,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire('Error', data.message, 'error');
-                    }
+                        Swal.fire({ icon: 'success', title: 'Removed!', timer: 2000, showConfirmButton: false });
+                    } else { Swal.fire('Error', data.message, 'error'); }
                 })
-                .catch(error => {
-                    Swal.fire('Error', 'Failed to remove subject', 'error');
-                });
+                .catch(error => { Swal.fire('Error', 'Failed to remove subject', 'error'); });
             }
         });
     }
     
     function verifyAndContinue() {
         Swal.fire({
-            title: 'Verify Results',
-            text: 'Are you sure all grades are correct?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Continue',
-            cancelButtonText: 'No, Edit Again',
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33'
+            title: 'Verify Results', text: 'Are you sure all grades are correct?', icon: 'question',
+            showCancelButton: true, confirmButtonText: 'Yes, Continue', confirmButtonColor: '#3085d6'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Verify with server
                 fetch("{{ route('verify.ocr.results') }}", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                     body: JSON.stringify({ confirm: true })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Display verified grades in step 3
-                        displayVerifiedGrades(data.totalAs, data.academicCategory);
-                        
-                        // Move to step 3
+                        displayVerifiedGrades(data.totalAs);
                         goToStep(3);
-                        
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Verified!',
-                            text: data.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire('Error', data.message, 'error');
-                    }
+                        Swal.fire({ icon: 'success', title: 'Verified!', text: data.message, timer: 1500, showConfirmButton: false });
+                    } else { Swal.fire('Error', data.message, 'error'); }
                 })
-                .catch(error => {
-                    Swal.fire('Error', 'Verification failed', 'error');
-                });
+                .catch(error => { Swal.fire('Error', 'Verification failed', 'error'); });
             }
         });
     }
     
-    function displayVerifiedGrades(totalAs, academicCategory) {
-        const gradesContainer = document.getElementById('extractedGrades');
-        gradesContainer.innerHTML = `
+    function displayVerifiedGrades(totalAs) {
+        document.getElementById('totalAsInput').value = totalAs;
+        document.getElementById('extractedGrades').innerHTML = `
             <div class="verified-grades">
                 <div class="alert alert-success">
                     <div class="d-flex align-items-center">
                         <i class="fas fa-check-circle me-3 fa-2x"></i>
                         <div>
                             <h6 class="mb-1">✓ Verified SPM Results</h6>
-                            <p class="mb-0">Total A's: <span class="badge bg-success">${totalAs}</span> | 
-                            Academic Category: <span class="badge bg-primary">${academicCategory}</span></p>
+                            <p class="mb-0">Total A's: <span class="badge bg-success">${totalAs}</span></p>
                         </div>
                     </div>
                 </div>
                 <p class="text-muted mb-0"><small>Your grades have been verified and will be used for scholarship matching.</small></p>
             </div>
         `;
-        
-        // Set academic category in hidden field
-        document.getElementById('academicCategory').value = academicCategory;
     }
     
-    // Navigation functions
     function goToStep(step) {
-        // Hide all steps
         document.getElementById('step1').classList.add('d-none');
         document.getElementById('step2').classList.add('d-none');
         document.getElementById('step3').classList.add('d-none');
-        
-        // Show current step
         document.getElementById(`step${step}`).classList.remove('d-none');
         
-        // Update progress bar
         const progress = step === 1 ? 33 : step === 2 ? 66 : 100;
         document.getElementById('progressBar').style.width = `${progress}%`;
         
-        // Update step text
-        document.querySelectorAll('.d-flex.justify-content-between span').forEach(span => {
-            span.classList.remove('text-primary', 'fw-bold');
-            span.classList.add('text-muted');
+        const stepTexts = ['step1Text', 'step2Text', 'step3Text'];
+        stepTexts.forEach((id, idx) => {
+            const el = document.getElementById(id);
+            if (idx + 1 === step) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
         });
-        
-        document.getElementById(`step${step}Text`).classList.remove('text-muted');
-        document.getElementById(`step${step}Text`).classList.add('text-primary', 'fw-bold');
-        
         currentStep = step;
     }
     
     function goBackToUpload() {
         Swal.fire({
-            title: 'Upload Again?',
-            text: 'This will clear all extracted data.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Upload Again',
-            cancelButtonText: 'Cancel'
+            title: 'Upload Again?', text: 'This will clear all extracted data.', icon: 'warning',
+            showCancelButton: true, confirmButtonText: 'Yes, Upload Again'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Clear OCR data
                 fetch("{{ route('verify.ocr.results') }}", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                     body: JSON.stringify({ confirm: false })
-                })
-                .then(() => {
-                    // Reset file input
+                }).then(() => {
                     document.getElementById('spmFile').value = '';
                     document.getElementById('fileInfo').classList.add('d-none');
-                    
-                    // Go back to step 1
                     goToStep(1);
                 });
             }
         });
     }
     
-    function goBackToStep2() {
-        goToStep(2);
-    }
+    function goBackToStep2() { goToStep(2); }
     
-    // Selection functions for step 3
-    function selectIncome(value) {
-        document.querySelectorAll('.income-option').forEach(option => {
-            option.classList.remove('border-primary', 'border-2');
-            option.querySelector('input[type="radio"]').checked = false;
-        });
-        
-        const selected = document.querySelector(`.income-option[data-value="${value}"]`);
-        selected.classList.add('border-primary', 'border-2');
-        selected.querySelector('input[type="radio"]').checked = true;
-        document.getElementById('incomeError').textContent = '';
-    }
-    
-    function selectStudy(value) {
-        document.querySelectorAll('.study-option').forEach(option => {
-            option.classList.remove('border-primary', 'border-2');
-            option.querySelector('input[type="radio"]').checked = false;
-        });
-        
-        const selected = document.querySelector(`.study-option[data-value="${value}"]`);
-        selected.classList.add('border-primary', 'border-2');
-        selected.querySelector('input[type="radio"]').checked = true;
-        document.getElementById('studyError').textContent = '';
-    }
-    
-    // Form validation for step 3
     document.getElementById('profileForm').addEventListener('submit', function(e) {
-        const incomeSelected = document.querySelector('input[name="income_category"]:checked');
-        const studySelected = document.querySelector('input[name="study_path"]:checked');
-        let valid = true;
-        
-        if (!incomeSelected) {
-            document.getElementById('incomeError').textContent = 'Please select family income category';
-            valid = false;
-        }
-        
-        if (!studySelected) {
-            document.getElementById('studyError').textContent = 'Please select intended study path';
-            valid = false;
-        }
-        
-        if (!valid) {
+        const incomeSelected = document.querySelector('select[name="income_category"]').value;
+        const studySelected = document.querySelector('select[name="study_path"]').value;
+        if (!incomeSelected || !studySelected) {
             e.preventDefault();
             Swal.fire('Error', 'Please complete all required fields', 'error');
         }

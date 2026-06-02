@@ -7,6 +7,7 @@ use App\Models\Scholarship;
 use App\Models\ScholarshipEligibilityCriteria;
 use App\Models\Bookmark;
 use App\Models\ScrapingLog;
+use App\Models\Feedback;  
 use App\Notifications\ScholarshipDeadlineNear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class AdminController extends Controller
      * Display admin dashboard.
      */
     public function dashboard()
-{
+    {
     $stats = [
         'totalUsers' => User::count(),
         'totalScholarships' => Scholarship::count(),
@@ -58,7 +59,7 @@ class AdminController extends Controller
     ];
 
     return view('admin.dashboard', $stats);
-}
+    }
 
     
     /**
@@ -71,7 +72,7 @@ class AdminController extends Controller
             'require_bumiputera' => ScholarshipEligibilityCriteria::where('bumiputera_required', true)->count(),
             'require_leadership' => ScholarshipEligibilityCriteria::where('leadership_required', true)->count(),
             'with_bond' => ScholarshipEligibilityCriteria::where('bond_required', true)->count(),
-            'b40_friendly' => ScholarshipEligibilityCriteria::whereJsonContains('income_categories', 'B1')->count(),
+            'b40_friendly' => ScholarshipEligibilityCriteria::whereNotNull('max_monthly_income')->count(),
             'overseas_only' => ScholarshipEligibilityCriteria::where('study_destination', 'Overseas')->count(),
         ];
     }
@@ -184,61 +185,6 @@ class AdminController extends Controller
     }
     
     
-    // ============================================
-    // NEW: ELIGIBILITY MANAGEMENT METHODS
-    // ============================================
-    
-    /**
-     * Bulk create eligibility criteria for scholarships missing them
-     */
-    public function bulkCreateEligibility()
-    {
-        try {
-            $scholarships = Scholarship::doesntHave('eligibilityCriteria')
-                ->where('is_active', true)
-                ->get();
-
-            $created = 0;
-
-            foreach ($scholarships as $scholarship) {
-                // Auto-create basic eligibility from legacy fields
-                if ($scholarship->academic_category || $scholarship->income_category || $scholarship->study_path) {
-                    
-                    $minAs = match($scholarship->academic_category) {
-                        'A1' => 0,
-                        'A2' => 4,
-                        'A3' => 7,
-                        'A4' => 10,
-                        default => null,
-                    };
-
-                    ScholarshipEligibilityCriteria::create([
-                        'scholarship_id' => $scholarship->id,
-                        'min_spm_as' => $minAs,
-                        'academic_categories' => $scholarship->academic_category 
-                            ? json_encode([$scholarship->academic_category]) 
-                            : null,
-                        'income_categories' => $scholarship->income_category 
-                            ? json_encode([$scholarship->income_category]) 
-                            : null,
-                        'study_paths' => $scholarship->study_path 
-                            ? json_encode([$scholarship->study_path]) 
-                            : null,
-                        'notes' => 'Auto-migrated from legacy fields',
-                    ]);
-
-                    $created++;
-                }
-            }
-
-            return back()->with('success', "Created eligibility criteria for {$created} scholarships!");
-            
-        } catch (\Exception $e) {
-            Log::error('Bulk eligibility creation failed: ' . $e->getMessage());
-            return back()->with('error', 'Failed to create eligibility criteria: ' . $e->getMessage());
-        }
-    }
-    
     /**
      * View eligibility management dashboard
      */
@@ -251,8 +197,6 @@ class AdminController extends Controller
                 ->where('is_active', true)
                 ->count(),
             'complete_eligibility' => ScholarshipEligibilityCriteria::whereNotNull('min_spm_as')
-                ->whereNotNull('income_categories')
-                ->whereNotNull('study_paths')
                 ->count(),
         ];
         
@@ -267,54 +211,6 @@ class AdminController extends Controller
     }
     
     /**
-     * Test matching system with sample student
-     */
-    public function testMatching(Request $request)
-    {
-        $request->validate([
-            'total_as' => 'required|integer|min:0|max:12',
-            'income_category' => 'required|in:B1,B3,B4',
-            'study_path' => 'required|in:C1,C2,C3,C4',
-            'bumiputera' => 'required|boolean',
-            'age' => 'required|integer|min:15|max:30',
-            'gender' => 'required|in:Male,Female',
-            'state' => 'required|string',
-            'has_leadership' => 'required|boolean',
-        ]);
-
-        try {
-            // Call stored procedure
-            $matches = DB::select('CALL find_matching_scholarships(?, ?, ?, ?, ?, ?, ?, ?)', [
-                $request->total_as,
-                $request->income_category,
-                $request->study_path,
-                $request->bumiputera,
-                $request->age,
-                $request->gender,
-                $request->state,
-                $request->has_leadership,
-            ]);
-
-            $studentProfile = [
-                'total_as' => $request->total_as,
-                'income_category' => $request->income_category,
-                'study_path' => $request->study_path,
-                'bumiputera' => $request->bumiputera,
-                'age' => $request->age,
-                'gender' => $request->gender,
-                'state' => $request->state,
-                'has_leadership' => $request->has_leadership,
-            ];
-
-            return view('admin.eligibility.test-results', compact('matches', 'studentProfile'));
-            
-        } catch (\Exception $e) {
-            Log::error('Test matching failed: ' . $e->getMessage());
-            return back()->with('error', 'Test matching failed: ' . $e->getMessage());
-        }
-    }
-    
-    /**
      * Show test matching form
      */
     public function showTestForm()
@@ -322,24 +218,6 @@ class AdminController extends Controller
         return view('admin.eligibility.test-form');
     }
     
-    /**
-     * Verify stored procedure exists
-     */
-    public function verifyStoredProcedure()
-    {
-        try {
-            $result = DB::select("SHOW PROCEDURE STATUS WHERE Name = 'find_matching_scholarships' AND Db = DATABASE()");
-            
-            if (empty($result)) {
-                return back()->with('error', 'Stored procedure not found! Please run the SQL script to create it.');
-            }
-            
-            return back()->with('success', 'Stored procedure is installed and ready!');
-            
-        } catch (\Exception $e) {
-            return back()->with('error', 'Error checking stored procedure: ' . $e->getMessage());
-        }
-    }
     
     /**
      * Export eligibility data as CSV for review
@@ -349,119 +227,209 @@ class AdminController extends Controller
         $scholarships = Scholarship::with('eligibilityCriteria')
             ->where('is_active', true)
             ->get();
-        
+
         $csv = [];
+
         $csv[] = [
-            'ID', 'Title', 'Provider', 'Min As', 'Income Categories', 
-            'Study Paths', 'Bumiputera Required', 'Max Age', 'Bond Required',
+            'ID',
+            'Title',
+            'Provider',
+            'Min As',
+            'Max Monthly Income',
+            'Study Levels',
+            'Fields Of Study',
+            'Bumiputera Required',
+            'Max Age',
+            'Bond Required',
             'Has Criteria'
         ];
-        
+
         foreach ($scholarships as $scholarship) {
+
             $criteria = $scholarship->eligibilityCriteria;
-            
+
             $csv[] = [
                 $scholarship->id,
+
                 $scholarship->title,
+
                 $scholarship->provider,
+
                 $criteria->min_spm_as ?? 'N/A',
-                $criteria ? json_encode($criteria->income_categories) : 'N/A',
-                $criteria ? json_encode($criteria->study_paths) : 'N/A',
-                $criteria && $criteria->bumiputera_required ? 'Yes' : 'No',
+
+                $criteria->max_monthly_income ?? 'N/A',
+
+                $criteria && $criteria->study_paths
+                    ? json_encode($criteria->study_paths)
+                    : 'N/A',
+
+                $criteria && $criteria->fields_of_study
+                    ? json_encode($criteria->fields_of_study)
+                    : 'N/A',
+
+                $criteria && $criteria->bumiputera_required
+                    ? 'Yes'
+                    : 'No',
+
                 $criteria->max_age ?? 'N/A',
-                $criteria && $criteria->bond_required ? 'Yes' : 'No',
+
+                $criteria && $criteria->bond_required
+                    ? 'Yes'
+                    : 'No',
+
                 $criteria ? 'Yes' : 'No',
             ];
         }
-        
-        $filename = 'scholarships_eligibility_' . date('Y-m-d') . '.csv';
-        
+
+        $filename =
+            'scholarships_eligibility_' .
+            date('Y-m-d') .
+            '.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Content-Disposition' =>
+                "attachment; filename=\"{$filename}\"",
         ];
-        
-        $callback = function() use ($csv) {
+
+        $callback = function () use ($csv) {
+
             $file = fopen('php://output', 'w');
+
             foreach ($csv as $row) {
                 fputcsv($file, $row);
             }
+
             fclose($file);
         };
+
+        return response()->stream(
+            $callback,
+            200,
+            $headers
+        );
+    }
+
+
+    public function sendDeadlineNotification()
+    {
+        Artisan::call('notify:scholarship-deadline');
+
+        return back()->with('success', 'Deadline notifications sent successfully!');
+    }
+    public function notifications()
+    {
+        $totalBookmarks = Bookmark::count();
+
+        $pending = Bookmark::where('notification_status', 'pending')->count();
+        $sent = Bookmark::where('notification_status', 'success')->count();
+        $failed = Bookmark::where('notification_status', 'failed')->count();
+
+        $pendingList = Bookmark::with(['user', 'scholarship'])
+            ->where('notification_status', 'pending')
+            ->latest()
+            ->get();
+
+        $history = DB::table('notifications')
+            ->latest()
+            ->limit(20)
+            ->get();
+
+        return view('admin.notifications.index', compact(
+            'totalBookmarks',
+            'pending',
+            'sent',
+            'failed',
+            'pendingList',
+            'history'
+        ));
+    }
+
+    public function notifySingle(Request $request)
+    {
+        $bookmark = Bookmark::with(['user', 'scholarship'])
+            ->findOrFail($request->bookmark_id);
+
+        if (!$bookmark->user || !$bookmark->scholarship) {
+            return back()->with('error', 'Invalid data');
+        }
+
+        $daysLeft = now()->diffInDays($bookmark->scholarship->deadline, false);
+
+    try {
+        $bookmark->user->notify(
+            new ScholarshipDeadlineNear(
+                $bookmark->scholarship,
+                $daysLeft
+            )
+        );
+
+        $bookmark->update([
+            'notified_at' => now(),
+            'notification_status' => 'success',
+            'notification_error' => null
+        ]);
+
+        return back()->with('success', 'Notification sent successfully!');
+
+    } catch (\Exception $e) {
+
+        $bookmark->update([
+            'notification_status' => 'failed',
+            'notification_error' => $e->getMessage()
+        ]);
+
+        return back()->with('error', 'Failed: ' . $e->getMessage());
+    }
+    }
+    public function feedbacks()
+    {
+        $feedbacks = Feedback::with('user')
+            ->latest()
+            ->paginate(20);
         
-        return response()->stream($callback, 200, $headers);
+        $pendingCount = Feedback::where('approved', 0)->count();
+        $approvedCount = Feedback::where('approved', 1)->count();
+        
+        return view('admin.feedbacks', compact('feedbacks', 'pendingCount', 'approvedCount'));
     }
 
-
-public function sendDeadlineNotification()
-{
-    Artisan::call('notify:scholarship-deadline');
-
-    return back()->with('success', 'Deadline notifications sent successfully!');
-}
-public function notifications()
-{
-    $totalBookmarks = Bookmark::count();
-
-    $pending = Bookmark::where('notification_status', 'pending')->count();
-    $sent = Bookmark::where('notification_status', 'success')->count();
-    $failed = Bookmark::where('notification_status', 'failed')->count();
-
-    $pendingList = Bookmark::with(['user', 'scholarship'])
-        ->where('notification_status', 'pending')
-        ->latest()
-        ->get();
-
-    $history = DB::table('notifications')
-        ->latest()
-        ->limit(20)
-        ->get();
-
-    return view('admin.notifications.index', compact(
-        'totalBookmarks',
-        'pending',
-        'sent',
-        'failed',
-        'pendingList',
-        'history'
-    ));
-}
-
-public function notifySingle(Request $request)
-{
-    $bookmark = Bookmark::with(['user', 'scholarship'])
-        ->findOrFail($request->bookmark_id);
-
-    if (!$bookmark->user || !$bookmark->scholarship) {
-        return back()->with('error', 'Invalid data');
+    /**
+     * Approve a feedback
+     */
+    public function approveFeedback($id)
+    {
+        $feedback = Feedback::findOrFail($id);
+        $feedback->approved = 1;
+        $feedback->save();
+        
+        return redirect()->back()->with('success', 'Feedback approved successfully!');
     }
 
-    $daysLeft = now()->diffInDays($bookmark->scholarship->deadline, false);
+    /**
+     * Reject/Delete a feedback
+     */
+    public function rejectFeedback($id)
+    {
+        $feedback = Feedback::findOrFail($id);
+        $feedback->delete();
+        
+        return redirect()->back()->with('success', 'Feedback rejected and removed.');
+    }
 
-try {
-    $bookmark->user->notify(
-        new ScholarshipDeadlineNear(
-            $bookmark->scholarship,
-            $daysLeft
-        )
-    );
-
-    $bookmark->update([
-        'notified_at' => now(),
-        'notification_status' => 'success',
-        'notification_error' => null
-    ]);
-
-    return back()->with('success', 'Notification sent successfully!');
-
-} catch (\Exception $e) {
-
-    $bookmark->update([
-        'notification_status' => 'failed',
-        'notification_error' => $e->getMessage()
-    ]);
-
-    return back()->with('error', 'Failed: ' . $e->getMessage());
+    /**
+     * Bulk approve feedbacks
+     */
+    public function bulkApproveFeedbacks(Request $request)
+    {
+        $ids = $request->ids;
+        
+        if ($ids && count($ids) > 0) {
+            Feedback::whereIn('id', $ids)->update(['approved' => 1]);
+            return redirect()->back()->with('success', count($ids) . ' feedbacks approved successfully!');
+        }
+        
+        return redirect()->back()->with('error', 'No feedbacks selected.');
+    }
 }
-}
-}
+

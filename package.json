@@ -2,8 +2,22 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "build": "vite build"
+    "dev": "vite",
+    "build": "vite build",
+
+    "scrape:bnm": "node scrapers/bnm.js",
+    "scrape:axiata": "node scrapers/axiata.js",
+    "scrape:bpmb": "node scrapers/bpmb.js",
+    "scrape:k.equity": "node scrapers/k.equity.js",
+    "scrape:k.watan": "node scrapers/k.watan.js",
+    "scrape:k.paynet": "node scrapers/k.paynet.js",
+    "scrape:mara": "node scrapers/mara.js",
+    "scrape:petronas": "node scrapers/petronas.js",
+    "scrape:shell": "node scrapers/shell.js",
+    "scrape:jpa.db40": "node scrapers/jpa.db40.js",
+    "scrape:jpa.lspm": "node scrapers/jpa.lspm.js",
+    "scrape:jpa.ppn": "node scrapers/jpa.ppn.js"
+    
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",

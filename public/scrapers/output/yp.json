@@ -5,18 +5,13 @@
     "application_link": "https://yp.org.my/program-bantuan-pendidikan/hadiah-pelajar-cemerlang-hpc/",
     "raw_eligibility": "Laman Utama | Program Bantuan Pendidikan | Hadiah Pelajar Cemerlang (HPC)\n\nPROGRAM-PROGRAM BANTUAN PENDIDIKAN\n\nHPC sebagai rangsangan berbentuk sijil penghargaan dan wang tunai mengikut kategori ini diberikan kepada pelajar-pelajar sekolah dalam Negeri Pahang di bawah Jabatan Pendidikan Negeri Pahang (JPNP) dan Jabatan Agama Islam Pahang (JAIP) yang mencatat kejayaan cemerlang dalam peperiksaan awam:-\n\nPEPERIKSAAN AWAM\tINSENTIF/TUNAI (RM)\tPENCAPAIAN\nUjian Pencapaian Sekolah Rendah (UPSR)\tRM150\t6A(SK)/8A(SJK)\nSijil Pelajaran Malaysia (SPM)\tRM200\tMinimum 8A ke atas\nSijil Menengah Agama (SMA)\tRM200\tPangkat Mumtaz\nSijil Tinggi Pelajaran Malaysia (STPM)\tRM250\tMinimum 3A ke atas\nSijil TInggi Agama Malaysia (STAM)\tRM250\tPangkat Mumtaz\nDIKEMASKINI PADA: JULY 30, 2025, 10:22 AM",
     "rules": {
-      "min_spm_as": 6,
+      "min_spm_as": 8,
       "max_spm_as": null,
-      "academic_categories": [
-        "A3"
-      ],
       "required_subjects": null,
-      "income_categories": null,
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": null,
       "fields_of_study": null,
       "study_destination": "Both",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
@@ -31,14 +26,13 @@
       "min_community_hours": null,
       "bond_required": false,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Auto-parsed by ruleParser"
     },
     "source": "scraped",
     "source_website": "yp",
-    "scraped_at": "2026-04-27T07:02:14.380Z"
+    "scraped_at": "2026-05-15T14:52:17.672Z"
   },
   {
     "title": "Geran Pra Siswazah / Pasca Siswazah",
@@ -48,27 +42,25 @@
     "rules": {
       "min_spm_as": null,
       "max_spm_as": null,
-      "academic_categories": [
-        "A2"
-      ],
       "required_subjects": null,
-      "income_categories": null,
-      "income_strict": true,
+      "max_monthly_income": null,
       "study_paths": [
-        "C1",
-        "C3"
+        "Foundation",
+        "Matriculation",
+        "Diploma",
+        "Degree",
+        "Postgraduate"
       ],
       "fields_of_study": [
         "Medicine",
         "Science"
       ],
       "study_destination": "Overseas",
-      "study_path_strict": true,
       "bumiputera_required": false,
       "bumiputera_priority": false,
       "gender_requirement": "Any",
       "citizenship_required": "Malaysian",
-      "state_requirement": "Selangor",
+      "state_requirement": null,
       "rural_priority": false,
       "min_age": null,
       "max_age": null,
@@ -78,13 +70,12 @@
       "min_community_hours": null,
       "bond_required": false,
       "bond_years": null,
-      "match_all_criteria": true,
       "priority_weight": 1,
       "max_score": 100,
       "notes": "Auto-parsed by ruleParser"
     },
     "source": "scraped",
     "source_website": "yp",
-    "scraped_at": "2026-04-27T07:02:17.975Z"
+    "scraped_at": "2026-05-15T14:52:20.899Z"
   }
 ]
