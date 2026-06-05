@@ -77,7 +77,7 @@
                                             <h6 class="text-muted mb-2">Last Run</h6>
                                             <h5 class="mb-0">
                                                 @if($logs->count() > 0)
-                                                    {{ $logs->first()->created_at->diffForHumans() }}
+                                                    {{ \Carbon\Carbon::parse($logs->first()->started_at)->diffForHumans() }}
                                                 @else
                                                     Never
                                                 @endif
@@ -158,8 +158,10 @@
                                     </td>
                                     <td>
                                         <div class="small">
-                                            {{ $log->created_at->format('H:i') }}
-                                            <div class="text-muted">{{ $log->created_at->format('d/m/Y') }}</div>
+                                            {{ \Carbon\Carbon::parse($log->started_at)->format('H:i') }}
+                                            <div class="text-muted">
+                                                {{ \Carbon\Carbon::parse($log->started_at)->format('d/m/Y') }}
+                                            </div>
                                         </div>
                                     </td>
                                     <td>
@@ -362,7 +364,7 @@ function viewLogDetails(logId) {
             if (data.success) {
                 $('#detail-website').text(data.log.website_name);
                 $('#detail-status').html(getStatusBadge(data.log.status));
-                $('#detail-started').text(new Date(data.log.created_at).toLocaleString());
+                $('#detail-started').text(new Date(data.log.started_at).toLocaleString());
                 $('#detail-duration').text(data.log.duration ? data.log.duration + ' seconds' : 'N/A');
                 $('#detail-scholarships').text(data.log.scholarships_added);
                 $('#detail-type').text(data.log.type || 'Automatic');
