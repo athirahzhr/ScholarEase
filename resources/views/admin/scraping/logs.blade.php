@@ -156,11 +156,11 @@
                             <td>
                                 <div class="d-flex flex-column">
                                     <span class="fw-semibold">
-                                        {{ \Carbon\Carbon::parse($log->created_at)->format('d M Y') }}
+                                        {{ \Carbon\Carbon::parse($log->started_at)->format('d M Y') }}
                                     </span>
                                     <small class="text-muted">
                                         <i class="far fa-clock me-1"></i>
-                                        {{ \Carbon\Carbon::parse($log->created_at)->format('H:i:s') }}
+                                        {{ \Carbon\Carbon::parse($log->started_at)->format('H:i:s') }}
                                     </small>
                                 </div>
                             </td>
