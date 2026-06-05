@@ -14,8 +14,8 @@ import {
 
 const db = await mysql.createConnection({
   host: '127.0.0.1',
-  user: 'root',
-  password: '',
+  user: 'scholarease',
+  password: 'ScholarEase@2026',
   database: 'scholarease_db'
 });
 
