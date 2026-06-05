@@ -42,7 +42,9 @@ class AdminScraperController extends Controller
     try {
 
         // run scraper and capture output
-        $output = shell_exec("npm run {$command} 2>&1");
+        $output = shell_exec(
+        "PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm run {$command} 2>&1"
+        );
 
         if (!$output) {
             return back()->with(
