@@ -58,7 +58,7 @@ class OCRController extends Controller
         $processedPath = $this->preprocessImage($fullPath);
 
         $text = (new TesseractOCR($processedPath))
-            ->executable('C:\Program Files\Tesseract-OCR\tesseract.exe')
+            ->executable('/usr/bin/tesseract')
             ->lang('eng')
             ->run();
 
