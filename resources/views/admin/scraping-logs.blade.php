@@ -126,7 +126,7 @@
                                             </div>
                                             <div>
                                                 <strong>{{ $log->website_name }}</strong>
-                                                <div class="text-muted small">{{ $log->created_at->format('d M Y, H:i') }}</div>
+                                                <div class="text-muted small">{{ $log->started_at->format('d M Y, H:i') }}</div>
                                             </div>
                                         </div>
                                     </td>
