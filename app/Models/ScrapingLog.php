@@ -11,7 +11,7 @@ class ScrapingLog extends Model
         'website_url',
         'pages_to_scrape',
         'status',
-        'scholarships_added',
+        'inserted_count',
         'details',
         'duration_seconds',
         'error_message',

@@ -148,9 +148,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($log->scholarships_added > 0)
+                                        @if($log->inserted_count > 0)
                                             <span class="badge bg-info">
-                                                <i class="fas fa-plus me-1"></i>{{ $log->scholarships_added }}
+                                                <i class="fas fa-plus me-1"></i>{{ $log->inserted_count }}
                                             </span>
                                         @else
                                             <span class="text-muted">0</span>
