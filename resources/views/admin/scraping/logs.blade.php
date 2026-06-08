@@ -136,7 +136,7 @@
                             
                             <td>
                                 <span class="badge" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; padding: 6px 12px;">
-                                    <i class="fas fa-plus-circle me-1"></i> +{{ $log->success_count }}
+                                    <i class="fas fa-plus-circle me-1"></i> +{{ $log->inserted_count }}
                                 </span>
                             </td>
                             
