@@ -516,35 +516,33 @@ console.log(
       ? 'failed'
       : 'partial';
 
-  await db.execute(
-    `
-    INSERT INTO scraping_logs (
+  await db.execute(`
+  INSERT INTO scraping_logs (
       source_website,
       total_scraped,
       success_count,
       failed_count,
+      inserted_count,
+      updated_count,
+      skipped_count,
       status,
       started_at,
       finished_at
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    `,
-    [
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [
       'petronas',
-
       programs.length,
-
       success,
-
       failed,
 
+      inserted,
+      updated,
+      skipped,
+
       status,
-
       startTime,
-
       new Date()
-    ]
-  );
+  ]);
 
   await db.end();
 
