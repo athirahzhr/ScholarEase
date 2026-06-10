@@ -30,25 +30,26 @@ class ScrapingController extends Controller
      * Scraping logs dashboard
      */
     public function logs()
-    {
+{
     return view('admin.scraping.logs', [
         'logs' => ScrapingLog::latest()->paginate(20),
 
-        // statistics
         'totalScholarships'  => Scholarship::count(),
         'activeScholarships' => Scholarship::where('is_active', true)->count(),
 
-        'todayScrapes' => ScrapingLog::whereDate(
+        'todayScrapes' => ScrapingLog::whereBetween(
             'started_at',
-            now()->toDateString()
+            [
+                now('Asia/Kuala_Lumpur')->startOfDay(),
+                now('Asia/Kuala_Lumpur')->endOfDay()
+            ]
         )->count(),
 
         'totalScrapes' => ScrapingLog::count(),
 
-        // NEW meaning: no structured eligibility rules yet
         'uncategorized' => Scholarship::whereDoesntHave('eligibilityCriteria')->count(),
     ]);
-    }
+}
 
     /**
      * Run JPA scraper
