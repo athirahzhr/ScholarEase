@@ -437,7 +437,7 @@ const program = {
   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
       'bpmb',
-      programs.length,
+      results.length,
       success,
       failed,
 
