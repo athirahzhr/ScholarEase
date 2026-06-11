@@ -16,7 +16,8 @@
     "scrape:shell": "node scrapers/shell.js",
     "scrape:jpa.db40": "node scrapers/jpa.db40.js",
     "scrape:jpa.lspm": "node scrapers/jpa.lspm.js",
-    "scrape:jpa.ppn": "node scrapers/jpa.ppn.js"
+    "scrape:jpa.ppn": "node scrapers/jpa.ppn.js",
+    "scrape:all": "npm run scrape:axiata && npm run scrape:bnm && npm run scrape:bpmb && npm run scrape:k.watan && npm run scrape:k.paynet && npm run scrape:k.equity && npm run scrape:mara && npm run scrape:petronas && npm run scrape:shell && npm run scrape:jpa.db40 && npm run scrape:jpa.ppn && npm run scrape:jpa.lspm"
     
     },
     "devDependencies": {
