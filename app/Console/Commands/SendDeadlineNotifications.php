@@ -10,6 +10,7 @@ use App\Notifications\ScholarshipDeadlineNear;
 class SendDeadlineNotifications extends Command
 {
     protected $signature = 'notify:scholarship-deadline';
+
     protected $description = 'Send email notification for bookmarked scholarships nearing deadline';
 
     public function handle()
@@ -25,7 +26,7 @@ class SendDeadlineNotifications extends Command
             })
             ->get();
 
-        $count = 0; 
+        $count = 0;
 
         foreach ($bookmarks as $bookmark) {
 
@@ -38,27 +39,42 @@ class SendDeadlineNotifications extends Command
 
             $daysLeft = now()->diffInDays($scholarship->deadline, false);
 
-            // Prevent duplicate (extra safety)
-            $updated = Bookmark::where('id', $bookmark->id)
-                ->whereNull('notified_at')
-                ->update([
-                    'notified_at' => now()
-                ]);
+            try {
 
-            if ($updated) {
+                // Send notification email
                 $user->notify(
-                    new ScholarshipDeadlineNear($scholarship, $daysLeft)
+                    new ScholarshipDeadlineNear(
+                        $scholarship,
+                        $daysLeft
+                    )
                 );
+
+                // Mark as sent
+                $bookmark->update([
+                    'notified_at' => now(),
+                    'notification_status' => 'success',
+                    'notification_error' => null,
+                ]);
 
                 $count++;
 
                 $this->info(
                     "[SUCCESS] {$user->email} → {$scholarship->title} ({$daysLeft} days left)"
                 );
+
+            } catch (\Exception $e) {
+
+                $bookmark->update([
+                    'notification_status' => 'failed',
+                    'notification_error' => $e->getMessage(),
+                ]);
+
+                $this->error(
+                    "[FAILED] {$user->email} → {$e->getMessage()}"
+                );
             }
         }
 
-       
         $this->info("Total notifications sent: {$count}");
 
         return Command::SUCCESS;
