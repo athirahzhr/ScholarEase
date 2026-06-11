@@ -55,7 +55,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 | USER ROUTES (Authenticated)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
