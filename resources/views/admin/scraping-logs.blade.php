@@ -60,7 +60,7 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <h6 class="text-muted mb-2">Total Scholarships</h6>
-                                            <h3 class="mb-0">{{ $logs->sum('scholarships_added') }}</h3>
+                                            <h3 class="mb-0">{{ $logs->sum('inserted_count') }}</h3>
                                         </div>
                                         <div class="stat-icon bg-warning bg-opacity-10 text-warning">
                                             <i class="fas fa-graduation-cap"></i>
@@ -366,7 +366,7 @@ function viewLogDetails(logId) {
                 $('#detail-status').html(getStatusBadge(data.log.status));
                 $('#detail-started').text(new Date(data.log.started_at).toLocaleString());
                 $('#detail-duration').text(data.log.duration ? data.log.duration + ' seconds' : 'N/A');
-                $('#detail-scholarships').text(data.log.scholarships_added);
+                $('#detail-scholarships').text(data.log.inserted_count);
                 $('#detail-type').text(data.log.type || 'Automatic');
                 $('#detail-full-details').text(data.log.details || 'No details available');
                 $('#detailsModal').modal('show');

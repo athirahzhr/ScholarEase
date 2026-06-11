@@ -141,9 +141,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Scraping Management
     Route::prefix('scraping')->name('scraping.')->group(function () {
         Route::get('/logs', [ScrapingController::class, 'logs'])->name('logs');
-        Route::post('/jpa', [ScrapingController::class, 'scrapeJPA'])->name('jpa');
-        Route::post('/khazanah', [ScrapingController::class, 'scrapeKhazanah'])->name('khazanah');
-        Route::post('/unienrol', [ScrapingController::class, 'scrapeUnienrol'])->name('unienrol');
     });
 
     // Scraper Controller
