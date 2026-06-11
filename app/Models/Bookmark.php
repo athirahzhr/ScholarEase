@@ -12,10 +12,12 @@ class Bookmark extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'user_id',
-        'scholarship_id',
-        'notified_at',
-    ];
+    'user_id',
+    'scholarship_id',
+    'notified_at',
+    'notification_status',
+    'notification_error',
+]   ;
 
     public function scholarship()
     {
