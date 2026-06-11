@@ -14,7 +14,6 @@ use App\Models\Bookmark;
 use App\Models\Application;
 
 class User extends Authenticatable implements MustVerifyEmail
-
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -37,32 +36,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_active' => 'boolean',
     ];
 
-public function markEmailAsVerified()
-{
-    if ($this->hasVerifiedEmail()) {
-        return false;
-    }
-
-    $this->forceFill([
-        'email_verified_at' => $this->freshTimestamp(),
-    ])->save();
-
-    event(new Verified($this));
-
-    return true;
-}
-
-
-public function hasVerifiedEmail()
-{
-    
-    if ($this->role === 'admin') {
-        return true;
-    }
-
-   
-    return ! is_null($this->email_verified_at);
-}
     public function isAdmin()
     {
         return $this->role === 'admin';
@@ -82,5 +55,4 @@ public function hasVerifiedEmail()
     {
         return $this->hasMany(Application::class);
     }
-    
 }
