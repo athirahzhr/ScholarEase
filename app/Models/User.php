@@ -13,7 +13,7 @@ use App\Models\UserProfile;
 use App\Models\Bookmark;
 use App\Models\Application;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 
 {
     use HasApiTokens, HasFactory, Notifiable;
