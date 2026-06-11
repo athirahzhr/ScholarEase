@@ -16,16 +16,21 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+    $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
-            
-        }
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json([
+            'message' => 'Invalid credentials'
+        ], 401);
+    }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+    if (!$user->hasVerifiedEmail()) {
+        return response()->json([
+            'message' => 'Please verify your email before logging in.'
+        ], 403);
+    }
+
+    $token = $user->createToken('auth_token')->plainTextToken;
 
     return response()->json([
         'message' => 'Login successful',
