@@ -295,7 +295,7 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <h5 class="text-maroon">Drag & Drop or Click to Upload</h5>
-                        <p class="text-muted">Supported formats: JPG, PNG, PDF (Max: 5MB)</p>
+                        <p class="text-muted">Supported formats: JPG, PNG, JPEG (Max: 5MB)</p>
                         <input type="file" class="form-control d-none" id="spmFile" name="spm_file" accept="image/*,.pdf" required>
                         <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('spmFile').click()">
                             <i class="fas fa-folder-open me-2"></i> Browse Files

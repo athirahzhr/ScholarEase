@@ -51,126 +51,189 @@ class OCRController extends Controller
     }
 
     private function processRealOCR($path)
-    {
-        
-        $fullPath = storage_path('app/public/' . $path);
+{
+    $fullPath = storage_path('app/public/' . $path);
 
-        $processedPath = $this->preprocessImage($fullPath);
+    $processedPath = $this->preprocessImage($fullPath);
 
-        $text = (new TesseractOCR($processedPath))
-            ->executable('/usr/bin/tesseract')
-            ->lang('eng')
-            ->run();
+    $text = (new TesseractOCR($processedPath))
+        ->executable('/usr/bin/tesseract')
+        ->lang('eng')
+        ->run();
 
-        if (!$this->isValidSPMResult($text)) {
-            throw new \Exception('Uploaded file is not a valid SPM result slip.');
-        }
+    // Debug OCR output
+    file_put_contents(
+        storage_path('app/ocr_debug.txt'),
+        $text
+    );
 
-        return $this->parseSPMGradesFromText($text);
+    if (!$this->isValidSPMResult($text)) {
+        throw new \Exception('Uploaded file is not a valid SPM result slip.');
     }
+
+    return $this->parseSPMGradesFromText($text);
+}
 
     private function preprocessImage($fullPath)
-    {
-        $imageInfo = getimagesize($fullPath);
+{
+    $imageInfo = getimagesize($fullPath);
 
-        switch ($imageInfo['mime']) {
-            case 'image/jpeg':
-                $image = imagecreatefromjpeg($fullPath);
-                break;
+    switch ($imageInfo['mime']) {
 
-            case 'image/png':
-                $image = imagecreatefrompng($fullPath);
-                break;
+        case 'image/jpeg':
+            $image = imagecreatefromjpeg($fullPath);
+            break;
 
-            default:
-                throw new \Exception('Unsupported image format.');
-        }
+        case 'image/png':
+            $image = imagecreatefrompng($fullPath);
+            break;
 
-        imagefilter($image, IMG_FILTER_GRAYSCALE);
-        imagefilter($image, IMG_FILTER_CONTRAST, -20);
-
-        $processedPath = storage_path('app/public/temp_processed.jpg');
-
-        imagejpeg($image, $processedPath, 100);
-
-        imagedestroy($image);
-
-        return $processedPath;
+        default:
+            throw new \Exception('Unsupported image format.');
     }
+
+    $width = imagesx($image);
+    $height = imagesy($image);
+
+    // Besarkan gambar untuk OCR
+    $newWidth = $width * 3;
+    $newHeight = $height * 3;
+
+    $resized = imagecreatetruecolor($newWidth, $newHeight);
+
+    imagecopyresampled(
+        $resized,
+        $image,
+        0,
+        0,
+        0,
+        0,
+        $newWidth,
+        $newHeight,
+        $width,
+        $height
+    );
+
+    $image = $resized;
+
+    imagefilter($image, IMG_FILTER_GRAYSCALE);
+    imagefilter($image, IMG_FILTER_CONTRAST, -40);
+    imagefilter($image, IMG_FILTER_BRIGHTNESS, 10);
+
+    $processedPath = storage_path(
+        'app/public/temp_' . uniqid() . '.jpg'
+    );
+
+    imagejpeg($image, $processedPath, 100);
+
+    imagedestroy($image);
+
+    return $processedPath;
+}
 
     private function isValidSPMResult($text)
-    {
-        $keywords = [
-            'KEMENTERIAN PENDIDIKAN',
-            'LEMBAGA PEPERIKSAAN',
-            'SIJIL PELAJARAN MALAYSIA'
-        ];
+{
+    $text = strtoupper($text);
 
-        $matches = 0;
-
-        foreach ($keywords as $keyword) {
-            if (stripos($text, $keyword) !== false) {
-                $matches++;
-            }
-        }
-
-        return $matches >= 2;
-    }
+    return (
+        str_contains($text, 'SIJIL') ||
+        str_contains($text, 'PELAJARAN') ||
+        str_contains($text, 'LEMBAGA') ||
+        str_contains($text, 'PEPERIKSAAN')
+    );
+}
 
     private function parseSPMGradesFromText($text)
-    {
-        $subjects = [
-            'BAHASA MELAYU',
-            'BAHASA INGGERIS',
-            'SEJARAH',
-            'MATEMATIK',
-            'MATHEMATICS',
-            'SAINS',
-            'BIOLOGI',
-            'BIOLOGY',
-            'FIZIK',
-            'PHYSICS',
-            'KIMIA',
-            'CHEMISTRY',
-            'MATEMATIK TAMBAHAN',
-            'ADDITIONAL MATHEMATICS',
-            'PENDIDIKAN ISLAM',
-            'PENDIDIKAN MORAL',
-            'BAHASA ARAB',
-            'PENDIDIKAN AL-QURAN DAN AL-SUNNAH',
-            'PENDIDIKAN SYARIAH ISLAMIAH',
-            'PRINSIP PERAKAUNAN',
-            'EKONOMI',
-            'PERDAGANGAN',
-            'GEOGRAFI'
-        ];
+{
+    $subjects = [
+        'BAHASA MELAYU',
+        'BAHASA INGGERIS',
+        'PENDIDIKAN ISLAM',
+        'PENDIDIKAN MORAL',
+        'SEJARAH',
+        'MATHEMATICS',
+        'MATEMATIK',
+        'ADDITIONAL MATHEMATICS',
+        'MATEMATIK TAMBAHAN',
+        'PHYSICS',
+        'FIZIK',
+        'CHEMISTRY',
+        'KIMIA',
+        'BIOLOGY',
+        'BIOLOGI',
+        'SAINS',
+        'GRAFIK KOMUNIKASI TEKNIKAL',
+        'BAHASA ARAB',
+        'PRINSIP PERAKAUNAN',
+        'EKONOMI',
+        'PERDAGANGAN',
+        'GEOGRAFI'
+    ];
 
-        $grades = [];
-        $normalizedText = strtoupper($text);
+    $text = strtoupper($text);
+
+    // Betulkan OCR typo biasa
+    $text = str_replace([
+        'AT',
+        'AS',
+        'A®',
+        'A?',
+        'A*'
+    ], 'A+', $text);
+
+    $lines = preg_split('/\r\n|\r|\n/', $text);
+
+    $lines = array_map(function ($line) {
+        return trim(preg_replace('/\s+/', ' ', $line));
+    }, $lines);
+
+    $detectedSubjects = [];
+
+    foreach ($lines as $line) {
 
         foreach ($subjects as $subject) {
-            $pattern = '/' .
-                preg_quote($subject, '/') .
-                '[\s\r\n]{0,20}' .
-                '(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)/i';
 
-            if (preg_match($pattern, $normalizedText, $matches)) {
-                $grades[$subject] = strtoupper($matches[1]);
+            if (
+                stripos($line, $subject) !== false &&
+                !in_array($subject, $detectedSubjects)
+            ) {
+                $detectedSubjects[] = $subject;
             }
         }
-
-        if (count($grades) < 5) {
-            throw new \Exception('Too few subjects detected. Invalid or unclear SPM slip.');
-        }
-
-        $totalAs = $this->countAsFromGrades($grades);
-
-        return [
-            'grades' => $grades,
-            'total_as' => $totalAs,
-            
-        ];
     }
+
+    preg_match_all(
+        '/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/',
+        $text,
+        $gradeMatches
+    );
+
+    $detectedGrades = $gradeMatches[1] ?? [];
+
+    $grades = [];
+
+    $count = min(
+        count($detectedSubjects),
+        count($detectedGrades)
+    );
+
+    for ($i = 0; $i < $count; $i++) {
+
+        $grades[$detectedSubjects[$i]] =
+            strtoupper($detectedGrades[$i]);
+    }
+
+    if (count($grades) < 3) {
+        throw new \Exception(
+            'Unable to detect enough subjects from SPM slip.'
+        );
+    }
+
+    return [
+        'grades' => $grades,
+        'total_as' => $this->countAsFromGrades($grades)
+    ];
+}
 
     public function updateOCRResults(Request $request)
     {
