@@ -50,138 +50,24 @@ class OCRController extends Controller
         }
     }
 
-   private function processRealOCR($path)
-{
-    $fullPath = storage_path('app/public/' . $path);
+    private function processRealOCR($path)
+    {
+        
+        $fullPath = storage_path('app/public/' . $path);
 
-    $processedPath = $this->preprocessImage($fullPath);
+        $processedPath = $this->preprocessImage($fullPath);
 
-    $text = (new TesseractOCR($processedPath))
-    ->lang('eng')
-    ->run();
+        $text = (new TesseractOCR($processedPath))
+            ->executable('/usr/bin/tesseract')
+            ->lang('eng')
+            ->run();
 
-    dd($text);
-
-    if (!$this->isValidSPMResult($text)) {
-        throw new \Exception('Uploaded file is not a valid SPM result slip.');
-    }
-
-    return $this->parseSPMGradesFromText($text);
-}
-
-private function isValidSPMResult($text)
-{
-    $text = strtoupper($text);
-
-    return (
-        str_contains($text, 'SIJIL PELAJARAN MALAYSIA') ||
-        str_contains($text, 'LEMBAGA PEPERIKSAAN') ||
-        str_contains($text, 'KEMENTERIAN PENDIDIKAN')
-    );
-}
-
-private function parseSPMGradesFromText($text)
-{
-    $subjects = [
-        'BAHASA MELAYU',
-        'BAHASA INGGERIS',
-        'PENDIDIKAN ISLAM',
-        'PENDIDIKAN MORAL',
-        'SEJARAH',
-        'MATHEMATICS',
-        'MATEMATIK',
-        'ADDITIONAL MATHEMATICS',
-        'MATEMATIK TAMBAHAN',
-        'PHYSICS',
-        'FIZIK',
-        'CHEMISTRY',
-        'KIMIA',
-        'BIOLOGY',
-        'BIOLOGI',
-        'SAINS',
-        'GRAFIK KOMUNIKASI TEKNIKAL',
-        'BAHASA ARAB',
-        'PRINSIP PERAKAUNAN',
-        'EKONOMI',
-        'PERDAGANGAN',
-        'GEOGRAFI',
-        'PENDIDIKAN AL-QURAN DAN AL-SUNNAH',
-        'PENDIDIKAN SYARIAH ISLAMIAH'
-    ];
-
-    $grades = [];
-
-    $text = strtoupper($text);
-
-    // Betulkan kesalahan OCR biasa
-    $text = str_replace([
-        'AT',
-        'AS',
-        'A®',
-        'A?',
-        'A*'
-    ], 'A+', $text);
-
-    $text = str_replace([
-        'A.',
-        'A,'
-    ], 'A', $text);
-
-    $lines = preg_split('/\r\n|\r|\n/', $text);
-
-    $lines = array_map(function ($line) {
-        return trim(preg_replace('/\s+/', ' ', $line));
-    }, $lines);
-
-    foreach ($lines as $index => $line) {
-
-        foreach ($subjects as $subject) {
-
-            if (stripos($line, $subject) !== false) {
-
-                $grade = null;
-
-                // Cari grade dalam 15 line selepas nama subjek
-                for ($i = $index; $i <= min($index + 15, count($lines) - 1); $i++) {
-
-                    if (preg_match('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $lines[$i], $match)) {
-                        $grade = strtoupper($match[1]);
-                        break;
-                    }
-                }
-
-                if ($grade) {
-                    $grades[$subject] = $grade;
-                }
-            }
+        if (!$this->isValidSPMResult($text)) {
+            throw new \Exception('Uploaded file is not a valid SPM result slip.');
         }
+
+        return $this->parseSPMGradesFromText($text);
     }
-
-    // Fallback method jika parser pertama gagal
-    if (count($grades) < 3) {
-
-        foreach ($subjects as $subject) {
-
-            $pattern = '/'
-                . preg_quote($subject, '/')
-                . '.*?'
-                . '(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)/is';
-
-            if (preg_match($pattern, $text, $matches)) {
-                $grades[$subject] = strtoupper($matches[1]);
-            }
-        }
-    }
-
-    if (empty($grades)) {
-        throw new \Exception('No subjects or grades detected from SPM slip.');
-    }
-
-    return [
-        'grades' => $grades,
-        'total_as' => $this->countAsFromGrades($grades)
-    ];
-}
 
     private function preprocessImage($fullPath)
     {
@@ -210,6 +96,80 @@ private function parseSPMGradesFromText($text)
         imagedestroy($image);
 
         return $processedPath;
+    }
+
+    private function isValidSPMResult($text)
+    {
+        $keywords = [
+            'KEMENTERIAN PENDIDIKAN',
+            'LEMBAGA PEPERIKSAAN',
+            'SIJIL PELAJARAN MALAYSIA'
+        ];
+
+        $matches = 0;
+
+        foreach ($keywords as $keyword) {
+            if (stripos($text, $keyword) !== false) {
+                $matches++;
+            }
+        }
+
+        return $matches >= 2;
+    }
+
+    private function parseSPMGradesFromText($text)
+    {
+        $subjects = [
+            'BAHASA MELAYU',
+            'BAHASA INGGERIS',
+            'SEJARAH',
+            'MATEMATIK',
+            'MATHEMATICS',
+            'SAINS',
+            'BIOLOGI',
+            'BIOLOGY',
+            'FIZIK',
+            'PHYSICS',
+            'KIMIA',
+            'CHEMISTRY',
+            'MATEMATIK TAMBAHAN',
+            'ADDITIONAL MATHEMATICS',
+            'PENDIDIKAN ISLAM',
+            'PENDIDIKAN MORAL',
+            'BAHASA ARAB',
+            'PENDIDIKAN AL-QURAN DAN AL-SUNNAH',
+            'PENDIDIKAN SYARIAH ISLAMIAH',
+            'PRINSIP PERAKAUNAN',
+            'EKONOMI',
+            'PERDAGANGAN',
+            'GEOGRAFI'
+        ];
+
+        $grades = [];
+        $normalizedText = strtoupper($text);
+
+        foreach ($subjects as $subject) {
+            $pattern = '/' .
+                preg_quote($subject, '/') .
+                '[\s\r\n]{0,20}' .
+                '(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)/i';
+
+            if (preg_match($pattern, $normalizedText, $matches)) {
+                $grades[$subject] = strtoupper($matches[1]);
+            }
+        }
+
+        if (count($grades) < 5) {
+            throw new \Exception('Too few subjects detected. Invalid or unclear SPM slip.');
+        }
+
+        $totalAs = $this->countAsFromGrades($grades);
+
+        return [
+            'grades' => $grades,
+            'total_as' => $totalAs,
+            
+        ];
     }
 
     public function updateOCRResults(Request $request)
