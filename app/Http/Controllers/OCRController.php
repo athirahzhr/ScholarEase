@@ -51,23 +51,23 @@ class OCRController extends Controller
     }
 
     private function processRealOCR($path)
-    {
-        
-        $fullPath = storage_path('app/public/' . $path);
+{
+    $fullPath = storage_path('app/public/' . $path);
 
-        $processedPath = $this->preprocessImage($fullPath);
+    $processedPath = $this->preprocessImage($fullPath);
 
-        $text = (new TesseractOCR($processedPath))
-            ->executable('/usr/bin/tesseract')
-            ->lang('eng')
-            ->run();
+    $text = (new TesseractOCR($processedPath))
+        ->lang('eng')
+        ->run();
 
-        if (!$this->isValidSPMResult($text)) {
-            throw new \Exception('Uploaded file is not a valid SPM result slip.');
-        }
+    dd($text);
 
-        return $this->parseSPMGradesFromText($text);
+    if (!$this->isValidSPMResult($text)) {
+        throw new \Exception('Uploaded file is not a valid SPM result slip.');
     }
+
+    return $this->parseSPMGradesFromText($text);
+}
 
     private function preprocessImage($fullPath)
     {
