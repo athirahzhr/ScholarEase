@@ -340,7 +340,7 @@
         @forelse($results as $scholarship)
             @php
                 $matchScore = $scholarship->match_score ?? 0;
-                $matchLevel = $matchScore >= 90 ? 'high' : ($matchScore >= 70 ? 'medium' : 'low');
+                $matchLevel = $scholarship->match_level ?? 'Low Match';
             @endphp
             <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 50 }}">
                 <div class="recommendation-card">
@@ -359,25 +359,27 @@
                         <div class="recommendation-tags">
                             <span class="tag score-tag">
                                 <i class="fas fa-chart-simple me-1"></i>
-                                {{ $matchScore }}% Match
+                                {{ $matchScore }}% - {{ $matchLevel }}
                             </span>
 
-                            @if($matchScore >= 90)
-                                <span class="tag success-tag">
-                                    <i class="fas fa-star me-1"></i>
-                                    Highly Recommended
-                                </span>
-                            @elseif($matchScore >= 70)
-                                <span class="tag primary-tag">
-                                    <i class="fas fa-thumbs-up me-1"></i>
-                                    Good Match
-                                </span>
-                            @else
-                                <span class="tag warning-tag">
-                                    <i class="fas fa-chart-line me-1"></i>
-                                    Moderate Match
-                                </span>
-                            @endif
+                            @if($matchLevel == 'High Match')
+                            <span class="tag success-tag">
+                                <i class="fas fa-star me-1"></i>
+                                Highly Recommended
+                            </span>
+
+                        @elseif($matchLevel == 'Medium Match')
+                            <span class="tag primary-tag">
+                                <i class="fas fa-thumbs-up me-1"></i>
+                                Good Match
+                            </span>
+
+                        @else
+                            <span class="tag warning-tag">
+                                <i class="fas fa-chart-line me-1"></i>
+                                Low Match
+                            </span>
+                        @endif
                         </div>
 
                         <p class="scholarship-description">

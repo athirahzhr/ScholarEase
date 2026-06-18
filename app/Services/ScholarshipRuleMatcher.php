@@ -26,14 +26,20 @@ class ScholarshipRuleMatcher
                 $criteria
             );
 
-            // ONLY ELIGIBLE
-            if ($result['eligible']) {
+            // ELIGIBLE + MINIMUM SCORE 50%
+            if (
+                $result['eligible'] &&
+                $result['score'] >= 50
+                ) {
 
                 $scholarship->match_score =
                     $result['score'];
 
                 $scholarship->match_breakdown =
                     $result['breakdown'];
+
+                $scholarship->match_level =
+                    $result['match_level'];
 
                 $results[] = $scholarship;
             }
@@ -67,41 +73,76 @@ class ScholarshipRuleMatcher
 
         $maxScore += 25;
 
-        if (
-            $criteria->min_spm_as !== null &&
-            $student->total_as < $criteria->min_spm_as
-        ) {
+        if ($criteria->min_spm_as !== null) {
 
-            // Partial academic compatibility
-            $score += 10;
+            $difference =
+                $criteria->min_spm_as -
+                $student->total_as;
+
+            if ($difference <= 0) {
+
+                $score += 25;
+                $breakdown['spm'] = true;
+
+            } elseif ($difference == 1) {
+
+                $score += 18;
+
+            } elseif ($difference == 2) {
+
+                $score += 12;
+
+            } else {
+
+                $score += 5;
+            }
 
         } else {
 
             $score += 25;
-
             $breakdown['spm'] = true;
         }
 
         // =========================
         // MONTHLY INCOME
         // =========================
-        $breakdown['income'] = false;
+       $breakdown['income'] = false;
 
         $maxScore += 20;
 
-        if (
-            $criteria->max_monthly_income !== null &&
-            $student->monthly_income >
-            $criteria->max_monthly_income
-        ) {
+        if ($criteria->max_monthly_income !== null) {
 
-            // Partial financial compatibility
-            $score += 8;
+            if (
+                $student->monthly_income <=
+                $criteria->max_monthly_income
+            ) {
+
+                $score += 20;
+                $breakdown['income'] = true;
+
+            } else {
+
+                $excess =
+                    $student->monthly_income -
+                    $criteria->max_monthly_income;
+
+                if ($excess <= 1000) {
+
+                    $score += 15;
+
+                } elseif ($excess <= 3000) {
+
+                    $score += 10;
+
+                } else {
+
+                    $score += 5;
+                }
+            }
 
         } else {
 
             $score += 20;
-
             $breakdown['income'] = true;
         }
 
@@ -140,23 +181,28 @@ class ScholarshipRuleMatcher
         $fields =
             $criteria->fields_of_study ?? [];
 
-            $maxScore += 15;
+        $maxScore += 15;
 
-        if (
-            !empty($fields) &&
-            !in_array(
-                $student->field_of_study,
-                $fields
-            )
-        ) {
+        if (!empty($fields)) {
 
-            // Related but different field
-            $score += 5;
+            if (
+                in_array(
+                    $student->field_of_study,
+                    $fields
+                )
+            ) {
+
+                $score += 15;
+                $breakdown['field'] = true;
+
+            } else {
+
+                $score += 8;
+            }
 
         } else {
 
             $score += 15;
-
             $breakdown['field'] = true;
         }
 
@@ -284,6 +330,11 @@ class ScholarshipRuleMatcher
             'eligible' => $eligible,
             'score' => $percentage,
             'breakdown' => $breakdown,
+            'match_level' => match (true) {
+            $percentage >= 80 => 'High Match',
+            $percentage >= 60 => 'Medium Match',
+            default => 'Low Match',
+},
         ];
     }
 }
