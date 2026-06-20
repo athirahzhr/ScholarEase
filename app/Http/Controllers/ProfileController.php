@@ -55,7 +55,6 @@ class ProfileController extends Controller
 
         'age' => 'required|integer|min:15|max:100',
 
-        'gender' => 'required|in:Male,Female',
 
         'state' => 'required|string|max:100',
 
@@ -116,8 +115,7 @@ class ProfileController extends Controller
             'age' =>
                 $validated['age'],
 
-            'gender' =>
-                $validated['gender'],
+
 
             'state' =>
                 $validated['state'],
