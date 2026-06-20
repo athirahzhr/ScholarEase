@@ -334,8 +334,13 @@
                 <div class="step-header">
                     <div class="step-number">2</div>
                     <div>
-                        <h4 class="mb-1">Review & Edit Extracted Results</h4>
-                        <p class="text-muted mb-0">Please edit the extracted grades if needed</p>
+                        <h4 class="mb-1" id="step2Title">
+                        Review & Edit Extracted Results
+                    </h4>
+
+                    <p class="text-muted mb-0" id="step2Desc">
+                        Please edit the extracted grades if needed
+                    </p>
                     </div>
                 </div>
                 
@@ -626,13 +631,22 @@
     
     // Display OCR results in editable table
     function displayOCRResults(data) {
+
+        const isManual = data.manualEntry === true;
+
         let html = `
             <div class="alert alert-info mb-4">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-info-circle me-3 fa-2x"></i>
                     <div>
-                        <h6 class="mb-1">OCR Results Summary</h6>
-                        <p class="mb-0">Detected <strong>${Object.keys(data.grades).length}</strong> subjects | 
+                       <h6 class="mb-1">
+                        ${isManual
+                        ? 'Academic Results Summary'
+                        : 'OCR Results Summary'}
+                        </h6>
+                        <p class="mb-0">${isManual
+                        ? `Added <strong>${Object.keys(data.grades).length}</strong> subjects`
+                        : `Detected <strong>${Object.keys(data.grades).length}</strong> subjects`} | 
                         Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span></p>
                     </div>
                 </div>
@@ -642,10 +656,16 @@
             
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0 fw-bold text-maroon">Edit Detected Grades:</h6>
+                    <h6 class="mb-0 fw-bold text-maroon">
+                    ${isManual
+                    ? 'Enter Your Subjects & Grades'
+                    : 'Edit Detected Grades'}
+                    </h6>
                     <div>
                         <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="showAddSubjectModal()">
-                            <i class="fas fa-plus me-1"></i> Add Missing Subject
+                            <i class="fas fa-plus me-1"></i> ${isManual
+                            ? 'Add Subject'
+                            : 'Add Missing Subject'}
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-success" onclick="saveAllGrades()">
                             <i class="fas fa-save me-1"></i> Save All Changes
@@ -657,8 +677,14 @@
                     <table class="table table-hover" id="gradesTable">
                         <thead>
                             <tr>
-                                <th width="40%">Subject (Detected by OCR)</th>
-                                <th width="20%">Extracted Grade</th>
+                                <th width="40%">${isManual
+                                ? 'Subject'
+                                : 'Subject (Detected by OCR)'}</th>
+                                <th width="20%">
+                                ${isManual
+                                ? 'Grade'
+                                : 'Extracted Grade'}
+                                </th>
                                 <th width="30%">Edit Grade</th>
                                 <th width="10%">Actions</th>
                             </tr>
@@ -705,15 +731,28 @@
         
         html += `
                         </tbody>
-                    </table>
+                    </tr>
                 </div>
                 
                 <div class="row mt-3">
                     <div class="col-md-8">
                         <div class="alert alert-warning">
-                            <h6><i class="fas fa-exclamation-triangle me-2"></i> OCR Accuracy Note:</h6>
-                            <p class="mb-0 small">OCR may not detect all subjects or may misread grades. 
-                            Please verify each subject and grade. Add any missing subjects using the button above.</p>
+                            <h6>
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+
+                            ${isManual
+                            ? 'Manual Entry Note:'
+                            : 'OCR Accuracy Note:'}
+
+                            </h6>
+
+                            <p class="mb-0 small">
+
+                            ${isManual
+                            ? 'Please enter all your SPM subjects and grades manually before continuing.'
+                            : 'OCR may not detect all subjects or may misread grades. Please verify each subject and grade.'}
+
+                            </p>
                         </div>
                     </div>
                     <div class="col-md-4 text-end">
@@ -722,7 +761,9 @@
                                 <i class="fas fa-check-circle me-2"></i> Continue
                             </button>
                             <button type="button" class="btn btn-outline-secondary" onclick="goBackToUpload()">
-                                <i class="fas fa-redo me-2"></i> Upload Again
+                                <i class="fas fa-redo me-2"></i> ${isManual
+                                ? 'Back'
+                                : 'Upload Again'}
                             </button>
                         </div>
                     </div>
@@ -732,7 +773,7 @@
         
         document.getElementById('ocrResultsContainer').innerHTML = html;
 
-        if (data.confidence !== undefined) {
+        if (!isManual && data.confidence !== undefined){
             const confidence = data.confidence;
             let confidenceColor = 'bg-danger';
             let confidenceText = 'Low confidence – manual verification recommended';
@@ -754,6 +795,23 @@
                 </div>
                 <small class="text-muted mt-1 d-block">${confidenceText}</small>
             `;
+                }
+
+                if(isManual){
+
+            document.getElementById('step2Title').innerText =
+                'Enter Your SPM Results';
+
+            document.getElementById('step2Desc').innerText =
+                'Please add your subjects and grades manually';
+
+        }else{
+
+            document.getElementById('step2Title').innerText =
+                'Review & Edit Extracted Results';
+
+            document.getElementById('step2Desc').innerText =
+                'Please edit the extracted grades if needed';
         }
         
         goToStep(2);
@@ -906,7 +964,7 @@
                     <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option><option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
                 </select></td>
                 <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')"><i class="fas fa-trash"></i></button></td>
-            </table>
+            </tr>
         `;
         const tbody = document.getElementById('gradesTableBody');
         if (tbody) tbody.innerHTML += newRow;
@@ -1051,7 +1109,8 @@
 
                             ocrData = {
                                 grades: {},
-                                totalAs: 0
+                                totalAs: 0,
+                                manualEntry: true
                             };
 
                             displayOCRResults(ocrData);
