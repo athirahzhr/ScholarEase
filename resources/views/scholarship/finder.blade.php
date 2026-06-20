@@ -264,14 +264,19 @@
             <div class="mb-5" data-aos="fade-down">
                 <div class="d-flex justify-content-between mb-3">
                     <span class="step-indicator active" id="step1Text">
-                        <i class="fas fa-upload me-2"></i>Step 1: Upload SPM
-                    </span>
-                    <span class="step-indicator" id="step2Text">
-                        <i class="fas fa-edit me-2"></i>Step 2: Review Results
-                    </span>
-                    <span class="step-indicator" id="step3Text">
-                        <i class="fas fa-user me-2"></i>Step 3: Profile Info
-                    </span>
+                    <i class="fas fa-file-alt me-2"></i>
+                    Step 1: Academic Information
+                </span>
+
+                <span class="step-indicator" id="step2Text">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Step 2: Results Verification
+                </span>
+
+                <span class="step-indicator" id="step3Text">
+                    <i class="fas fa-user-graduate me-2"></i>
+                    Step 3: Eligibility Profile
+                </span>
                 </div>
                 <div class="progress-custom">
                     <div class="progress-bar-custom" id="progressBar" style="width: 33%;"></div>
@@ -283,8 +288,8 @@
                 <div class="step-header">
                     <div class="step-number">1</div>
                     <div>
-                        <h4 class="mb-1">Upload Your SPM Certificate</h4>
-                        <p class="text-muted mb-0">Upload a clear photo or scan of your SPM results slip</p>
+                        <h4 class="mb-1">Academic Results Submission</h4>
+                        <p class="text-muted mb-0">Upload your SPM result slip or enter your results manually.</p>
                     </div>
                 </div>
                 
@@ -354,8 +359,8 @@
                 <div class="step-header">
                     <div class="step-number">3</div>
                     <div>
-                        <h4 class="mb-1">Additional Information</h4>
-                        <p class="text-muted mb-0">Complete your profile for personalized recommendations</p>
+                        <h4 class="mb-1">Eligibility Profile</h4>
+                        <p class="text-muted mb-0">Complete your profile for personalized scholarship recommendations.</p>
                     </div>
                 </div>
                 
@@ -661,16 +666,19 @@
                     ? 'Enter Your Subjects & Grades'
                     : 'Edit Detected Grades'}
                     </h6>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="showAddSubjectModal()">
-                            <i class="fas fa-plus me-1"></i> ${isManual
-                            ? 'Add Subject'
-                            : 'Add Missing Subject'}
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-success" onclick="saveAllGrades()">
-                            <i class="fas fa-save me-1"></i> Save All Changes
-                        </button>
-                    </div>
+                   <div>
+                    <button type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="showAddSubjectModal()">
+
+                        <i class="fas fa-plus me-1"></i>
+
+                        ${isManual
+                        ? 'Add Subject'
+                        : 'Add Missing Subject'}
+
+                    </button>
+                </div>
                 </div>
                 
                 <div class="table-responsive">
@@ -1021,6 +1029,17 @@
                 .catch(error => { Swal.fire('Error', 'Verification failed', 'error'); });
             }
         });
+
+        fetch("{{ route('update.ocr.results') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                grades: ocrData.grades
+            })
+        })
     }
     
     function displayVerifiedGrades(totalAs) {
