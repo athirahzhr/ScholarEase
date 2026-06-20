@@ -55,6 +55,7 @@
         font-weight: bold;
         font-size: 1.2rem;
         margin-right: 1rem;
+        flex-shrink: 0;
         box-shadow: 0 4px 12px rgba(122, 0, 25, 0.3);
     }
     
@@ -148,34 +149,95 @@
     .grade-c { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
     .grade-other { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
     
-    /* Buttons */
+    /* Buttons - STANDARDIZED */
+    .btn {
+        border-radius: 40px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 0.625rem 1.5rem;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 44px;
+        min-width: 120px;
+    }
+    
     .btn-primary {
         background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
         border: none;
-        border-radius: 40px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
+        color: white;
     }
     
     .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(122, 0, 25, 0.3);
         background: linear-gradient(115deg, var(--maroon-dark), var(--maroon));
+        color: white;
     }
     
     .btn-outline-primary {
         border: 2px solid var(--maroon);
         color: var(--maroon);
-        border-radius: 40px;
-        font-weight: 600;
-        transition: all 0.3s ease;
+        background: transparent;
     }
     
     .btn-outline-primary:hover {
         background: var(--maroon);
         color: white;
         transform: translateY(-2px);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid var(--gray-600);
+        color: var(--gray-600);
+        background: transparent;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: var(--gray-600);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-sm {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        min-height: 36px;
+        min-width: 80px;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        font-size: 1.05rem;
+        min-height: 52px;
+        min-width: 160px;
+    }
+    
+    .btn-block {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    /* Button Container */
+    .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+    }
+    
+    .button-group-center {
+        justify-content: center;
+    }
+    
+    .button-group-between {
+        justify-content: space-between;
+    }
+    
+    .button-group-end {
+        justify-content: flex-end;
     }
     
     /* Tables */
@@ -188,6 +250,11 @@
     
     .table td {
         vertical-align: middle;
+    }
+    
+    .table-responsive {
+        border-radius: 12px;
+        overflow: hidden;
     }
     
     /* Verified Grades */
@@ -237,22 +304,150 @@
         color: #065f46;
     }
     
+    .alert {
+        border-radius: 12px;
+    }
+    
+    /* Utility Classes */
+    .text-maroon {
+        color: var(--maroon);
+    }
+    
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 1rem; }
+    .gap-4 { gap: 1.5rem; }
+    
+    .flex-1 { flex: 1; }
+    
+    .mt-3 { margin-top: 1rem; }
+    .mt-4 { margin-top: 1.5rem; }
+    .mt-5 { margin-top: 2rem; }
+    .mb-3 { margin-bottom: 1rem; }
+    .mb-4 { margin-bottom: 1.5rem; }
+    .mb-5 { margin-bottom: 2rem; }
+    
+    .d-flex { display: flex; }
+    .flex-column { flex-direction: column; }
+    .align-items-center { align-items: center; }
+    .justify-content-between { justify-content: space-between; }
+    .justify-content-center { justify-content: center; }
+    .justify-content-end { justify-content: flex-end; }
+    
+    .text-center { text-align: center; }
+    .text-end { text-align: right; }
+    
+    .w-100 { width: 100%; }
+    
+    .d-none { display: none !important; }
+    .d-grid { display: grid; }
+    
+    /* Responsive */
     @media (max-width: 768px) {
         .step-card {
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
         
         .upload-area {
-            padding: 2rem;
+            padding: 1.5rem;
         }
         
         .table {
             font-size: 0.8rem;
         }
         
-        .btn-primary, .btn-outline-primary {
+        .table td, .table th {
+            padding: 0.5rem;
+        }
+        
+        .btn {
             padding: 0.5rem 1rem;
             font-size: 0.85rem;
+            min-height: 40px;
+            min-width: 100px;
+        }
+        
+        .btn-lg {
+            padding: 0.6rem 1.25rem;
+            font-size: 0.95rem;
+            min-height: 46px;
+            min-width: 140px;
+        }
+        
+        .btn-sm {
+            padding: 0.3rem 0.75rem;
+            font-size: 0.8rem;
+            min-height: 32px;
+            min-width: 60px;
+        }
+        
+        .step-number {
+            width: 38px;
+            height: 38px;
+            font-size: 1rem;
+        }
+        
+        .step-header h4 {
+            font-size: 1rem;
+        }
+        
+        .step-header p {
+            font-size: 0.8rem;
+        }
+        
+        .step-indicator {
+            font-size: 0.7rem;
+        }
+        
+        .step-indicator i {
+            display: none;
+        }
+        
+        .button-group {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .button-group .btn {
+            width: 100%;
+            min-width: unset;
+        }
+        
+        .button-group-between {
+            flex-direction: column-reverse;
+        }
+        
+        .row .col-md-4, .row .col-md-6, .row .col-md-8 {
+            margin-bottom: 0.5rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .step-card {
+            padding: 1rem;
+        }
+        
+        .step-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .step-number {
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-area {
+            padding: 1rem;
+        }
+        
+        .upload-icon {
+            font-size: 2rem;
+        }
+        
+        .grade-badge {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            min-width: 40px;
         }
     }
 </style>
@@ -262,21 +457,19 @@
         <div class="step-container">
             <!-- Progress Bar -->
             <div class="mb-5" data-aos="fade-down">
-                <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
                     <span class="step-indicator active" id="step1Text">
-                    <i class="fas fa-file-alt me-2"></i>
-                    Step 1: Academic Information
-                </span>
-
-                <span class="step-indicator" id="step2Text">
-                    <i class="fas fa-check-circle me-2"></i>
-                    Step 2: Results Verification
-                </span>
-
-                <span class="step-indicator" id="step3Text">
-                    <i class="fas fa-user-graduate me-2"></i>
-                    Step 3: Eligibility Profile
-                </span>
+                        <i class="fas fa-file-alt me-2"></i>
+                        Step 1: Academic Information
+                    </span>
+                    <span class="step-indicator" id="step2Text">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Step 2: Results Verification
+                    </span>
+                    <span class="step-indicator" id="step3Text">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        Step 3: Eligibility Profile
+                    </span>
                 </div>
                 <div class="progress-custom">
                     <div class="progress-bar-custom" id="progressBar" style="width: 33%;"></div>
@@ -302,15 +495,15 @@
                         <h5 class="text-maroon">Drag & Drop or Click to Upload</h5>
                         <p class="text-muted">Supported formats: JPG, PNG, JPEG (Max: 5MB)</p>
                         <input type="file" class="form-control d-none" id="spmFile" name="spm_file" accept="image/*,.pdf" required>
-                        <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('spmFile').click()">
-                            <i class="fas fa-folder-open me-2"></i> Browse Files
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('spmFile').click()">
+                            <i class="fas fa-folder-open"></i> Browse Files
                         </button>
                     </div>
                     
                     <div id="fileInfo" class="mt-3 d-none">
                         <div class="alert alert-info d-flex align-items-center">
                             <i class="fas fa-file-alt me-3 fa-2x"></i>
-                            <div class="flex-grow-1">
+                            <div class="flex-1">
                                 <strong id="fileName"></strong>
                                 <div class="progress mt-2" style="height: 6px;">
                                     <div class="progress-bar bg-success" id="fileProgress" style="width: 0%"></div>
@@ -319,18 +512,14 @@
                         </div>
                     </div>
                     
-                    <div class="text-center mt-4">
-                        <button type="button" class="btn btn-primary btn-lg px-5" onclick="processUpload()" id="processBtn">
-                            <i class="fas fa-cogs me-2"></i> Process SPM Results
+                    <div class="button-group button-group-center mt-4">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="processUpload()" id="processBtn">
+                            <i class="fas fa-cogs"></i> Process SPM Results
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="skipOCR()">
+                            <i class="fas fa-pen"></i> Enter Manually
                         </button>
                     </div>
-
-                    <div class="text-center mt-3">
-
-                        <button type="button" class="btn btn-outline-secondary" onclick="skipOCR()">
-                             <i class="fas fa-pen me-2"></i> I Don't Have SPM Result Slip
-                        </button>
-                     </div>
                 </form>
             </div>
 
@@ -339,13 +528,8 @@
                 <div class="step-header">
                     <div class="step-number">2</div>
                     <div>
-                        <h4 class="mb-1" id="step2Title">
-                        Review & Edit Extracted Results
-                    </h4>
-
-                    <p class="text-muted mb-0" id="step2Desc">
-                        Please edit the extracted grades if needed
-                    </p>
+                        <h4 class="mb-1" id="step2Title">Review & Edit Extracted Results</h4>
+                        <p class="text-muted mb-0" id="step2Desc">Please edit the extracted grades if needed</p>
                     </div>
                 </div>
                 
@@ -509,12 +693,12 @@
                     </div>
                     
                     <!-- Navigation -->
-                    <div class="d-flex justify-content-between mt-4 pt-3">
+                    <div class="button-group button-group-between mt-4 pt-3">
                         <button type="button" class="btn btn-outline-primary" onclick="goBackToStep2()">
-                            <i class="fas fa-arrow-left me-2"></i> Back
+                            <i class="fas fa-arrow-left"></i> Back
                         </button>
-                        <button type="submit" class="btn btn-primary btn-lg px-5">
-                            Get Recommendations <i class="fas fa-arrow-right ms-2"></i>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Get Recommendations <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </form>
@@ -636,7 +820,6 @@
     
     // Display OCR results in editable table
     function displayOCRResults(data) {
-
         const isManual = data.manualEntry === true;
 
         let html = `
@@ -644,14 +827,8 @@
                 <div class="d-flex align-items-center">
                     <i class="fas fa-info-circle me-3 fa-2x"></i>
                     <div>
-                       <h6 class="mb-1">
-                        ${isManual
-                        ? 'Academic Results Summary'
-                        : 'OCR Results Summary'}
-                        </h6>
-                        <p class="mb-0">${isManual
-                        ? `Added <strong>${Object.keys(data.grades).length}</strong> subjects`
-                        : `Detected <strong>${Object.keys(data.grades).length}</strong> subjects`} | 
+                        <h6 class="mb-1">${isManual ? 'Academic Results Summary' : 'OCR Results Summary'}</h6>
+                        <p class="mb-0">${isManual ? `Added <strong>${Object.keys(data.grades).length}</strong> subjects` : `Detected <strong>${Object.keys(data.grades).length}</strong> subjects`} | 
                         Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span></p>
                     </div>
                 </div>
@@ -660,39 +837,19 @@
             <div id="ocrConfidenceBar" class="mb-4"></div>
             
             <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0 fw-bold text-maroon">
-                    ${isManual
-                    ? 'Enter Your Subjects & Grades'
-                    : 'Edit Detected Grades'}
-                    </h6>
-                   <div>
-                    <button type="button"
-                        class="btn btn-sm btn-outline-primary"
-                        onclick="showAddSubjectModal()">
-
-                        <i class="fas fa-plus me-1"></i>
-
-                        ${isManual
-                        ? 'Add Subject'
-                        : 'Add Missing Subject'}
-
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h6 class="mb-0 fw-bold text-maroon">${isManual ? 'Enter Your Subjects & Grades' : 'Edit Detected Grades'}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="showAddSubjectModal()">
+                        <i class="fas fa-plus"></i> ${isManual ? 'Add Subject' : 'Add Missing Subject'}
                     </button>
-                </div>
                 </div>
                 
                 <div class="table-responsive">
                     <table class="table table-hover" id="gradesTable">
                         <thead>
                             <tr>
-                                <th width="40%">${isManual
-                                ? 'Subject'
-                                : 'Subject (Detected by OCR)'}</th>
-                                <th width="20%">
-                                ${isManual
-                                ? 'Grade'
-                                : 'Extracted Grade'}
-                                </th>
+                                <th width="40%">${isManual ? 'Subject' : 'Subject (Detected by OCR)'}</th>
+                                <th width="20%">${isManual ? 'Grade' : 'Extracted Grade'}</th>
                                 <th width="30%">Edit Grade</th>
                                 <th width="10%">Actions</th>
                             </tr>
@@ -739,39 +896,23 @@
         
         html += `
                         </tbody>
-                    </tr>
+                    </table>
                 </div>
                 
-                <div class="row mt-3">
+                <div class="row mt-3 align-items-center">
                     <div class="col-md-8">
-                        <div class="alert alert-warning">
-                            <h6>
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-
-                            ${isManual
-                            ? 'Manual Entry Note:'
-                            : 'OCR Accuracy Note:'}
-
-                            </h6>
-
-                            <p class="mb-0 small">
-
-                            ${isManual
-                            ? 'Please enter all your SPM subjects and grades manually before continuing.'
-                            : 'OCR may not detect all subjects or may misread grades. Please verify each subject and grade.'}
-
-                            </p>
+                        <div class="alert alert-warning mb-0">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>${isManual ? 'Manual Entry Note:' : 'OCR Accuracy Note:'}</h6>
+                            <p class="mb-0 small">${isManual ? 'Please enter all your SPM subjects and grades manually before continuing.' : 'OCR may not detect all subjects or may misread grades. Please verify each subject and grade.'}</p>
                         </div>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="d-grid gap-2">
+                    <div class="col-md-4">
+                        <div class="button-group button-group-end mt-3 mt-md-0">
                             <button type="button" class="btn btn-primary" onclick="verifyAndContinue()">
-                                <i class="fas fa-check-circle me-2"></i> Continue
+                                <i class="fas fa-check-circle"></i> Continue
                             </button>
                             <button type="button" class="btn btn-outline-secondary" onclick="goBackToUpload()">
-                                <i class="fas fa-redo me-2"></i> ${isManual
-                                ? 'Back'
-                                : 'Upload Again'}
+                                <i class="fas fa-redo"></i> ${isManual ? 'Back' : 'Upload Again'}
                             </button>
                         </div>
                     </div>
@@ -781,7 +922,7 @@
         
         document.getElementById('ocrResultsContainer').innerHTML = html;
 
-        if (!isManual && data.confidence !== undefined){
+        if (!isManual && data.confidence !== undefined) {
             const confidence = data.confidence;
             let confidenceColor = 'bg-danger';
             let confidenceText = 'Low confidence – manual verification recommended';
@@ -803,23 +944,14 @@
                 </div>
                 <small class="text-muted mt-1 d-block">${confidenceText}</small>
             `;
-                }
+        }
 
-                if(isManual){
-
-            document.getElementById('step2Title').innerText =
-                'Enter Your SPM Results';
-
-            document.getElementById('step2Desc').innerText =
-                'Please add your subjects and grades manually';
-
-        }else{
-
-            document.getElementById('step2Title').innerText =
-                'Review & Edit Extracted Results';
-
-            document.getElementById('step2Desc').innerText =
-                'Please edit the extracted grades if needed';
+        if (isManual) {
+            document.getElementById('step2Title').innerText = 'Enter Your SPM Results';
+            document.getElementById('step2Desc').innerText = 'Please add your subjects and grades manually';
+        } else {
+            document.getElementById('step2Title').innerText = 'Review & Edit Extracted Results';
+            document.getElementById('step2Desc').innerText = 'Please edit the extracted grades if needed';
         }
         
         goToStep(2);
@@ -1039,7 +1171,7 @@
             body: JSON.stringify({
                 grades: ocrData.grades
             })
-        })
+        });
     }
     
     function displayVerifiedGrades(totalAs) {
@@ -1102,47 +1234,36 @@
     
     function goBackToStep2() { goToStep(2); }
 
-            function skipOCR() {
-
-            Swal.fire({
-                title: 'Manual Entry',
-                text: 'Proceed without OCR and enter SPM results manually?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes'
-            }).then((result) => {
-
-                if(result.isConfirmed){
-
-                    fetch("{{ route('ocr.skip') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-
-                        if(data.success){
-
-                            ocrData = {
-                                grades: {},
-                                totalAs: 0,
-                                manualEntry: true
-                            };
-
-                            displayOCRResults(ocrData);
-
-                        }
-
-                    });
-
-                }
-
-            });
-
-        }
+    function skipOCR() {
+        Swal.fire({
+            title: 'Manual Entry',
+            text: 'Proceed without OCR and enter SPM results manually?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ route('ocr.skip') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        ocrData = {
+                            grades: {},
+                            totalAs: 0,
+                            manualEntry: true
+                        };
+                        displayOCRResults(ocrData);
+                    }
+                });
+            }
+        });
+    }
     
     document.getElementById('profileForm').addEventListener('submit', function(e) {
         const incomeSelected = document.querySelector('select[name="income_category"]').value;
