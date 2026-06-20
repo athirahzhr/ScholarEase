@@ -397,6 +397,22 @@ class OCRController extends Controller
         ]);
     }
 
+    public function skipOCR()
+{
+    Session::put('ocr_temp_data', [
+        'file_path' => null,
+        'raw_grades' => [],
+        'grades' => [],
+        'total_as' => 0,
+        'detected_subjects' => [],
+        'timestamp' => now()
+    ]);
+
+    return response()->json([
+        'success' => true
+    ]);
+}
+
     private function countAsFromGrades($grades)
     {
         return collect($grades)->filter(function ($grade) {

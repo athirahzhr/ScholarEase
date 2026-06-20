@@ -319,6 +319,13 @@
                             <i class="fas fa-cogs me-2"></i> Process SPM Results
                         </button>
                     </div>
+
+                    <div class="text-center mt-3">
+
+                        <button type="button" class="btn btn-outline-secondary" onclick="skipOCR()">
+                             <i class="fas fa-pen me-2"></i> I Don't Have SPM Result Slip
+                        </button>
+                     </div>
                 </form>
             </div>
 
@@ -1017,6 +1024,47 @@
     }
     
     function goBackToStep2() { goToStep(2); }
+
+            function skipOCR() {
+
+            Swal.fire({
+                title: 'Manual Entry',
+                text: 'Proceed without OCR and enter SPM results manually?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+
+                if(result.isConfirmed){
+
+                    fetch("{{ route('ocr.skip') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        if(data.success){
+
+                            ocrData = {
+                                grades: {},
+                                totalAs: 0
+                            };
+
+                            displayOCRResults(ocrData);
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
     
     document.getElementById('profileForm').addEventListener('submit', function(e) {
         const incomeSelected = document.querySelector('select[name="income_category"]').value;

@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/verify-ocr-results', [OCRController::class, 'verifyOCRResults'])->name('verify.ocr.results');
     Route::post('/add-ocr-subject', [OCRController::class, 'addSubject'])->name('add.ocr.subject');
     Route::post('/remove-ocr-subject', [OCRController::class, 'removeSubject'])->name('remove.ocr.subject');
+    Route::post('/ocr/skip', [OCRController::class, 'skipOCR'])->name('ocr.skip');
 
     // Bookmarks
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
