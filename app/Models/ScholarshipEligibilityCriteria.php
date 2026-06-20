@@ -29,7 +29,6 @@ class ScholarshipEligibilityCriteria extends Model
         'study_destination',
 
         // Demographic
-        'gender_requirement',
         'citizenship_required',
         'state_requirement',
 

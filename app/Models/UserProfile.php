@@ -26,7 +26,6 @@ class UserProfile extends Model
         'citizenship',
 
         'age',
-        'gender',
         'state',
 
         // Extra
