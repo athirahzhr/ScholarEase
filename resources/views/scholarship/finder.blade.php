@@ -517,7 +517,7 @@
                             <i class="fas fa-cogs"></i> Process SPM Results
                         </button>
                         <button type="button" class="btn btn-outline-secondary" onclick="skipOCR()">
-                            <i class="fas fa-pen"></i> Enter Manually
+                            <i class="fas fa-pen"></i> I dont Have SPM result
                         </button>
                     </div>
                 </form>
