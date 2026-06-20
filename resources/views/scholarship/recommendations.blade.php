@@ -90,9 +90,7 @@
         gap: 8px;
     }
 
-    .provider-name i {
-        color: var(--gold);
-    }
+    .provider-name i { color: var(--gold); }
 
     .recommendation-tags {
         display: flex;
@@ -108,25 +106,10 @@
         font-weight: 600;
     }
 
-    .score-tag {
-        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-        color: #065f46;
-    }
-
-    .success-tag {
-        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-        color: #1e40af;
-    }
-
-    .primary-tag {
-        background: linear-gradient(135deg, #ede9fe, #c4b5fd);
-        color: #6d28d9;
-    }
-
-    .warning-tag {
-        background: linear-gradient(135deg, #fef3c7, #fde68a);
-        color: #92400e;
-    }
+    .score-tag        { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+    .success-tag      { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+    .primary-tag      { background: linear-gradient(135deg, #ede9fe, #c4b5fd); color: #6d28d9; }
+    .warning-tag      { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
 
     .scholarship-description {
         color: var(--gray-600);
@@ -134,32 +117,96 @@
         margin-bottom: 20px;
     }
 
+    /* ── Breakdown ─────────────────────────────────────────────────────────── */
     .breakdown-list {
         margin-top: 14px;
         margin-bottom: 18px;
         background: #f9fafb;
-        padding: 12px 16px;
+        padding: 14px 16px;
         border-radius: 16px;
     }
 
     .breakdown-item {
         font-size: 0.85rem;
         color: var(--gray-600);
-        margin-bottom: 6px;
+        margin-bottom: 10px;
         display: flex;
-        align-items: center;
-        gap: 8px;
+        align-items: flex-start;
+        gap: 10px;
     }
 
-    .breakdown-item:last-child {
-        margin-bottom: 0;
+    .breakdown-item:last-child { margin-bottom: 0; }
+
+    /* icon column — fixed width so text aligns */
+    .breakdown-icon {
+        width: 18px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        font-size: 0.9rem;
     }
 
-    .breakdown-item i {
-        width: 20px;
-        color: var(--maroon);
+    .breakdown-icon.pass    { color: #10b981; }   /* green  */
+    .breakdown-icon.partial { color: #f59e0b; }   /* amber  */
+    .breakdown-icon.fail    { color: #ef4444; }   /* red    */
+
+    .breakdown-label {
+        font-weight: 600;
+        color: var(--gray-800);
+        white-space: nowrap;
+        min-width: 130px;
     }
 
+    .breakdown-detail {
+        color: var(--gray-600);
+    }
+
+    /* inline score pill inside breakdown */
+    .breakdown-score {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 1px 8px;
+        border-radius: 20px;
+        margin-left: 6px;
+    }
+
+    .score-full    { background: #d1fae5; color: #065f46; }
+    .score-partial { background: #fef3c7; color: #92400e; }
+    .score-zero    { background: #fee2e2; color: #991b1b; }
+
+    /* ── Score bar ─────────────────────────────────────────────────────────── */
+    .score-bar-wrap {
+        margin-bottom: 16px;
+    }
+
+    .score-bar-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        margin-bottom: 4px;
+    }
+
+    .score-bar-bg {
+        background: #e5e7eb;
+        border-radius: 99px;
+        height: 8px;
+        overflow: hidden;
+    }
+
+    .score-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        width: var(--bar-width, 0%);
+        transition: width 0.6s ease;
+    }
+
+    .fill-high    { background: linear-gradient(90deg, #10b981, #34d399); }
+    .fill-medium  { background: linear-gradient(90deg, #f59e0b, #fcd34d); }
+    .fill-low     { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+    /* ── Footer ────────────────────────────────────────────────────────────── */
     .recommendation-footer {
         display: flex;
         justify-content: space-between;
@@ -176,14 +223,9 @@
         gap: 8px;
     }
 
-    .deadline-text i {
-        color: var(--gold);
-    }
+    .deadline-text i { color: var(--gold); }
 
-    .recommendation-actions {
-        display: flex;
-        gap: 10px;
-    }
+    .recommendation-actions { display: flex; gap: 10px; }
 
     .btn-primary {
         background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
@@ -263,45 +305,17 @@
         padding: 1rem;
     }
 
-    .alert-warning a, .alert-info a {
-        color: var(--maroon);
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-    .alert-warning a:hover, .alert-info a:hover {
-        text-decoration: underline;
-    }
+    .alert-warning a, .alert-info a { color: var(--maroon); font-weight: 600; text-decoration: none; }
+    .alert-warning a:hover, .alert-info a:hover { text-decoration: underline; }
 
     @media (max-width: 768px) {
-        .recommendation-card {
-            flex-direction: column;
-            padding: 20px;
-            gap: 12px;
-        }
-        
-        .recommendation-icon {
-            font-size: 36px;
-        }
-        
-        .scholarship-title {
-            font-size: 1.2rem;
-        }
-        
-        .recommendation-footer {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .recommendation-actions {
-            width: 100%;
-            justify-content: flex-start;
-        }
-        
-        .btn-primary, .btn-outline-secondary, .btn-outline-primary {
-            padding: 0.4rem 1rem;
-            font-size: 0.8rem;
-        }
+        .recommendation-card { flex-direction: column; padding: 20px; gap: 12px; }
+        .recommendation-icon { font-size: 36px; }
+        .scholarship-title   { font-size: 1.2rem; }
+        .recommendation-footer { flex-direction: column; align-items: flex-start; }
+        .recommendation-actions { width: 100%; justify-content: flex-start; }
+        .btn-primary, .btn-outline-secondary, .btn-outline-primary { padding: 0.4rem 1rem; font-size: 0.8rem; }
+        .breakdown-label { min-width: 110px; }
     }
 </style>
 
@@ -311,7 +325,7 @@
             <i class="fas fa-graduation-cap me-2" style="color: var(--gold);"></i>
             Scholarship Recommendations
         </h2>
-        <p>Personalized scholarship matches based on your academic profile and preferences</p>
+        <p>Personalised scholarship matches based on your academic profile and preferences</p>
     </div>
 
     @if(session('success'))
@@ -324,7 +338,7 @@
     @if(!auth()->user()->profile)
         <div class="alert-warning mb-4" data-aos="fade-down">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            Please complete your profile to get personalized recommendations.
+            Please complete your profile to get personalised recommendations.
             <a href="{{ route('scholarship.finder') }}" class="ms-2">
                 <i class="fas fa-arrow-right"></i> Complete Profile
             </a>
@@ -339,99 +353,210 @@
     <div class="row">
         @forelse($results as $scholarship)
             @php
-                $matchScore = $scholarship->match_score ?? 0;
-                $matchLevel = $scholarship->match_level ?? 'Low Match';
+                $matchScore    = $scholarship->match_score    ?? 0;
+                $matchLevel    = $scholarship->match_level    ?? 'Low Match';
+                $breakdown     = $scholarship->match_breakdown ?? [];
+
+                // Scored criteria detail strings (from PHP service)
+                $spmData    = $breakdown['spm']    ?? [];
+                $incomeData = $breakdown['income'] ?? [];
+                $bonusData  = $breakdown['bonus']  ?? [];
+
+                // Hard filter results (bool)
+                $passedCitizenship = $breakdown['citizenship']  ?? true;
+                $passedBumiputera  = $breakdown['bumiputera']   ?? true;
+                $passedStudyLevel  = $breakdown['study_level']  ?? true;
+                $passedField       = $breakdown['field']        ?? true;
+                $passedAge         = $breakdown['age']          ?? true;
+
+                // SPM status
+                $spmEarned  = $spmData['earned'] ?? 0;
+                $spmMax     = $spmData['max']    ?? 0;
+                $spmDetail  = $spmData['detail'] ?? '';
+                $spmFull    = $spmMax > 0 && $spmEarned === $spmMax;
+                $spmZero    = $spmEarned === 0;
+
+                // Income status
+                $incomeEarned = $incomeData['earned'] ?? 0;
+                $incomeMax    = $incomeData['max']    ?? 0;
+                $incomeDetail = $incomeData['detail'] ?? '';
+                $incomeFull   = $incomeMax > 0 && $incomeEarned === $incomeMax;
+                $incomeZero   = $incomeEarned === 0;
+
+                // Bonus
+                $bonusEarned  = $bonusData['earned']  ?? 0;
+                $bonusDetails = $bonusData['detail']  ?? [];
+
+                // Bar colour
+                $barClass = match(true) {
+                    $matchScore >= 80 => 'fill-high',
+                    $matchScore >= 60 => 'fill-medium',
+                    default           => 'fill-low',
+                };
             @endphp
+
             <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 50 }}">
                 <div class="recommendation-card">
-                    <div class="recommendation-icon">
-                        🎓
-                    </div>
+                    <div class="recommendation-icon">🎓</div>
+
                     <div class="recommendation-content">
-                        <h3 class="scholarship-title">
-                            {{ $scholarship->title }}
-                        </h3>
+
+                        {{-- Title & Provider --}}
+                        <h3 class="scholarship-title">{{ $scholarship->title }}</h3>
                         <div class="provider-name">
                             <i class="fas fa-building"></i>
                             {{ $scholarship->provider }}
                         </div>
 
+                        {{-- Match badge --}}
                         <div class="recommendation-tags">
                             <span class="tag score-tag">
                                 <i class="fas fa-chart-simple me-1"></i>
-                                {{ $matchScore }}% - {{ $matchLevel }}
+                                {{ $matchScore }}% — {{ $matchLevel }}
                             </span>
 
-                            @if($matchLevel == 'High Match')
-                            <span class="tag success-tag">
-                                <i class="fas fa-star me-1"></i>
-                                Highly Recommended
-                            </span>
-
-                        @elseif($matchLevel == 'Medium Match')
-                            <span class="tag primary-tag">
-                                <i class="fas fa-thumbs-up me-1"></i>
-                                Good Match
-                            </span>
-
-                        @else
-                            <span class="tag warning-tag">
-                                <i class="fas fa-chart-line me-1"></i>
-                                Low Match
-                            </span>
-                        @endif
+                            @if($matchLevel === 'High Match')
+                                <span class="tag success-tag"><i class="fas fa-star me-1"></i> Highly Recommended</span>
+                            @elseif($matchLevel === 'Medium Match')
+                                <span class="tag primary-tag"><i class="fas fa-thumbs-up me-1"></i> Good Match</span>
+                            @else
+                                <span class="tag warning-tag"><i class="fas fa-chart-line me-1"></i> Low Match</span>
+                            @endif
                         </div>
 
+                        {{-- Score bar --}}
+                        <div class="score-bar-wrap">
+                            <div class="score-bar-label">
+                                <span>Match Score</span>
+                                <span>{{ $matchScore }}/100</span>
+                            </div>
+                            <div class="score-bar-bg">
+                                <div class="score-bar-fill {{ $barClass }}" style="--bar-width: {{ $matchScore }}%"></div>
+                            </div>
+                        </div>
+
+                        {{-- Description --}}
                         <p class="scholarship-description">
                             {{ \Illuminate\Support\Str::limit(strip_tags($scholarship->description), 180) }}
                         </p>
 
+                        {{-- ── Breakdown ──────────────────────────────────── --}}
                         <div class="breakdown-list">
-                            <div class="breakdown-item">
-                                <i class="fas {{ ($scholarship->match_breakdown['spm'] ?? false) ? 'fa-check-circle' : 'fa-minus-circle' }}"></i>
-                                Academic Match: {{ ($scholarship->match_breakdown['spm'] ?? false) ? 'Yes' : 'Partial' }}
-                            </div>
-                            <div class="breakdown-item">
-                                <i class="fas {{ ($scholarship->match_breakdown['income'] ?? false) ? 'fa-check-circle' : 'fa-minus-circle' }}"></i>
-                                Income Match: {{ ($scholarship->match_breakdown['income'] ?? false) ? 'Yes' : 'Partial' }}
-                            </div>
-                            <div class="breakdown-item">
-                                <i class="fas {{ ($scholarship->match_breakdown['study_level'] ?? false) ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
-                                Study Path Match: {{ ($scholarship->match_breakdown['study_level'] ?? false) ? 'Yes' : 'No' }}
-                            </div>
-                            <div class="breakdown-item">
-                                <i class="fas {{ ($scholarship->match_breakdown['field'] ?? false) ? 'fa-check-circle' : 'fa-minus-circle' }}"></i>
-                                Field Match: {{ ($scholarship->match_breakdown['field'] ?? false) ? 'Yes' : 'Partial' }}
-                            </div>
-                        </div>
 
+                            {{-- 1. SPM (scored) --}}
+                            @if($spmMax > 0)
+                            <div class="breakdown-item">
+                                <i class="fas breakdown-icon
+                                    {{ $spmFull ? 'fa-check-circle pass' : ($spmZero ? 'fa-times-circle fail' : 'fa-exclamation-circle partial') }}">
+                                </i>
+                                <span class="breakdown-label">SPM Result</span>
+                                <span class="breakdown-detail">
+                                    {{ $spmDetail }}
+                                    <span class="breakdown-score {{ $spmFull ? 'score-full' : ($spmZero ? 'score-zero' : 'score-partial') }}">
+                                        {{ $spmEarned }}/{{ $spmMax }} pts
+                                    </span>
+                                </span>
+                            </div>
+                            @endif
+
+                            {{-- 2. Monthly Income (scored) --}}
+                            @if($incomeMax > 0)
+                            <div class="breakdown-item">
+                                <i class="fas breakdown-icon
+                                    {{ $incomeFull ? 'fa-check-circle pass' : ($incomeZero ? 'fa-times-circle fail' : 'fa-exclamation-circle partial') }}">
+                                </i>
+                                <span class="breakdown-label">Monthly Income</span>
+                                <span class="breakdown-detail">
+                                    {{ $incomeDetail }}
+                                    <span class="breakdown-score {{ $incomeFull ? 'score-full' : ($incomeZero ? 'score-zero' : 'score-partial') }}">
+                                        {{ $incomeEarned }}/{{ $incomeMax }} pts
+                                    </span>
+                                </span>
+                            </div>
+                            @endif
+
+                            {{-- 3. Hard filter — Study Level --}}
+                            <div class="breakdown-item">
+                                <i class="fas breakdown-icon {{ $passedStudyLevel ? 'fa-check-circle pass' : 'fa-times-circle fail' }}"></i>
+                                <span class="breakdown-label">Study Level</span>
+                                <span class="breakdown-detail">
+                                    {{ $passedStudyLevel ? 'Eligible' : 'Not eligible for this study level' }}
+                                </span>
+                            </div>
+
+                            {{-- 4. Hard filter — Field of Study --}}
+                            <div class="breakdown-item">
+                                <i class="fas breakdown-icon {{ $passedField ? 'fa-check-circle pass' : 'fa-times-circle fail' }}"></i>
+                                <span class="breakdown-label">Field of Study</span>
+                                <span class="breakdown-detail">
+                                    {{ $passedField ? 'Eligible' : 'Your field is not listed for this scholarship' }}
+                                </span>
+                            </div>
+
+                            {{-- 5. Hard filter — Age --}}
+                            <div class="breakdown-item">
+                                <i class="fas breakdown-icon {{ $passedAge ? 'fa-check-circle pass' : 'fa-times-circle fail' }}"></i>
+                                <span class="breakdown-label">Age</span>
+                                <span class="breakdown-detail">
+                                    {{ $passedAge ? 'Within age requirement' : 'Outside the required age range' }}
+                                </span>
+                            </div>
+
+                            {{-- 6. Hard filter — Citizenship --}}
+                            <div class="breakdown-item">
+                                <i class="fas breakdown-icon {{ $passedCitizenship ? 'fa-check-circle pass' : 'fa-times-circle fail' }}"></i>
+                                <span class="breakdown-label">Citizenship</span>
+                                <span class="breakdown-detail">
+                                    {{ $passedCitizenship ? 'Eligible' : 'Citizenship requirement not met' }}
+                                </span>
+                            </div>
+
+                            {{-- 7. Hard filter — Bumiputera --}}
+                            <div class="breakdown-item">
+                                <i class="fas breakdown-icon {{ $passedBumiputera ? 'fa-check-circle pass' : 'fa-times-circle fail' }}"></i>
+                                <span class="breakdown-label">Bumiputera</span>
+                                <span class="breakdown-detail">
+                                    {{ $passedBumiputera ? 'Eligible' : 'This scholarship requires Bumiputera status' }}
+                                </span>
+                            </div>
+
+                            {{-- 8. Bonus (only show if any bonus was earned) --}}
+                            @if($bonusEarned > 0)
+                            <div class="breakdown-item">
+                                <i class="fas fa-plus-circle breakdown-icon pass"></i>
+                                <span class="breakdown-label">Bonus</span>
+                                <span class="breakdown-detail">
+                                    {{ implode(', ', $bonusDetails) }}
+                                    <span class="breakdown-score score-full">+{{ $bonusEarned }} pts</span>
+                                </span>
+                            </div>
+                            @endif
+
+                        </div>
+                        {{-- ── End Breakdown ──────────────────────────────── --}}
+
+                        {{-- Footer --}}
                         <div class="recommendation-footer">
                             <div class="deadline-text">
                                 <i class="fas fa-calendar-alt"></i>
                                 Deadline:
                                 {{ $scholarship->deadline
                                     ? \Carbon\Carbon::parse($scholarship->deadline)->format('d M Y')
-                                    : 'Rolling / Not specified'
-                                }}
+                                    : 'Rolling / Not specified' }}
                             </div>
 
                             <div class="recommendation-actions">
                                 @if($scholarship->application_link)
-                                    <a href="{{ $scholarship->application_link }}"
-                                       target="_blank"
-                                       class="btn btn-primary">
+                                    <a href="{{ $scholarship->application_link }}" target="_blank" class="btn btn-primary">
                                         <i class="fas fa-external-link-alt me-1"></i> Apply
                                     </a>
                                 @endif
 
-                                <a href="{{ route('scholarships.show', $scholarship->id) }}"
-                                   class="btn btn-outline-secondary">
+                                <a href="{{ route('scholarships.show', $scholarship->id) }}" class="btn btn-outline-secondary">
                                     <i class="fas fa-info-circle me-1"></i> Details
                                 </a>
 
-                                <form action="{{ route('bookmarks.toggle', $scholarship->id) }}"
-                                      method="POST"
-                                      class="d-inline">
+                                <form action="{{ route('bookmarks.toggle', $scholarship->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-outline-primary">
                                         <i class="fas fa-bookmark me-1"></i> Save
@@ -439,6 +564,7 @@
                                 </form>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -447,7 +573,7 @@
                 <div class="alert-info text-center py-5" data-aos="fade-up">
                     <i class="fas fa-search fa-3x mb-3" style="display: block;"></i>
                     <h5 class="mb-2">No Scholarships Found</h5>
-                    <p class="mb-0">No scholarships match your current criteria. Try updating your profile or check back later for new opportunities.</p>
+                    <p class="mb-0">No scholarships match your current criteria. Try updating your profile or check back later.</p>
                     <a href="{{ route('scholarship.finder') }}" class="btn btn-primary mt-3">
                         <i class="fas fa-edit me-2"></i> Update Profile
                     </a>
