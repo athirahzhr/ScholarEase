@@ -5,43 +5,33 @@ namespace App\Services;
 /**
  * Rule-Based Scholarship Matcher
  * ================================
- * Designed for FYP — explainable rule-based recommendation system.
+ * FYP — Explainable Rule-Based Recommendation System
  *
- * HOW IT WORKS (for examiner explanation):
- * -----------------------------------------
+ * HOW IT WORKS:
+ * ─────────────────────────────────────────────────────
  * STEP 1 — Hard Filters (Pass/Fail)
- *   Citizenship, Bumiputera, Study Level, Field of Study
- *   → If student fails ANY of these, scholarship is excluded entirely.
- *   → These are binary because they are fixed policy requirements with no "close enough".
+ *   Citizenship, Bumiputera, Study Level, Field of Study, Age
+ *   → Student must pass ALL. Any failure = excluded immediately.
+ *   → Binary because these are fixed policy requirements.
  *
- * STEP 2 — Scored Criteria (Range-based, has partial credit)
- *   SPM Result, Monthly Income, Age Gap
- *   → These have a natural range/spectrum, so we reward closeness.
- *   → e.g. A student 1 A short of requirement is closer than one 5 As short.
+ * STEP 2 — Scored Criteria (Range-based, partial credit)
+ *   SPM Result (50 pts) + Monthly Income (50 pts) = 100 pts base
+ *   → These have a natural spectrum — rewards closeness to requirement.
  *
- * STEP 3 — Bonus Points
- *   Leadership, Bumiputera Priority
- *   → Optional traits preferred by the scholarship provider.
- *   → Adds small score boost but never disqualifies.
+ * STEP 3 — Bonus Points (on top, capped at 100 final)
+ *   Leadership (+5) and Bumiputera Priority (+5)
+ *   → Preferred but not mandatory traits.
  *
- * SCORING BUDGET (total = 100 pts):
- *   SPM Result       → 40 pts  (highest weight, most academic relevance)
- *   Monthly Income   → 35 pts  (second, financial need is key for most scholarships)
- *   Age              → 25 pts  (tertiary, most students fall within range)
- *   ─────────────────────────
- *   Base Total       = 100 pts
- *   Bonus (each)     = +5 pts  (can push past 100, capped at 100)
- *
- * RECOMMENDATION THRESHOLD: Score >= 50% after hard filter pass.
+ * RECOMMENDATION THRESHOLD: Score >= 50
+ * ─────────────────────────────────────────────────────
  */
 class ScholarshipRuleMatcher
 {
     // ── Scoring weights (must total 100) ─────────────────────────────────────
-    private const W_SPM    = 40;
-    private const W_INCOME = 35;
-    private const W_AGE    = 25;
+    private const W_SPM    = 50;
+    private const W_INCOME = 50;
 
-    // ── Bonus (on top, capped at 100 final) ──────────────────────────────────
+    // ── Bonus (on top, final score capped at 100) ─────────────────────────────
     private const W_BONUS = 5;
 
     // ── Minimum score to appear in recommendations ────────────────────────────
@@ -84,10 +74,8 @@ class ScholarshipRuleMatcher
     public function matchScholarship($student, $criteria): array
     {
         // ── STEP 1: Hard Filters ─────────────────────────────────────────────
-        // All must pass. If any fail → ineligible, stop here.
         $hardFilters = $this->runHardFilters($student, $criteria);
-
-        $failedAny = in_array(false, $hardFilters, true);
+        $failedAny   = in_array(false, $hardFilters, true);
 
         if ($failedAny) {
             return [
@@ -98,15 +86,15 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        // ── STEP 2: Scored Criteria (range-based) ────────────────────────────
+        // ── STEP 2: Scored Criteria ───────────────────────────────────────────
         $score    = 0;
         $maxScore = 0;
         $scoreBreakdown = [];
 
-        // SPM
+        // SPM Result
         [$earned, $max, $detail] = $this->scoreSpm($student, $criteria);
-        $score              += $earned;
-        $maxScore           += $max;
+        $score    += $earned;
+        $maxScore += $max;
         $scoreBreakdown['spm'] = [
             'earned' => $earned,
             'max'    => $max,
@@ -115,25 +103,15 @@ class ScholarshipRuleMatcher
 
         // Monthly Income
         [$earned, $max, $detail] = $this->scoreIncome($student, $criteria);
-        $score                 += $earned;
-        $maxScore              += $max;
+        $score    += $earned;
+        $maxScore += $max;
         $scoreBreakdown['income'] = [
             'earned' => $earned,
             'max'    => $max,
             'detail' => $detail,
         ];
 
-        // Age
-        [$earned, $max, $detail] = $this->scoreAge($student, $criteria);
-        $score              += $earned;
-        $maxScore           += $max;
-        $scoreBreakdown['age'] = [
-            'earned' => $earned,
-            'max'    => $max,
-            'detail' => $detail,
-        ];
-
-        // ── STEP 3: Bonus Points ─────────────────────────────────────────────
+        // ── STEP 3: Bonus Points ──────────────────────────────────────────────
         [$bonusEarned, $bonusDetail] = $this->scoreBonus($student, $criteria);
         $score += $bonusEarned;
         $scoreBreakdown['bonus'] = [
@@ -155,29 +133,23 @@ class ScholarshipRuleMatcher
     }
 
     // =========================================================================
-    // STEP 1 — Hard Filters (Pass/Fail only, no scoring)
+    // STEP 1 — Hard Filters (Pass/Fail, no scoring)
     // =========================================================================
 
     private function runHardFilters($student, $criteria): array
     {
         return [
-            // Must be correct citizenship
             'citizenship' => $this->checkCitizenship($student, $criteria),
-
-            // Must be Bumiputera if required
             'bumiputera'  => $this->checkBumiputera($student, $criteria),
-
-            // Must be in allowed study level (e.g. Diploma, Degree)
             'study_level' => $this->checkStudyLevel($student, $criteria),
-
-            // Must be in allowed field of study (e.g. Engineering, Medicine)
             'field'       => $this->checkField($student, $criteria),
+            'age'         => $this->checkAge($student, $criteria),
         ];
     }
 
     private function checkCitizenship($student, $criteria): bool
     {
-        // No requirement set = open to all
+        // No requirement = open to all
         if (!$criteria->citizenship_required) {
             return true;
         }
@@ -199,7 +171,7 @@ class ScholarshipRuleMatcher
     {
         $allowed = $criteria->study_paths ?? [];
 
-        // No restriction = all levels accepted
+        // Empty = no restriction = pass
         return empty($allowed) || in_array($student->study_level, $allowed, true);
     }
 
@@ -207,33 +179,49 @@ class ScholarshipRuleMatcher
     {
         $allowed = $criteria->fields_of_study ?? [];
 
-        // No restriction = all fields accepted
+        // Empty = open to all fields = pass
         return empty($allowed) || in_array($student->field_of_study, $allowed, true);
     }
 
+    private function checkAge($student, $criteria): bool
+    {
+        // Below minimum age
+        if ($criteria->min_age !== null && $student->age < $criteria->min_age) {
+            return false;
+        }
+
+        // Above maximum age
+        if ($criteria->max_age !== null && $student->age > $criteria->max_age) {
+            return false;
+        }
+
+        return true;
+    }
+
     // =========================================================================
-    // STEP 2 — Scored Criteria (range-based partial credit)
-    // Each method returns: [points_earned, max_points, detail_string]
+    // STEP 2 — Scored Criteria (range-based, partial credit)
+    // Each returns: [points_earned, max_points, detail_string]
     // =========================================================================
 
     /**
-     * SPM Result — 40 pts
+     * SPM Result — 50 pts
      *
-     * Rule:
-     *   Meets or exceeds requirement   → 40/40 (full)
-     *   1 A short                      → 28/40 (70%)
-     *   2 As short                     → 18/40 (45%)
-     *   3+ As short                    → 6/40  (15% floor — still passes filter)
+     * Scoring Tiers:
+     *   Meets or exceeds requirement  → 50/50 (100%)
+     *   1 A short                     → 35/50  (70%)
+     *   2 As short                    → 23/50  (45%)
+     *   3+ As short                   →  8/50  (15% floor)
      *
-     * Why partial credit?
-     *   A student with 9As applying for a 10A scholarship is still highly
-     *   competitive vs one with 5As. Partial credit preserves this ranking.
+     * Rationale:
+     *   SPM result exists on a spectrum. A student with 9As applying for
+     *   a 10A scholarship is still highly academic. Partial credit
+     *   preserves meaningful ranking between close candidates.
      */
     private function scoreSpm($student, $criteria): array
     {
         $max = self::W_SPM;
 
-        // No SPM requirement set → full marks
+        // No SPM requirement → full marks
         if ($criteria->min_spm_as === null) {
             return [$max, $max, 'No SPM requirement — full marks awarded'];
         }
@@ -241,40 +229,44 @@ class ScholarshipRuleMatcher
         $shortfall = $criteria->min_spm_as - $student->total_as;
 
         if ($shortfall <= 0) {
-            return [$max, $max, "Meets requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"];
+            return [
+                $max,
+                $max,
+                "Meets requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)",
+            ];
         }
 
         $tiers = [
-            1 => [0.70, "1A short of requirement"],
-            2 => [0.45, "2As short of requirement"],
+            1 => [0.70, "1A short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"],
+            2 => [0.45, "2As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"],
         ];
 
-        [$multiplier, $label] = $tiers[$shortfall] ?? [0.15, "{$shortfall}As short of requirement"];
+        [$multiplier, $label] = $tiers[$shortfall]
+            ?? [0.15, "{$shortfall}As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"];
 
-        $earned = (int) round($max * $multiplier);
-
-        return [$earned, $max, $label];
+        return [(int) round($max * $multiplier), $max, $label];
     }
 
     /**
-     * Monthly Income — 35 pts
+     * Monthly Income — 50 pts
      *
-     * Rule:
-     *   Within limit                   → 35/35 (full)
-     *   Exceeds by ≤ RM500             → 26/35 (75%)  ← tighter tiers than before
-     *   Exceeds by RM501–RM1,500       → 18/35 (50%)
-     *   Exceeds by RM1,501–RM3,000     → 11/35 (30%)
-     *   Exceeds by > RM3,000           → 4/35  (10% floor)
+     * Scoring Tiers:
+     *   Within limit                  → 50/50 (100%)
+     *   Exceeds by ≤ RM500            → 38/50  (75%)
+     *   Exceeds by RM501–RM1,500      → 25/50  (50%)
+     *   Exceeds by RM1,501–RM3,000    → 15/50  (30%)
+     *   Exceeds by > RM3,000          →  5/50  (10% floor)
      *
-     * Why partial credit?
-     *   Income limits are policy thresholds. A family RM200 over the limit
-     *   should rank higher than one RM5,000 over.
+     * Rationale:
+     *   Income limits are policy thresholds but a family RM200 over the
+     *   limit is far closer in financial need than one RM5,000 over.
+     *   Partial credit reflects real proximity to financial eligibility.
      */
     private function scoreIncome($student, $criteria): array
     {
         $max = self::W_INCOME;
 
-        // No income limit set → full marks
+        // No income limit → full marks
         if ($criteria->max_monthly_income === null) {
             return [$max, $max, 'No income requirement — full marks awarded'];
         }
@@ -289,9 +281,9 @@ class ScholarshipRuleMatcher
         $excess = $income - $limit;
 
         $tiers = [
-            500  => [0.75, "Exceeds limit by RM{$excess} (≤ RM500)"],
-            1500 => [0.50, "Exceeds limit by RM{$excess} (RM501–RM1,500)"],
-            3000 => [0.30, "Exceeds limit by RM{$excess} (RM1,501–RM3,000)"],
+            500  => [0.75, "Exceeds by RM{$excess} (≤ RM500 over limit)"],
+            1500 => [0.50, "Exceeds by RM{$excess} (RM501–RM1,500 over limit)"],
+            3000 => [0.30, "Exceeds by RM{$excess} (RM1,501–RM3,000 over limit)"],
         ];
 
         foreach ($tiers as $threshold => [$multiplier, $label]) {
@@ -300,57 +292,7 @@ class ScholarshipRuleMatcher
             }
         }
 
-        return [(int) round($max * 0.10), $max, "Exceeds limit by RM{$excess} (> RM3,000)"];
-    }
-
-    /**
-     * Age — 25 pts
-     *
-     * Rule:
-     *   Within age range               → 25/25 (full)
-     *   1 year outside range           → 13/25 (50%)
-     *   2+ years outside range         → 0/25  (0 — too far off)
-     *
-     * Why partial credit and NOT a hard filter?
-     *   Age limits for scholarships are often soft guidelines, not strict
-     *   legal requirements. A student 1 year over may still be considered.
-     *   If your scholarships treat age as strict, move this to hard filters.
-     */
-    private function scoreAge($student, $criteria): array
-    {
-        $max = self::W_AGE;
-
-        $hasMin = $criteria->min_age !== null;
-        $hasMax = $criteria->max_age !== null;
-
-        // No age requirement → full marks
-        if (!$hasMin && !$hasMax) {
-            return [$max, $max, 'No age requirement — full marks awarded'];
-        }
-
-        $age = $student->age;
-        $gap = 0;
-
-        if ($hasMin && $age < $criteria->min_age) {
-            $gap = $criteria->min_age - $age;
-        } elseif ($hasMax && $age > $criteria->max_age) {
-            $gap = $age - $criteria->max_age;
-        }
-
-        if ($gap === 0) {
-            $range = ($hasMin ? $criteria->min_age : '?') . '–' . ($hasMax ? $criteria->max_age : '?');
-            return [$max, $max, "Within age range ({$age} yrs, range {$range})"];
-        }
-
-        if ($gap === 1) {
-            return [
-                (int) round($max * 0.50),
-                $max,
-                "1 year outside age range (age {$age})",
-            ];
-        }
-
-        return [0, $max, "{$gap} years outside age range (age {$age}) — no score"];
+        return [(int) round($max * 0.10), $max, "Exceeds by RM{$excess} (> RM3,000 over limit)"];
     }
 
     // =========================================================================
@@ -358,10 +300,11 @@ class ScholarshipRuleMatcher
     // =========================================================================
 
     /**
-     * Bonus — up to +5 pts each (capped at 100 overall)
+     * Bonus — up to +5 pts each (final score capped at 100)
      *
-     * Bonuses reward preferred but non-mandatory traits.
-     * They can tip the ranking between two equally-scoring candidates.
+     * Rationale:
+     *   Bonuses reward preferred but non-mandatory traits.
+     *   They break ties between equally-scored candidates.
      */
     private function scoreBonus($student, $criteria): array
     {
@@ -369,20 +312,20 @@ class ScholarshipRuleMatcher
         $details = [];
 
         if ($criteria->leadership_priority && $student->has_leadership) {
-            $earned            += self::W_BONUS;
-            $details[]          = 'Leadership bonus (+' . self::W_BONUS . ')';
+            $earned    += self::W_BONUS;
+            $details[] = 'Leadership bonus (+' . self::W_BONUS . ' pts)';
         }
 
         if ($criteria->bumiputera_priority && $student->bumiputera) {
-            $earned            += self::W_BONUS;
-            $details[]          = 'Bumiputera priority bonus (+' . self::W_BONUS . ')';
+            $earned    += self::W_BONUS;
+            $details[] = 'Bumiputera priority bonus (+' . self::W_BONUS . ' pts)';
         }
 
         return [$earned, $details];
     }
 
     // =========================================================================
-    // Helpers
+    // Helper
     // =========================================================================
 
     private function getMatchLevel(int $score): string
