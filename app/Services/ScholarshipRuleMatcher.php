@@ -28,8 +28,9 @@ class ScholarshipRuleMatcher
 
             // ELIGIBLE + MINIMUM SCORE 50%
             if (
+                $result['eligible'] &&
                 $result['score'] >= 50
-            ) {
+            ){
 
                 $scholarship->match_score =
                     $result['score'];
@@ -59,6 +60,8 @@ class ScholarshipRuleMatcher
 
         $score = 0;
         $maxScore = 0;
+
+        $eligible = true;
         
 
         $breakdown = [];
@@ -146,13 +149,9 @@ class ScholarshipRuleMatcher
         // =========================
         // STUDY LEVEL
         // =========================
-        $breakdown['study_level'] = false;
+            $breakdown['study_level'] = false;
 
-
-        $studyLevels =
-            $criteria->study_paths ?? [];
-
-        $maxScore += 15;
+        $studyLevels = $criteria->study_paths ?? [];
 
         if (
             !empty($studyLevels) &&
@@ -162,14 +161,12 @@ class ScholarshipRuleMatcher
             )
         ) {
 
-            $score += 5;
+            $eligible = false;
 
         } else {
 
-            $score += 15;
             $breakdown['study_level'] = true;
         }
-
         // =========================
         // FIELD OF STUDY
         // =========================
@@ -206,9 +203,7 @@ class ScholarshipRuleMatcher
         // =========================
         // AGE
         // =========================
-        $breakdown['age'] = false;
-
-        $maxScore += 10;
+            $breakdown['age'] = false;
 
         if (
             ($criteria->min_age &&
@@ -218,11 +213,10 @@ class ScholarshipRuleMatcher
                 $student->age > $criteria->max_age)
         ) {
 
-            $score += 3;
+            $eligible = false;
 
         } else {
 
-            $score += 10;
             $breakdown['age'] = true;
         }
 
@@ -230,20 +224,17 @@ class ScholarshipRuleMatcher
         // =========================
         // BUMIPUTERA
         // =========================
-        $breakdown['bumiputera'] = false;
-
-        $maxScore += 5;
+       $breakdown['bumiputera'] = false;
 
         if (
-    $criteria->bumiputera_required &&
-    !$student->bumiputera
+            $criteria->bumiputera_required &&
+            !$student->bumiputera
         ) {
 
-            $score += 2;
+            $eligible = false;
 
         } else {
 
-            $score += 5;
             $breakdown['bumiputera'] = true;
         }
 
@@ -251,8 +242,6 @@ class ScholarshipRuleMatcher
         // CITIZENSHIP
         // =========================
         $breakdown['citizenship'] = false;
-
-        $maxScore += 5;
 
         if (
             $criteria->citizenship_required &&
@@ -262,11 +251,10 @@ class ScholarshipRuleMatcher
             )
         ) {
 
-            $score += 2;
+            $eligible = false;
 
         } else {
 
-            $score += 5;
             $breakdown['citizenship'] = true;
         }
 
@@ -301,13 +289,14 @@ class ScholarshipRuleMatcher
         $percentage = min($percentage, 100);
 
         return [
-            'score' => $percentage,
-            'breakdown' => $breakdown,
-            'match_level' => match (true) {
-                $percentage >= 80 => 'High Match',
-                $percentage >= 60 => 'Medium Match',
-                default => 'Low Match',
-            },
-        ];
+    'eligible' => $eligible,
+    'score' => $percentage,
+    'breakdown' => $breakdown,
+    'match_level' => match (true) {
+        $percentage >= 80 => 'High Match',
+        $percentage >= 60 => 'Medium Match',
+        default => 'Low Match',
+    },
+    ];
     }
 }
