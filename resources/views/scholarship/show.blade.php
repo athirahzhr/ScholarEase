@@ -411,19 +411,6 @@
                                         </div>
                                     @endif
 
-                                    {{-- Gender --}}
-                                    @if($e->gender_requirement && $e->gender_requirement !== 'Any')
-                                        <div class="eligibility-item">
-                                            <div class="eligibility-icon">
-                                                <i class="fas fa-venus-mars"></i>
-                                            </div>
-                                            <div class="eligibility-label">Gender Requirement:</div>
-                                            <div class="eligibility-value">
-                                                <span class="eligibility-badge badge-gold">{{ $e->gender_requirement }}</span>
-                                            </div>
-                                        </div>
-                                    @endif
-
                                     {{-- Citizenship --}}
                                     @if(!empty($e->citizenship_required))
                                         <div class="eligibility-item">

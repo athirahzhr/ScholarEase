@@ -117,13 +117,6 @@
                                                     </span>
                                                 @endforeach
 
-                                                {{-- GENDER --}}
-                                                @if($c->gender_requirement && $c->gender_requirement !== 'Any')
-                                                    <span class="eligibility-badge eligibility-secondary">
-                                                        <i class="fas fa-venus-mars me-1"></i> {{ $c->gender_requirement }}
-                                                    </span>
-                                                @endif
-
                                                 {{-- CITIZENSHIP --}}
                                                 @if($c->citizenship_required)
                                                     <span class="eligibility-badge eligibility-dark">

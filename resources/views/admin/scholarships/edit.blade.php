@@ -140,16 +140,6 @@
                                             <small class="text-muted">Select fields of study covered by this scholarship</small>
                                         </div>
 
-                                        {{-- GENDER --}}
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">Gender Requirement</label>
-                                            <select name="gender_requirement" class="form-select">
-                                                <option value="Any" {{ old('gender_requirement', $scholarship->eligibilityCriteria->gender_requirement ?? 'Any') == 'Any' ? 'selected' : '' }}>Any</option>
-                                                <option value="Male" {{ old('gender_requirement', $scholarship->eligibilityCriteria->gender_requirement ?? '') == 'Male' ? 'selected' : '' }}>Male</option>
-                                                <option value="Female" {{ old('gender_requirement', $scholarship->eligibilityCriteria->gender_requirement ?? '') == 'Female' ? 'selected' : '' }}>Female</option>
-                                            </select>
-                                        </div>
-
                                         {{-- CITIZENSHIP + STATE --}}
                                         <div class="row">
                                             <div class="col-md-6 mb-3">

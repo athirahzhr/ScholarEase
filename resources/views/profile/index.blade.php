@@ -334,15 +334,7 @@
                                                 </div>
                                             </div>
                                             @endif
-                                            <div class="info-item">
-                                                <div class="info-label">
-                                                    <i class="fas fa-venus-mars"></i>
-                                                    Gender
-                                                </div>
-                                                <div class="info-value">
-                                                    {{ $profile->gender ?? 'Not Set' }}
-                                                </div>
-                                            </div>
+
                                             <div class="info-item">
                                                 <div class="info-label">
                                                     <i class="fas fa-map-marker-alt"></i>

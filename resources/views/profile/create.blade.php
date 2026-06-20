@@ -283,18 +283,6 @@
                                 </h5>
                             </div>
 
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-venus-mars"></i>
-                                        Gender
-                                    </label>
-                                    <select name="gender" class="form-select" required>
-                                        <option value="Male" {{ old('gender', $profile->gender ?? '') == 'Male' ? 'selected' : '' }}>Male</option>
-                                        <option value="Female" {{ old('gender', $profile->gender ?? '') == 'Female' ? 'selected' : '' }}>Female</option>
-                                    </select>
-                                </div>
-
                                 <div class="col-md-3">
                                     <label class="form-label required-field">
                                         <i class="fas fa-map-marker-alt"></i>

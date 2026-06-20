@@ -440,18 +440,6 @@
                             <input type="number" name="age" class="form-control" min="15" max="30" placeholder="Enter your age" required>
                         </div>
 
-                        <!-- Gender -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-venus-mars me-2 text-maroon"></i>Gender
-                            </label>
-                            <select name="gender" class="form-select" required>
-                                <option value="">-- Select --</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-
                         <!-- State -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">

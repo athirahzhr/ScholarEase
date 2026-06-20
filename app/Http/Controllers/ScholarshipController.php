@@ -69,7 +69,7 @@ class ScholarshipController extends Controller
             'citizenship' => 'required|string|max:100',
 
             'age' => 'required|integer|min:15|max:30',
-            'gender' => 'required|in:Male,Female',
+            
 
             'state' => 'required|string|max:100',
 
@@ -92,7 +92,7 @@ class ScholarshipController extends Controller
                 'citizenship' => $validated['citizenship'],
 
                 'age' => $validated['age'],
-                'gender' => $validated['gender'],
+                
 
                 'state' => $validated['state'],
 
@@ -167,7 +167,6 @@ class ScholarshipController extends Controller
             'study_paths' => 'nullable|array',
             'fields_of_study' => 'nullable|array',
 
-            'gender_requirement' => 'nullable|in:Any,Male,Female',
 
             'citizenship_required' => 'nullable|string|max:100',
             'state_requirement' => 'nullable|string|max:100',
@@ -219,7 +218,6 @@ class ScholarshipController extends Controller
                 'study_paths' => $request->study_paths ?? [],
                 'fields_of_study' => $request->fields_of_study ?? [],
 
-                'gender_requirement' => $request->gender_requirement ?? 'Any',
 
                 'citizenship_required' => $request->citizenship_required,
 
@@ -432,10 +430,6 @@ class ScholarshipController extends Controller
                 $oldCriteria->max_age ?? null
             ),
 
-            'gender_requirement' => $request->input(
-                'gender_requirement',
-                $oldCriteria->gender_requirement ?? 'Any'
-            ),
 
             'citizenship_required' => $request->input(
                 'citizenship_required',

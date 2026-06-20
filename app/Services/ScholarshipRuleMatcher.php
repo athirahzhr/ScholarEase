@@ -226,27 +226,6 @@ class ScholarshipRuleMatcher
             $breakdown['age'] = true;
         }
 
-        // =========================
-        // GENDER
-        // =========================
-        $breakdown['gender'] = false;
-
-        $maxScore += 5;
-
-       if (
-            $criteria->gender_requirement &&
-            $criteria->gender_requirement !== 'Any' &&
-            $student->gender !==
-            $criteria->gender_requirement
-        ) {
-
-            $score += 2;
-
-        } else {
-
-            $score += 5;
-            $breakdown['gender'] = true;
-        }
 
         // =========================
         // BUMIPUTERA

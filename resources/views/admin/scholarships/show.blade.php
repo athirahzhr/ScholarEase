@@ -192,18 +192,6 @@
                                 </div>
                             @endif
 
-                            {{-- GENDER --}}
-                            @if($criteria->gender_requirement && $criteria->gender_requirement !== 'Any')
-                                <div class="eligibility-item">
-                                    <div class="eligibility-label">
-                                        <i class="fas fa-venus-mars me-2" style="color: #6b7280;"></i> Gender Requirement:
-                                    </div>
-                                    <div class="eligibility-badges mt-2">
-                                        <span class="badge badge-secondary">{{ $criteria->gender_requirement }}</span>
-                                    </div>
-                                </div>
-                            @endif
-
                             {{-- CITIZENSHIP --}}
                             @if($criteria->citizenship_required)
                                 <div class="eligibility-item">
