@@ -10,25 +10,29 @@ class ScrapeAll extends Command
     protected $description = 'Run all scholarship scrapers';
 
     public function handle()
-    {
-        $commands = [
-            'scrape:jpa',
-            'scrape:khazanah',
-            'scrape:petronas',
-            'scrape:mara',
-            'scrape:bnm',
-            'scrape:bpmp',
-            'scrape:axiata',
-            'scrape:shell',
-            'scrape:yp',
-        ];
+{
+    $this->info('🚀 Running all scholarship scrapers...');
 
-        foreach ($commands as $cmd) {
-            $this->info("▶ Running {$cmd}");
-            $this->call($cmd);
-        }
+    $output = [];
+    $returnCode = 0;
 
-        $this->info('🎉 All scrapers completed');
-        return Command::SUCCESS;
+    exec(
+    'cd ' . base_path() . ' && npm run scrape:all 2>&1',
+    $output,
+    $returnCode
+    );
+
+    foreach ($output as $line) {
+        $this->line($line);
     }
+
+    if ($returnCode !== 0) {
+        $this->error('❌ Scraping process failed.');
+        return Command::FAILURE;
+    }
+
+    $this->info('🎉 All scrapers completed successfully.');
+
+    return Command::SUCCESS;
+}
 }
