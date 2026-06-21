@@ -37,6 +37,10 @@ protected function schedule(Schedule $schedule): void
     ->weekly()
     ->mondays()
     ->at('02:00');
+
+    $schedule->command('scholarships:update-status')
+    ->daily()
+    ->at('00:05');
 }
 
 
