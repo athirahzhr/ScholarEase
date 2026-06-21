@@ -252,25 +252,6 @@
         </div>
     </div>
 
-    @if(auth()->user()->unreadNotifications->count())
-    <div class="row mb-4">
-        <div class="col-12">
-            @foreach(auth()->user()->unreadNotifications->take(3) as $notification)
-                <div class="alert alert-warning d-flex justify-content-between align-items-center" data-aos="fade-right">
-                    <div>
-                        <strong>{{ $notification->data['title'] ?? 'New Notification' }}</strong><br>
-                        {{ $notification->data['message'] ?? 'You have a new notification' }}
-                    </div>
-                    @if(!empty($notification->data['action_url']))
-                        <a href="{{ $notification->data['action_url'] }}" target="_blank" class="btn btn-sm btn-primary">
-                            Apply Now →
-                        </a>
-                    @endif
-                </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
 
     <div class="row">
         <!-- Sidebar Navigation -->
