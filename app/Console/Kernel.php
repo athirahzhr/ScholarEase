@@ -31,11 +31,10 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-protected function schedule(Schedule $schedule)
+protected function schedule(Schedule $schedule): void
 {
-    $schedule->command('app:import-scholarship')->dailyAt('02:00');
-    $schedule->command('notify:scholarship-deadline')->dailyAt('0:00');
-
+    $schedule->command('scrape:all')
+        ->everyMinute();
 }
 
 
