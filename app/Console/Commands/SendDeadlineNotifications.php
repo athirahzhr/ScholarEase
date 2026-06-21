@@ -22,7 +22,7 @@ class SendDeadlineNotifications extends Command
             ->whereNull('notified_at')
             ->whereHas('scholarship', function ($q) use ($today, $threshold) {
                 $q->whereDate('deadline', '>=', $today)
-                  ->whereDate('deadline', '<=', $threshold);
+                  ->whereDate('deadline', $today->copy()->addDays(3));
             })
             ->get();
 
@@ -36,8 +36,7 @@ class SendDeadlineNotifications extends Command
             if (!$scholarship || !$user) {
                 continue;
             }
-
-            $daysLeft = now()->diffInDays($scholarship->deadline, false);
+            $daysLeft = today()->diffInDays($scholarship->deadline, false);
 
             try {
 
