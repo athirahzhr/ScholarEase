@@ -34,7 +34,9 @@ class Kernel extends ConsoleKernel
 protected function schedule(Schedule $schedule): void
 {
     $schedule->command('scrape:all')
-        ->everyMinute();
+    ->weekly()
+    ->mondays()
+    ->at('02:00');
 }
 
 
