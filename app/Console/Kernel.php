@@ -33,14 +33,21 @@ class Kernel extends ConsoleKernel
      */
 protected function schedule(Schedule $schedule): void
 {
+    // Weekly Scraping
     $schedule->command('scrape:all')
     ->weekly()
     ->mondays()
     ->at('02:00');
 
+    // Update Scholarship Status
     $schedule->command('scholarships:update-status')
     ->daily()
     ->at('00:05');
+
+    // Deadline Notification
+    $schedule->command('notify:scholarship-deadline')
+        ->daily()
+        ->at('08:00');
 }
 
 
