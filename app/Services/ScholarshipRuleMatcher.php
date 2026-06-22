@@ -5,25 +5,69 @@ namespace App\Services;
 /**
  * Rule-Based Scholarship Matcher
  * ================================
- * FYP — Explainable Rule-Based Recommendation System
+ *
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │                     SYSTEM DESIGN PHILOSOPHY                    │
+ * │                                                                 │
+ * │  Score = FIT, not merit.                                        │
+ * │  A high score means "this scholarship was designed for you".    │
+ * │  A low score means "you are not the target group".              │
+ * │  Excluded means "you do not meet the policy requirement".       │
+ * └─────────────────────────────────────────────────────────────────┘
  *
  * HOW IT WORKS:
- * ─────────────────────────────────────────────────────
- * STEP 1 — Hard Filters (Pass/Fail)
- *   Citizenship, Bumiputera, Study Level, Field of Study, Age
- *   → Student must pass ALL. Any failure = excluded immediately.
- *   → Binary because these are fixed policy requirements.
+ * ─────────────────────────────────────────────────────────────────
+ *
+ * STEP 1 — Hard Filters (Pass/Fail, no scoring)
+ * ──────────────────────────────────────────────
+ * These are SYARAT WAJIB — fixed policy requirements with no spectrum.
+ * A student either qualifies or does not. There is no "almost eligible".
+ * If ANY filter fails → student is excluded from this scholarship entirely.
+ *
+ *   Criteria              Reason it is a hard filter
+ *   ─────────────────     ──────────────────────────────────────────────
+ *   Citizenship           You are either Malaysian or you are not
+ *   Bumiputera            Fixed racial policy requirement
+ *   Study Level           Scholarship is for Degree only, or Diploma only
+ *   Field of Study        Scholarship is for Engineering, not all fields
+ *   Age                   Fixed age policy — 19 years is 19 years
+ *   Income (RM ceiling)   "Tidak melebihi RM5,000" is a hard limit,
+ *                         not a preference. Over the limit = not eligible.
  *
  * STEP 2 — Scored Criteria (Range-based, partial credit)
- *   SPM Result (50 pts) + Monthly Income (50 pts) = 100 pts base
- *   → These have a natural spectrum — rewards closeness to requirement.
+ * ───────────────────────────────────────────────────────
+ * These criteria have a NATURAL SPECTRUM — there is meaningful distance
+ * between candidates. Partial credit reflects how close the student is
+ * to what the scholarship is specifically looking for.
+ *
+ *   SPM Result (50 pts)
+ *   → A student 1A short is closer to the target than one 5As short.
+ *   → Tolerance of 2As maximum. Beyond 2As → hard filter (excluded).
+ *   → This prevents misleading recommendations for very weak matches.
+ *
+ *   Income Category — B40/M40/T20 (50 pts)
+ *   → Only scored when scholarship uses "keutamaan" (preference) language.
+ *   → "Keutamaan kepada B40/M40" ≠ "Syarat: pendapatan ≤ RM10,960"
+ *   → Preferred category = full marks. Outside preference = partial marks.
+ *   → T20 students are NOT excluded — scholarship does not exclude them,
+ *     so the system must not impose a stricter rule than the policy itself.
  *
  * STEP 3 — Bonus Points (on top, capped at 100 final)
- *   Leadership (+5) and Bumiputera Priority (+5)
- *   → Preferred but not mandatory traits.
+ * ─────────────────────────────────────────────────────
+ *   Leadership (+5)        Preferred trait, not required
+ *   Bumiputera priority    Provider prefers Bumiputera, but not mandatory
+ *   → Breaks ties between equally-scored candidates.
  *
  * RECOMMENDATION THRESHOLD: Score >= 50
- * ─────────────────────────────────────────────────────
+ * ─────────────────────────────────────────────────────────────────
+ *
+ * INCOME TREATMENT SUMMARY (key design decision):
+ *
+ *   Scholarship format          Treatment       Reason
+ *   ─────────────────────────   ─────────────   ──────────────────────────
+ *   max_monthly_income (RM)  →  Hard Filter  →  Syarat wajib, not flexible
+ *   income_categories (B40…) →  Scored       →  Keutamaan = preference only
+ *   Neither set              →  Pass + full  →  No income restriction
  */
 class ScholarshipRuleMatcher
 {
@@ -36,6 +80,33 @@ class ScholarshipRuleMatcher
 
     // ── Minimum score to appear in recommendations ────────────────────────────
     private const MIN_SCORE = 50;
+
+    /**
+     * Official Malaysian household income thresholds.
+     * Source: Ministry of Economy Malaysia (Rafizi Ramli, 2023)
+     *
+     * Used ONLY for PATH B (category preference scoring) —
+     * converting a student's ringgit income into their B40/M40/T20 category
+     * so it can be matched against the scholarship's preferred categories.
+     *
+     * These thresholds are NOT used as income ceilings for hard filtering.
+     * Hard filtering uses max_monthly_income (PATH A) directly.
+     *
+     *   B40 → household income ≤ RM4,850/month       (bottom 40%)
+     *   M40 → household income RM4,851–RM10,960/month (middle 40%)
+     *   T20 → household income > RM10,960/month       (top 20%)
+     */
+    private const INCOME_CATEGORY_THRESHOLDS = [
+        'B40' => 4850,
+        'M40' => 10960,
+    ];
+
+    // ── SPM tolerance: max shortfall allowed before hard exclusion ────────────
+    // Students more than this many As below the requirement are excluded.
+    // Rationale: 1–2 As short is a close miss — still relevant to show.
+    //            3+ As short is a fundamentally different academic profile
+    //            and recommending them would be misleading to the student.
+    private const SPM_MAX_SHORTFALL = 2;
 
     // =========================================================================
     // PUBLIC: Get Recommendations
@@ -74,6 +145,8 @@ class ScholarshipRuleMatcher
     public function matchScholarship($student, $criteria): array
     {
         // ── STEP 1: Hard Filters ─────────────────────────────────────────────
+        // All must pass. Any single failure → excluded immediately.
+        // No scoring happens if student fails any hard filter.
         $hardFilters = $this->runHardFilters($student, $criteria);
         $failedAny   = in_array(false, $hardFilters, true);
 
@@ -87,11 +160,13 @@ class ScholarshipRuleMatcher
         }
 
         // ── STEP 2: Scored Criteria ───────────────────────────────────────────
-        $score    = 0;
-        $maxScore = 0;
+        // Only reached if all hard filters passed.
+        // Score reflects how well the student fits the scholarship's target.
+        $score          = 0;
+        $maxScore       = 0;
         $scoreBreakdown = [];
 
-        // SPM Result
+        // SPM Result (near-hard filter + scored)
         [$earned, $max, $detail] = $this->scoreSpm($student, $criteria);
         $score    += $earned;
         $maxScore += $max;
@@ -101,8 +176,8 @@ class ScholarshipRuleMatcher
             'detail' => $detail,
         ];
 
-        // Monthly Income
-        [$earned, $max, $detail] = $this->scoreIncome($student, $criteria);
+        // Income Category preference (only if scholarship uses B40/M40/T20)
+        [$earned, $max, $detail] = $this->scoreIncomeCategory($student, $criteria);
         $score    += $earned;
         $maxScore += $max;
         $scoreBreakdown['income'] = [
@@ -139,63 +214,123 @@ class ScholarshipRuleMatcher
     private function runHardFilters($student, $criteria): array
     {
         return [
-            'citizenship' => $this->checkCitizenship($student, $criteria),
-            'bumiputera'  => $this->checkBumiputera($student, $criteria),
-            'study_level' => $this->checkStudyLevel($student, $criteria),
-            'field'       => $this->checkField($student, $criteria),
-            'age'         => $this->checkAge($student, $criteria),
+            'citizenship'   => $this->checkCitizenship($student, $criteria),
+            'bumiputera'    => $this->checkBumiputera($student, $criteria),
+            'study_level'   => $this->checkStudyLevel($student, $criteria),
+            'field'         => $this->checkField($student, $criteria),
+            'age'           => $this->checkAge($student, $criteria),
+            'income_limit'  => $this->checkIncomeLimit($student, $criteria),
         ];
     }
 
+    /**
+     * Citizenship — Hard Filter
+     * You are either the required citizenship or you are not.
+     * No partial state exists for nationality.
+     */
     private function checkCitizenship($student, $criteria): bool
     {
-        // No requirement = open to all
         if (!$criteria->citizenship_required) {
-            return true;
+            return true; // No restriction — open to all
         }
 
         return strcasecmp($student->citizenship, $criteria->citizenship_required) === 0;
     }
 
+    /**
+     * Bumiputera — Hard Filter
+     * Fixed racial policy requirement.
+     * Either the scholarship requires it or it does not.
+     */
     private function checkBumiputera($student, $criteria): bool
     {
-        // No requirement = open to all races
         if (!$criteria->bumiputera_required) {
-            return true;
+            return true; // No restriction — open to all races
         }
 
         return (bool) $student->bumiputera;
     }
 
+    /**
+     * Study Level — Hard Filter
+     * Scholarship is designed for a specific level (e.g. Degree only).
+     * A Diploma student cannot be recommended for a Degree scholarship.
+     */
     private function checkStudyLevel($student, $criteria): bool
     {
         $allowed = $criteria->study_paths ?? [];
 
-        // Empty = no restriction = pass
         return empty($allowed) || in_array($student->study_level, $allowed, true);
     }
 
+    /**
+     * Field of Study — Hard Filter
+     * Scholarship is for specific fields (e.g. Engineering, Medicine).
+     * A student in an unlisted field is not the intended recipient.
+     */
     private function checkField($student, $criteria): bool
     {
         $allowed = $criteria->fields_of_study ?? [];
 
-        // Empty = open to all fields = pass
         return empty($allowed) || in_array($student->field_of_study, $allowed, true);
     }
 
+    /**
+     * Age — Hard Filter
+     * Fixed age policy. Age ranges are strict boundaries.
+     * A student 1 year over the limit does not qualify — no partial state.
+     */
     private function checkAge($student, $criteria): bool
     {
-        // Below minimum age
         if ($criteria->min_age !== null && $student->age < $criteria->min_age) {
             return false;
         }
 
-        // Above maximum age
         if ($criteria->max_age !== null && $student->age > $criteria->max_age) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Income Limit — Hard Filter (PATH A only)
+     *
+     * This filter ONLY activates when the scholarship sets max_monthly_income
+     * as a direct ringgit ceiling (e.g. "Tidak melebihi RM5,000").
+     *
+     * Rationale:
+     *   A ringgit ceiling is SYARAT WAJIB — a fixed policy requirement.
+     *   "Pendapatan tidak melebihi RM5,000" means exactly that.
+     *   A student earning RM6,000 does not meet this requirement.
+     *   There is no "almost qualifying" for a stated income limit —
+     *   the same way there is no "almost Malaysian" for citizenship.
+     *
+     *   Giving partial marks to over-limit students would be misleading:
+     *   the system would recommend a scholarship the student
+     *   is explicitly ineligible for.
+     *
+     * Note:
+     *   income_categories (B40/M40/T20) are NOT handled here.
+     *   They use "keutamaan" (preference) language, not a hard ceiling,
+     *   and are therefore scored in STEP 2 instead.
+     *
+     * Returns true (pass) when:
+     *   - No max_monthly_income is set (no restriction)
+     *   - Student income is within the stated limit
+     *
+     * Returns false (fail/excluded) when:
+     *   - max_monthly_income is set AND student income exceeds it
+     */
+    private function checkIncomeLimit($student, $criteria): bool
+    {
+        // No ringgit ceiling set → this filter does not apply → pass
+        if ($criteria->max_monthly_income === null) {
+            return true;
+        }
+
+        // Student must be within the stated ceiling
+        return $student->monthly_income <= $criteria->max_monthly_income;
     }
 
     // =========================================================================
@@ -204,30 +339,47 @@ class ScholarshipRuleMatcher
     // =========================================================================
 
     /**
-     * SPM Result — 50 pts
+     * SPM Result — 50 pts (near-hard filter + scored)
      *
-     * Scoring Tiers:
-     *   Meets or exceeds requirement  → 50/50 (100%)
-     *   1 A short                     → 35/50  (70%)
-     *   2 As short                    → 23/50  (45%)
-     *   3+ As short                   →  8/50  (15% floor)
+     * SPM acts as BOTH a near-hard filter and a scored criterion:
      *
-     * Rationale:
-     *   SPM result exists on a spectrum. A student with 9As applying for
-     *   a 10A scholarship is still highly academic. Partial credit
-     *   preserves meaningful ranking between close candidates.
+     *   Shortfall 0   → Meets requirement     → 50/50 (100%) — perfect fit
+     *   Shortfall 1   → 1A short              → 35/50  (70%) — very close
+     *   Shortfall 2   → 2As short             → 23/50  (45%) — borderline
+     *   Shortfall 3+  → Too far from target   → EXCLUDED (hard filter kicks in)
+     *
+     * Why exclude at shortfall > 2?
+     *   A student 3+ As below the requirement has a fundamentally different
+     *   academic profile from the scholarship's target. Recommending them
+     *   would be misleading — it gives false hope and wastes their time.
+     *   The tolerance of 2As covers genuine close misses (e.g. 8As for a
+     *   9A scholarship) without opening recommendations to clearly
+     *   unsuitable candidates.
+     *
+     * Why partial credit within the tolerance?
+     *   1A short is objectively closer to the target than 2As short.
+     *   Partial credit preserves this meaningful ranking between
+     *   close candidates — a 9A student and an 8A student competing
+     *   for the same scholarship should not receive identical scores.
+     *
+     * Why not make SPM a pure hard filter (pass/fail only)?
+     *   Because "1A short" carries real information about academic
+     *   closeness. Discarding that information produces a less useful
+     *   recommendation — two students with 8As and 4As would look
+     *   identical to the system even though one is far more suitable.
      */
     private function scoreSpm($student, $criteria): array
     {
         $max = self::W_SPM;
 
-        // No SPM requirement → full marks
+        // No SPM requirement → scholarship open to all academic levels → full marks
         if ($criteria->min_spm_as === null) {
             return [$max, $max, 'No SPM requirement — full marks awarded'];
         }
 
         $shortfall = $criteria->min_spm_as - $student->total_as;
 
+        // Meets or exceeds requirement → perfect academic fit
         if ($shortfall <= 0) {
             return [
                 $max,
@@ -236,63 +388,111 @@ class ScholarshipRuleMatcher
             ];
         }
 
+        // Beyond tolerance → should have been caught in hard filter
+        // This is a safety fallback — return 0 and flag as not suitable
+        if ($shortfall > self::SPM_MAX_SHORTFALL) {
+            return [
+                0,
+                $max,
+                "{$shortfall}As short — beyond tolerance (max allowed: " . self::SPM_MAX_SHORTFALL . "As short)",
+            ];
+        }
+
+        // Within tolerance (1–2 As short) → partial credit
         $tiers = [
             1 => [0.70, "1A short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"],
             2 => [0.45, "2As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"],
         ];
 
-        [$multiplier, $label] = $tiers[$shortfall]
-            ?? [0.15, "{$shortfall}As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"];
+        [$multiplier, $label] = $tiers[$shortfall];
 
         return [(int) round($max * $multiplier), $max, $label];
     }
 
     /**
-     * Monthly Income — 50 pts
+     * Income Category — 50 pts (PATH B only — "keutamaan" scholarships)
      *
-     * Scoring Tiers:
-     *   Within limit                  → 50/50 (100%)
-     *   Exceeds by ≤ RM500            → 38/50  (75%)
-     *   Exceeds by RM501–RM1,500      → 25/50  (50%)
-     *   Exceeds by RM1,501–RM3,000    → 15/50  (30%)
-     *   Exceeds by > RM3,000          →  5/50  (10% floor)
+     * This scoring method ONLY runs when the scholarship uses income
+     * categories (B40/M40/T20) with preference language like:
+     *   "Keutamaan diberikan kepada calon daripada kategori B40 dan M40"
      *
-     * Rationale:
-     *   Income limits are policy thresholds but a family RM200 over the
-     *   limit is far closer in financial need than one RM5,000 over.
-     *   Partial credit reflects real proximity to financial eligibility.
+     * It does NOT run for scholarships with max_monthly_income (ringgit
+     * ceiling) — those are handled as a hard filter in STEP 1.
+     *
+     * Why score instead of filter for categories?
+     *   Because "keutamaan" means preference, not requirement.
+     *   The scholarship does not write "T20 students cannot apply."
+     *   It writes "B40/M40 students are preferred."
+     *   The system must not be stricter than the policy itself.
+     *   Excluding T20 students would override the scholarship's own intent.
+     *
+     * Scoring logic:
+     *   Student category IN preferred list     → 50/50 (100%)
+     *     Perfect fit — student is exactly the target group.
+     *
+     *   Student category NOT in preferred list → 25/50  (50%)
+     *     Less preferred but not excluded.
+     *     Score of 50% communicates: "this scholarship exists for
+     *     someone in a different financial situation, but you may still apply."
+     *
+     * Why 50% for non-preferred?
+     *   0% would mean excluded — which contradicts "keutamaan" policy.
+     *   100% would mean perfectly matched — which ignores the preference.
+     *   50% is the midpoint: acknowledged but not the primary target.
+     *
+     * No income criteria at all → scholarship has no income restriction
+     * → full marks (50/50) — all income groups are equally welcome.
      */
-    private function scoreIncome($student, $criteria): array
+    private function scoreIncomeCategory($student, $criteria): array
     {
         $max = self::W_INCOME;
 
-        // No income limit → full marks
-        if ($criteria->max_monthly_income === null) {
+        // No income criteria of any kind → no restriction → full marks
+        if (empty($criteria->income_categories)) {
             return [$max, $max, 'No income requirement — full marks awarded'];
         }
 
-        $income = $student->monthly_income;
-        $limit  = $criteria->max_monthly_income;
+        // Convert student ringgit income to B40/M40/T20 category
+        $studentCategory = $this->incomeToCategory($student->monthly_income);
+        $preferred       = array_map('strtoupper', $criteria->income_categories);
 
-        if ($income <= $limit) {
-            return [$max, $max, "Within limit (RM{$income} ≤ RM{$limit})"];
+        if (in_array($studentCategory, $preferred, true)) {
+            return [
+                $max,
+                $max,
+                "Preferred category match ({$studentCategory}) — keutamaan diberikan",
+            ];
         }
 
-        $excess = $income - $limit;
-
-        $tiers = [
-            500  => [0.75, "Exceeds by RM{$excess} (≤ RM500 over limit)"],
-            1500 => [0.50, "Exceeds by RM{$excess} (RM501–RM1,500 over limit)"],
-            3000 => [0.30, "Exceeds by RM{$excess} (RM1,501–RM3,000 over limit)"],
+        // Student is outside preferred categories but not excluded
+        return [
+            (int) round($max * 0.50),
+            $max,
+            "Outside preferred categories (student: {$studentCategory}, preferred: "
+                . implode('/', $preferred)
+                . ') — less preferred but eligible',
         ];
+    }
 
-        foreach ($tiers as $threshold => [$multiplier, $label]) {
-            if ($excess <= $threshold) {
-                return [(int) round($max * $multiplier), $max, $label];
-            }
+    /**
+     * Convert monthly income (ringgit) to B40/M40/T20 category.
+     * Source: Ministry of Economy Malaysia (Rafizi Ramli, 2023)
+     *
+     * Used exclusively by scoreIncomeCategory() to determine
+     * which group the student belongs to before matching
+     * against the scholarship's preferred categories.
+     */
+    private function incomeToCategory(int $income): string
+    {
+        if ($income <= self::INCOME_CATEGORY_THRESHOLDS['B40']) {
+            return 'B40';
         }
 
-        return [(int) round($max * 0.10), $max, "Exceeds by RM{$excess} (> RM3,000 over limit)"];
+        if ($income <= self::INCOME_CATEGORY_THRESHOLDS['M40']) {
+            return 'M40';
+        }
+
+        return 'T20';
     }
 
     // =========================================================================
@@ -302,9 +502,13 @@ class ScholarshipRuleMatcher
     /**
      * Bonus — up to +5 pts each (final score capped at 100)
      *
-     * Rationale:
-     *   Bonuses reward preferred but non-mandatory traits.
-     *   They break ties between equally-scored candidates.
+     * Bonuses reward traits that scholarship providers prefer
+     * but do not mandate. They serve one purpose: breaking ties
+     * between two candidates with identical base scores.
+     *
+     * A student with leadership experience is a better fit for a
+     * scholarship that values leadership — the bonus reflects this
+     * without penalising students who lack it.
      */
     private function scoreBonus($student, $criteria): array
     {
