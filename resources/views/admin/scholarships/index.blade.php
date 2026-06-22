@@ -103,6 +103,28 @@
                                                     </span>
                                                 @endif
 
+                                                                                                {{-- INCOME CATEGORY --}}
+                                                @php
+                                                    $incomeCategories = $c->income_categories;
+
+                                                    if (is_string($incomeCategories)) {
+                                                        $incomeCategories = json_decode($incomeCategories, true);
+                                                    }
+                                                @endphp
+
+                                                @if(!empty($incomeCategories))
+
+                                                    @foreach($incomeCategories as $category)
+
+                                                        <span class="eligibility-badge eligibility-success">
+                                                            <i class="fas fa-users me-1"></i>
+                                                            {{ $category }}
+                                                        </span>
+
+                                                    @endforeach
+
+                                                @endif
+
                                                 {{-- STUDY LEVEL --}}
                                                 @foreach(($c->study_paths ?? []) as $path)
                                                     <span class="eligibility-badge eligibility-gold">
