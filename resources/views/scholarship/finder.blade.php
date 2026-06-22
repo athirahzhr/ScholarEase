@@ -638,7 +638,14 @@
                             <label class="form-label fw-bold">
                                 <i class="fas fa-birthday-cake me-2 text-maroon"></i>Age
                             </label>
-                            <input type="number" name="age" class="form-control" min="15" max="30" placeholder="Enter your age" required>
+
+                            <select name="age" class="form-select" required>
+                                <option value="">-- Select Age --</option>
+
+                                @for ($i = 15; $i <= 30; $i++)
+                                    <option value="{{ $i }}">{{ $i }} Years Old</option>
+                                @endfor
+                            </select>
                         </div>
 
                         <!-- State -->
@@ -1024,68 +1031,130 @@
         });
     }
     
-    function showAddSubjectModal() {
-        Swal.fire({
-            title: 'Add Missing Subject',
-            html: `
-                <div class="text-start">
-                    <div class="mb-3">
-                        <label class="form-label">Subject Name</label>
-                        <input type="text" id="newSubjectName" class="form-control" placeholder="e.g., BAHASA ARAB" required>
-                        <small class="text-muted">Enter subject name in capital letters</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Grade</label>
-                        <select id="newSubjectGrade" class="form-select">
-                            <option value="A+">A+</option><option value="A">A</option><option value="A-">A-</option>
-                            <option value="B+">B+</option><option value="B">B</option><option value="B-">B-</option>
-                            <option value="C+">C+</option><option value="C">C</option><option value="C-">C-</option>
-                            <option value="D">D</option><option value="E">E</option><option value="G">G</option>
-                        </select>
-                    </div>
+   function showAddSubjectModal() {
+    Swal.fire({
+        title: 'Add Missing Subject',
+        html: `
+            <div class="text-start">
+                <div class="mb-3">
+                    <label class="form-label">Subject Name</label>
+
+                    <select id="newSubjectName"
+                            class="form-select"
+                            onchange="toggleCustomSubject(this.value)">
+                        <option value="">-- Select Subject --</option>
+
+                        <option value="BAHASA MELAYU">BAHASA MELAYU</option>
+                        <option value="BAHASA INGGERIS">BAHASA INGGERIS</option>
+                        <option value="MATHEMATICS">MATHEMATICS</option>
+                        <option value="ADDITIONAL MATHEMATICS">ADDITIONAL MATHEMATICS</option>
+                        <option value="SCIENCE">SCIENCE</option>
+                        <option value="PHYSICS">PHYSICS</option>
+                        <option value="CHEMISTRY">CHEMISTRY</option>
+                        <option value="BIOLOGY">BIOLOGY</option>
+                        <option value="SEJARAH">SEJARAH</option>
+                        <option value="PENDIDIKAN ISLAM">PENDIDIKAN ISLAM</option>
+                        <option value="PENDIDIKAN MORAL">PENDIDIKAN MORAL</option>
+                        <option value="PRINSIP PERAKAUNAN">PRINSIP PERAKAUNAN</option>
+                        <option value="EKONOMI">EKONOMI</option>
+                        <option value="PERNIAGAAN">PERNIAGAAN</option>
+                        <option value="SAINS KOMPUTER">SAINS KOMPUTER</option>
+                        <option value="BAHASA ARAB">BAHASA ARAB</option>
+                        <option value="KESUSASTERAAN MELAYU">KESUSASTERAAN MELAYU</option>
+                        <option value="GEOGRAFI">GEOGRAFI</option>
+                        <option value="OTHER">OTHER</option>
+                    </select>
+
+                    <input
+                        type="text"
+                        id="customSubjectName"
+                        class="form-control mt-2 d-none"
+                        placeholder="Enter custom subject name">
+
+                    <small class="text-muted">
+                        Select a subject or choose OTHER
+                    </small>
                 </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Add Subject',
-            preConfirm: () => {
-                const subject = document.getElementById('newSubjectName').value;
-                const grade = document.getElementById('newSubjectGrade').value;
-                if (!subject.trim()) { Swal.showValidationMessage('Please enter subject name'); return false; }
-                if (subject.trim().length < 3) { Swal.showValidationMessage('Subject name must be at least 3 characters'); return false; }
-                return { subject: subject.trim().toUpperCase(), grade: grade };
+
+                <div class="mb-3">
+                    <label class="form-label">Grade</label>
+                    <select id="newSubjectGrade" class="form-select">
+                        <option value="A+">A+</option>
+                        <option value="A">A</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B">B</option>
+                        <option value="B-">B-</option>
+                        <option value="C+">C+</option>
+                        <option value="C">C</option>
+                        <option value="C-">C-</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                        <option value="G">G</option>
+                    </select>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Add Subject',
+
+        preConfirm: () => {
+
+            let subject =
+                document.getElementById('newSubjectName').value;
+
+            const grade =
+                document.getElementById('newSubjectGrade').value;
+
+            if (subject === 'OTHER') {
+
+                subject =
+                    document.getElementById('customSubjectName')
+                    .value
+                    .trim()
+                    .toUpperCase();
             }
-        }).then((result) => {
-            if (result.isConfirmed) addSubject(result.value.subject, result.value.grade);
-        });
-    }
-    
-    function addSubject(subject, grade) {
-        if (!ocrData) return;
-        if (ocrData.grades[subject]) {
-            Swal.fire('Warning', `Subject "${subject}" already exists!`, 'warning');
-            return;
+
+            if (!subject) {
+                Swal.showValidationMessage(
+                    'Please enter subject name'
+                );
+                return false;
+            }
+
+
+            return {
+                subject: subject,
+                grade: grade
+            };
         }
-        
-        Swal.fire({ title: 'Adding Subject', html: '<div class="spinner-border text-maroon"></div>', allowOutsideClick: false, showConfirmButton: false });
-        
-        fetch("{{ route('add.ocr.subject') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ subject: subject, grade: grade })
-        })
-        .then(response => response.json())
-        .then(data => {
-            Swal.close();
-            if (data.success) {
-                ocrData.grades[subject] = grade;
-                ocrData.totalAs = data.totalAs;
-                addSubjectToTable(subject, grade, data.totalAs);
-                Swal.fire({ icon: 'success', title: 'Subject Added!', timer: 2000, showConfirmButton: false });
-            } else {
-                Swal.fire('Error', data.message, 'error');
-            }
-        })
-        .catch(error => { Swal.close(); Swal.fire('Error', 'Failed to add subject', 'error'); });
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            addSubject(
+                result.value.subject,
+                result.value.grade
+            );
+        }
+    });
+}
+
+    function toggleCustomSubject(value)
+    {
+        const customInput =
+            document.getElementById('customSubjectName');
+
+        if (!customInput) return;
+
+        if (value === 'OTHER') {
+
+            customInput.classList.remove('d-none');
+
+        } else {
+
+            customInput.classList.add('d-none');
+            customInput.value = '';
+        }
     }
     
     function addSubjectToTable(subject, grade, totalAs) {
