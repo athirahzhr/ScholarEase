@@ -58,34 +58,47 @@ const programs = [
       // allow rendering
       await page.waitForTimeout(3000);
 
-      // Open all tabs
-      const tabTexts = [
-        'Syarat Umum',
-        'Syarat Khusus',
-        'Institusi Pengajian',
-        'Bidang Pengajian'
-      ];
+      // ================= EXTRACT ALL TAB CONTENT =================
 
-      for (const tab of tabTexts) {
+let rawText = '';
 
-        try {
+// Base page content
+const pageContent = await page.evaluate(() => {
 
-          await page.getByText(tab, {
-            exact: false
-          }).click();
+  const main =
+    document.querySelector('main') ||
+    document.querySelector('article') ||
+    document.body;
 
-          await page.waitForTimeout(1500);
+  return main.innerText;
 
-          console.log(`✅ Opened tab: ${tab}`);
+});
 
-        } catch (e) {
+rawText += pageContent;
 
-          console.log(`⚠️ Tab not found: ${tab}`);
-        }
-      }
+// Tabs to open
+const tabTexts = [
+  'Syarat Umum',
+  'Syarat Khusus',
+  'Institusi Pengajian',
+  'Bidang Pengajian'
+];
 
-      // extract content
-      const rawText = await page.evaluate(() => {
+for (const tab of tabTexts) {
+
+  try {
+
+    const tabElement =
+      page.getByText(tab, {
+        exact: false
+      }).first();
+
+    await tabElement.click();
+
+    await page.waitForTimeout(2000);
+
+    const tabContent =
+      await page.evaluate(() => {
 
         const main =
           document.querySelector('main') ||
@@ -96,7 +109,27 @@ const programs = [
 
       });
 
-      console.log(rawText.substring(0, 3000));
+    rawText += '\n\n' + tabContent;
+
+    console.log(`✅ Extracted tab: ${tab}`);
+
+  } catch (e) {
+
+    console.log(`⚠️ Could not extract tab: ${tab}`);
+  }
+}
+
+// Remove duplicate lines
+rawText = rawText
+  .split('\n')
+  .filter((line, index, arr) =>
+    arr.indexOf(line) === index
+  )
+  .join('\n');
+
+console.log('========== EXTRACTED CONTENT ==========');
+console.log(rawText.substring(0, 5000));
+console.log('======================================');
 
       if (!rawText || rawText.length < 300) {
         throw new Error('No usable text extracted');
