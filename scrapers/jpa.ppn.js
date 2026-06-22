@@ -58,6 +58,32 @@ const programs = [
       // allow rendering
       await page.waitForTimeout(3000);
 
+      // Open all tabs
+      const tabTexts = [
+        'Syarat Umum',
+        'Syarat Khusus',
+        'Institusi Pengajian',
+        'Bidang Pengajian'
+      ];
+
+      for (const tab of tabTexts) {
+
+        try {
+
+          await page.getByText(tab, {
+            exact: false
+          }).click();
+
+          await page.waitForTimeout(1500);
+
+          console.log(`✅ Opened tab: ${tab}`);
+
+        } catch (e) {
+
+          console.log(`⚠️ Tab not found: ${tab}`);
+        }
+      }
+
       // extract content
       const rawText = await page.evaluate(() => {
 
@@ -69,6 +95,8 @@ const programs = [
         return main.innerText;
 
       });
+
+      console.log(rawText.substring(0, 3000));
 
       if (!rawText || rawText.length < 300) {
         throw new Error('No usable text extracted');
