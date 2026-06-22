@@ -1156,8 +1156,8 @@
             customInput.value = '';
         }
     }
-    
-function addSubject(subject, grade) {
+
+    function addSubject(subject, grade) {
 
     if (!ocrData) return;
 
@@ -1226,15 +1226,38 @@ function addSubject(subject, grade) {
 
         Swal.close();
 
+        console.error(error);
+
         Swal.fire(
             'Error',
             'Failed to add subject',
             'error'
         );
-
-        console.error(error);
     });
 }
+    
+    function addSubjectToTable(subject, grade, totalAs) {
+        const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+        const gradeClass = getGradeClass(grade);
+        const newRow = `
+            <tr id="subject-row-${safeSubjectId}">
+                <td class="fw-bold">${subject} <span class="badge bg-info ms-2">Added</span></td>
+                <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
+                <td><select class="form-select form-select-sm" onchange="updateGrade('${subject}', this.value)" style="max-width: 140px;">
+                    <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option><option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
+                    <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option><option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
+                    <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option><option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
+                    <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option><option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
+                    <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option><option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
+                    <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option><option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
+                </select></td>
+                <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')"><i class="fas fa-trash"></i></button></td>
+            </tr>
+        `;
+        const tbody = document.getElementById('gradesTableBody');
+        if (tbody) tbody.innerHTML += newRow;
+        document.getElementById('totalAsBadge').textContent = totalAs;
+    }
     
     function removeSubject(subject) {
         Swal.fire({
