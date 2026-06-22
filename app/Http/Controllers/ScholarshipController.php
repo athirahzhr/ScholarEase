@@ -163,6 +163,7 @@ class ScholarshipController extends Controller
             'required_subjects' => 'nullable|array',
 
             'max_monthly_income' => 'nullable|numeric',
+            'income_categories' => 'nullable|array',
 
             'study_paths' => 'nullable|array',
             'fields_of_study' => 'nullable|array',
@@ -214,6 +215,7 @@ class ScholarshipController extends Controller
                 'required_subjects' => $request->required_subjects ?? [],
 
                 'max_monthly_income' => $request->max_monthly_income,
+                'income_categories' => $request->income_categories ?? [],
 
                 'study_paths' => $request->study_paths ?? [],
                 'fields_of_study' => $request->fields_of_study ?? [],
@@ -411,6 +413,10 @@ class ScholarshipController extends Controller
                 'max_monthly_income',
                 $oldCriteria->max_monthly_income ?? null
             ),
+
+            'income_categories' => $request->filled('income_categories')
+                ? $request->input('income_categories')
+                : ($oldCriteria->income_categories ?? []),
 
             'study_paths' => $request->filled('study_paths')
                 ? $request->input('study_paths')

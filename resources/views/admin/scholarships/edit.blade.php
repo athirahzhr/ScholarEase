@@ -101,6 +101,57 @@
                                             <small class="text-muted">Income threshold for eligibility (if applicable)</small>
                                         </div>
 
+                                        {{-- INCOME CATEGORIES --}}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Income Categories
+                                            </label>
+
+                                            @php
+                                                $selectedIncomeCategories =
+                                                    old(
+                                                        'income_categories',
+                                                        $scholarship->eligibilityCriteria->income_categories ?? []
+                                                    );
+                                            @endphp
+
+                                            <div class="row">
+
+                                                @foreach (['B40', 'M40', 'T20'] as $category)
+
+                                                    <div class="col-md-4">
+
+                                                        <div class="form-check mb-2">
+
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                name="income_categories[]"
+                                                                value="{{ $category }}"
+                                                                id="income_{{ $category }}"
+                                                                {{ in_array($category, $selectedIncomeCategories) ? 'checked' : '' }}>
+
+                                                            <label
+                                                                class="form-check-label"
+                                                                for="income_{{ $category }}">
+
+                                                                {{ $category }}
+
+                                                            </label>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                @endforeach
+
+                                            </div>
+
+                                            <small class="text-muted">
+                                                Select income groups eligible or prioritised
+                                            </small>
+                                        </div>
+
                                         {{-- STUDY LEVEL --}}
                                         <div class="mb-3">
                                             <label class="form-label fw-semibold">Study Levels</label>
