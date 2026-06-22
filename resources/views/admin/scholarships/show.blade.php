@@ -161,6 +161,32 @@
                                 </div>
                             @endif
 
+                            {{-- INCOME CATEGORY --}}
+                            @if(!empty($criteria->income_categories))
+
+                                <div class="eligibility-item">
+
+                                    <div class="eligibility-label">
+                                        <i class="fas fa-users me-2" style="color: #10b981;"></i>
+                                        Income Categories:
+                                    </div>
+
+                                    <div class="eligibility-badges mt-2">
+
+                                        @foreach($criteria->income_categories as $category)
+
+                                            <span class="badge badge-success">
+                                                {{ $category }}
+                                            </span>
+
+                                        @endforeach
+
+                                    </div>
+
+                                </div>
+
+                            @endif
+
                             {{-- STUDY LEVEL --}}
                             @if(!empty($criteria->study_paths))
                                 <div class="eligibility-item">
