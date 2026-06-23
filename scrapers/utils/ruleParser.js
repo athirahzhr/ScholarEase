@@ -261,6 +261,11 @@ if (
   fields.push('Science');
 }
 
+if (/statistics|statistic/i.test(text)) {
+  console.log('STATISTICS MATCHED');
+  fields.push('Statistics');
+}
+
   // ================= ARTS =================
 
 if (/archaeology/i.test(text))
