@@ -700,4 +700,7 @@ async function insertEligibility(
       rules.notes
     ]
   );
+
+console.log('RAW DEADLINE:', matchedDate);
+console.log('PARSED DEADLINE:', deadline);
 }
