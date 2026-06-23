@@ -148,6 +148,16 @@ function detectIncomeCategory(text) {
 
   const categories = [];
 
+  console.log(
+  'HAS B40:',
+  /b40/i.test(text)
+);
+
+console.log(
+  'HAS M40:',
+  /m40/i.test(text)
+);
+
   if (/b40/i.test(text)) {
     categories.push('B40');
   }
@@ -261,10 +271,6 @@ if (
   fields.push('Science');
 }
 
-if (/statistics|statistic/i.test(text)) {
-  console.log('STATISTICS MATCHED');
-  fields.push('Statistics');
-}
 
   // ================= ARTS =================
 
