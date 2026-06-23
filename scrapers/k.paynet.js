@@ -146,6 +146,18 @@ const programs = [
                   await page.waitForTimeout(1000);
 
                   const subText =
+                  await page.evaluate(() =>
+                    document.body.innerText || ''
+                  );
+
+                console.log(
+                  `FOUND B40:`,
+                  subText.includes(
+                    'Malaysian Muslim student from a low-income'
+                  )
+                );
+
+                  const subText =
                     await page.evaluate(() =>
                       document.body.innerText || ''
                     );
