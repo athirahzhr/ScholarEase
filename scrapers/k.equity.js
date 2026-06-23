@@ -62,56 +62,136 @@ const programs = [
 
     await page.waitForTimeout(3000);
 
-    // ================= CLICK TABS =================
+    // ================= EXTRACT ALL TABS =================
 
-const tabs = [
-  'Eligibility',
-  'Subject Areas',
-  'Approved Universities'
-];
+    let combinedText = '';
 
-for (const tab of tabs) {
+    // ambil page asal dulu
+    combinedText += await page.evaluate(() =>
+      document.body.innerText || ''
+    );
 
-  try {
+    const mainTabs = [
+      'General Information',
+      'Eligibility',
+      'Subject Areas',
+      'Approved Universities'
+    ];
 
-    const locator =
-      page.locator(`text=${tab}`).first();
+    for (const tabName of mainTabs) {
 
-    if (await locator.count()) {
+      try {
 
-      await locator.click();
+        const tab = page.getByText(
+          tabName,
+          { exact: true }
+        );
 
-      await page.waitForTimeout(1500);
+        if (await tab.count()) {
+
+          await tab.first().click();
+
+          await page.waitForTimeout(1500);
+
+          console.log(
+            `✅ Opened tab: ${tabName}`
+          );
+
+          const tabText =
+            await page.evaluate(() =>
+              document.body.innerText || ''
+            );
+
+          combinedText +=
+            '\n\n' +
+            `===== ${tabName} =====\n` +
+            tabText;
+
+          // =====================================
+          // ELIGIBILITY SUB-TABS
+          // =====================================
+
+          if (
+            tabName === 'Eligibility'
+          ) {
+
+            const subTabs = [
+
+              'Foundation Studies',
+
+              'Undergraduate Studies',
+
+              'Bachelor Degree',
+
+              'Undergraduate'
+
+            ];
+
+            for (const subTab of subTabs) {
+
+              try {
+
+                const sub =
+                  page.getByText(
+                    subTab,
+                    { exact: false }
+                  );
+
+                if (
+                  await sub.count()
+                ) {
+
+                  await sub.first().click();
+
+                  await page.waitForTimeout(1000);
+
+                  const subText =
+                    await page.evaluate(() =>
+                      document.body.innerText || ''
+                    );
+
+                  combinedText +=
+                    '\n\n' +
+                    `===== ${subTab} =====\n` +
+                    subText;
+
+                  console.log(
+                    `✅ Opened sub-tab: ${subTab}`
+                  );
+                }
+
+              } catch {
+
+                console.log(
+                  `⚠️ Sub-tab not found: ${subTab}`
+                );
+              }
+            }
+          }
+        }
+
+      } catch {
+
+        console.log(
+          `⚠️ Tab not found: ${tabName}`
+        );
+      }
     }
 
-  } catch (err) {
+    // guna combinedText
+    const rawText = combinedText;
 
     console.log(
-      `⚠️ Failed clicking tab: ${tab}`
+      '========== EXTRACTED CONTENT =========='
     );
-  }
-}
 
-    await page.waitForSelector('body');
+    console.log(
+      rawText.substring(0, 5000)
+    );
 
-    // ================= EXTRACT PAGE TEXT =================
-
-    const rawText = await page.evaluate(() => {
-
-      const body = document.body;
-
-      if (!body) {
-        return '';
-      }
-
-      return body.innerText || '';
-    });
-
-    if (!rawText || rawText.length < 100) {
-      throw new Error(
-        'Failed to extract scholarship content'
-      );
-    }
+    console.log(
+      '======================================'
+    );
 
     // ================= PARSE RULES =================
 
@@ -120,6 +200,7 @@ for (const tab of tabs) {
 
    const deadline =
   detectDeadline(rawText);
+  console.log('PARSED DEADLINE:', deadline);
 
     // ================= SAVE JSON =================
 
@@ -456,7 +537,7 @@ for (const tab of tabs) {
       ? 'failed'
       : 'partial';
 
-  await db.execute(`
+ await db.execute(`
   INSERT INTO scraping_logs (
       source_website,
       total_scraped,
@@ -483,7 +564,6 @@ for (const tab of tabs) {
       startTime,
       new Date()
   ]);
-
   await db.end();
 
   console.log(`
@@ -623,4 +703,5 @@ async function insertEligibility(
       rules.notes
     ]
   );
+
 }
