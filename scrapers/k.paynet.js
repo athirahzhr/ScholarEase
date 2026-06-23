@@ -94,6 +94,12 @@ const programs = [
           await page.waitForTimeout(1500);
 
           console.log(
+            await sub.first().evaluate(
+              el => el.outerHTML
+            )
+          );
+
+          console.log(
             `✅ Opened tab: ${tabName}`
           );
 
@@ -144,6 +150,12 @@ const programs = [
                   await sub.first().click();
 
                   await page.waitForTimeout(1000);
+
+                  console.log(
+                    await sub.first().evaluate(
+                      el => el.outerHTML
+                    )
+                  );
 
                   await page.screenshot({
                     path: `debug-${subTab}.png`,
