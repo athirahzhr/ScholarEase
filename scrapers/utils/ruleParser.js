@@ -192,8 +192,8 @@ if (
 
   // ================= COMPUTER SCIENCE =================
   if (
-    /computer science|software|it\b|information technology|teknologi maklumat/i.test(text)
-  ) {
+  /computer science|computing|software|it\b|information technology|teknologi maklumat/i.test(text)
+) {
     fields.push('Computer Science');
   }
 
@@ -227,7 +227,7 @@ if (
 
   // ================= LAW =================
   if (
-    /law|undang-undang/i.test(text)
+    /field.*law|bidang.*undang-undang|program.*law|law degree|ijazah undang-undang/i
   ) {
     fields.push('Law');
   }
@@ -255,7 +255,7 @@ if (
 
   // ================= GENERAL SCIENCE =================
   if (
-  /\bscience\b|sains/i.test(text) &&
+  /\bgeneral science\b|\bsains tulen\b/i &&
   !/computer science|data science/i.test(text)
   ) {
     fields.push('Science');
