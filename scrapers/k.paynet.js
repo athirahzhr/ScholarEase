@@ -94,110 +94,33 @@ const programs = [
           await page.waitForTimeout(1500);
 
           console.log(
-            await sub.first().evaluate(
-              el => el.outerHTML
-            )
-          );
-
-          console.log(
             `✅ Opened tab: ${tabName}`
           );
 
           const tabText =
-            await page.evaluate(() =>
-              document.body.innerText || ''
-            );
+          await page.evaluate(() =>
+            document.body.innerText || ''
+          );
 
-          combinedText +=
-            '\n\n' +
-            `===== ${tabName} =====\n` +
-            tabText;
+        if (tabName === 'Eligibility') {
 
-          // =====================================
-          // ELIGIBILITY SUB-TABS
-          // =====================================
+          console.log(
+            'FOUND 8As:',
+            tabText.includes('minimum of 8As')
+          );
 
-          if (
-            tabName === 'Eligibility'
-          ) {
+          console.log(
+            'FOUND B40:',
+            tabText.includes('low-income (B40)')
+          );
+        }
 
-            const subTabs = [
+        combinedText +=
+          '\n\n' +
+          `===== ${tabName} =====\n` +
+          tabText;
 
-              'Foundation Studies',
-
-              'Undergraduate Studies',
-
-              'Bachelor Degree',
-
-              'Undergraduate'
-
-            ];
-
-            for (const subTab of subTabs) {
-
-              try {
-
-                const sub =
-                  page.getByText(
-                    subTab,
-                    { exact: false }
-                  );
-
-                if (
-                  await sub.count()
-                ) {
-
-                  await sub.first().click();
-
-                  await page.waitForTimeout(1000);
-
-                  console.log(
-                    await sub.first().evaluate(
-                      el => el.outerHTML
-                    )
-                  );
-
-                  await page.screenshot({
-                    path: `debug-${subTab}.png`,
-                    fullPage: true
-                  });
-
-                  const subText =
-                    await page.evaluate(() =>
-                      document.body.innerText || ''
-                    );
-
-                  console.log(
-                  'FOUND 8As:',
-                  subText.includes('minimum of 8As')
-                );
-
-                console.log(
-                  'FOUND B40:',
-                  subText.includes('low-income (B40)')
-                );
-
-                  console.log(
-                      subText.substring(0, 1000)
-                  );
-                  combinedText +=
-                    '\n\n' +
-                    `===== ${subTab} =====\n` +
-                    subText;
-
-                  console.log(
-                    `✅ Opened sub-tab: ${subTab}`
-                  );
-                }
-
-              } catch {
-
-                console.log(
-                  `⚠️ Sub-tab not found: ${subTab}`
-                );
-              }
-            }
-          }
+          
         }
 
       } catch {
@@ -210,6 +133,11 @@ const programs = [
 
     // guna combinedText
     const rawText = combinedText;
+
+    fs.writeFileSync(
+  'paynet_raw.txt',
+  rawText
+);
 
     console.log(
       '========== EXTRACTED CONTENT =========='
