@@ -93,11 +93,6 @@ const programs = [
 
           await page.waitForTimeout(1500);
 
-          await page.screenshot({
-            path: `debug-${subTab}.png`,
-            fullPage: true
-          });
-
           console.log(
             `✅ Opened tab: ${tabName}`
           );
@@ -149,6 +144,11 @@ const programs = [
                   await sub.first().click();
 
                   await page.waitForTimeout(1000);
+
+                  await page.screenshot({
+                    path: `debug-${subTab}.png`,
+                    fullPage: true
+                  });
 
                   const subText =
                     await page.evaluate(() =>
