@@ -73,6 +73,10 @@ const programs = [
       // ================= PARSE RULES =================
 
       const rules = parseRules(rawText);
+      console.log(
+        'FIELDS:',
+        rules.fields_of_study
+      );
       const deadline = detectDeadline(rawText);
 
       // ================= STORE JSON =================
