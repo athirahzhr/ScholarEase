@@ -93,17 +93,10 @@ const programs = [
 
           await page.waitForTimeout(1500);
 
-          const subText =
-  await page.evaluate(() =>
-    document.body.innerText || ''
-  );
-
-        console.log(
-          `FOUND B40:`,
-          subText.includes(
-            'Malaysian Muslim student from a low-income'
-          )
-        );
+          await page.screenshot({
+            path: `debug-${subTab}.png`,
+            fullPage: true
+          });
 
           console.log(
             `✅ Opened tab: ${tabName}`
