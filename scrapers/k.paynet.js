@@ -155,6 +155,16 @@ const programs = [
                       document.body.innerText || ''
                     );
 
+                  console.log(
+                      'FOUND B40:',
+                      subText.includes(
+                          'Malaysian Muslim student from a low-income'
+                      )
+                  );
+
+                  console.log(
+                      subText.substring(0, 1000)
+                  );
                   combinedText +=
                     '\n\n' +
                     `===== ${subTab} =====\n` +
