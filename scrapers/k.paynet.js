@@ -156,11 +156,14 @@ const programs = [
                     );
 
                   console.log(
-                      'FOUND B40:',
-                      subText.includes(
-                          'Malaysian Muslim student from a low-income'
-                      )
-                  );
+                  'FOUND 8As:',
+                  subText.includes('minimum of 8As')
+                );
+
+                console.log(
+                  'FOUND B40:',
+                  subText.includes('low-income (B40)')
+                );
 
                   console.log(
                       subText.substring(0, 1000)
