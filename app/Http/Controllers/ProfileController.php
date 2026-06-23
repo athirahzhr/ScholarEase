@@ -41,7 +41,7 @@ class ProfileController extends Controller
         'total_as' => 'required|integer|min:0|max:12',
 
         // Financial
-        'income_category' => 'required|in:B40,M40,T20',
+        'monthly_income' => 'required|numeric|min:0',
 
         // Study
         'study_path' => 'required|string|max:100',
@@ -64,23 +64,13 @@ class ProfileController extends Controller
 
     // ================= INCOME CONVERSION =================
 
-    switch ($request->income_category) {
 
-        case 'B40':
-            $monthlyIncome = 5351;
-            break;
+    $monthlyIncome = $validated['monthly_income'];
 
-        case 'M40':
-            $monthlyIncome = 11161;
-            break;
-
-        case 'T20':
-            $monthlyIncome = 11819;
-            break;
-
-        default:
-            $monthlyIncome = null;
-    }
+    $incomeCategory =
+        $this->deriveIncomeCategory(
+            $monthlyIncome
+        );
 
     UserProfile::updateOrCreate(
 
@@ -92,11 +82,9 @@ class ProfileController extends Controller
             'total_as' => $validated['total_as'],
 
             // Financial
-            'income_category' =>
-                $validated['income_category'],
+            'income_category' => $incomeCategory,
 
-            'monthly_income' =>
-                $monthlyIncome,
+            'monthly_income' => $monthlyIncome,
 
             // Study
             'study_level' =>
@@ -135,4 +123,18 @@ class ProfileController extends Controller
 
     }
 
+    private function deriveIncomeCategory($income)
+    {
+        if ($income <= 4850) {
+            return 'B40';
+        }
+
+        if ($income <= 10960) {
+            return 'M40';
+        }
+
+        return 'T20';
+    }
+
 }
+
