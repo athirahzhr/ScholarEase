@@ -254,12 +254,12 @@ if (
   }
 
   // ================= GENERAL SCIENCE =================
-  if (
-  /\bgeneral science\b|\bsains tulen\b/i &&
+ if (
+  /\bgeneral science\b|\bsains tulen\b/i.test(text) &&
   !/computer science|data science/i.test(text)
-  ) {
-    fields.push('Science');
-  }
+) {
+  fields.push('Science');
+}
 
   // ================= ARTS =================
 
@@ -269,7 +269,7 @@ if (/archaeology/i.test(text))
 if (/architecture/i.test(text))
   fields.push('Architecture');
 
-if (/art & design|art and design/i.test(text))
+if (/arts?\s*&\s*design|arts?\s+and\s+design/i.test(text))
   fields.push('Art & Design');
 
 if (/history/i.test(text))
