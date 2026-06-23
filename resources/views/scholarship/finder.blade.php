@@ -566,18 +566,18 @@
                     </div>
                     
                     <div class="row g-3">
-                        <!-- Income Category -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-chart-line me-2 text-maroon"></i>Family Income Category
-                            </label>
-                            <select name="income_category" class="form-select" required>
-                                <option value="">-- Select Income Category --</option>
-                                <option value="B40">B40 (Below RM 5,351)</option>
-                                <option value="M40">M40 (RM 5,351 - RM 11,819)</option>
-                                <option value="T20">T20 (Above RM 11,819)</option>
-                            </select>
-                        </div>
+                        <!-- income category -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-money-bill me-2 text-maroon"></i>
+                                    Monthly Household Income (RM)
+                                </label>
+                                <input type="number" name="monthly_income"
+                                    class="form-control" min="0" placeholder="e.g. 4500" required>
+                                <small class="text-muted">
+                                    B40 ≤ RM4,850 &nbsp;|&nbsp; M40 RM4,851–RM10,960 &nbsp;|&nbsp; T20 > RM10,960
+                                </small>
+                            </div>
 
                         <!-- Study Path -->
                         <div class="col-md-6 mb-3">
