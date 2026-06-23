@@ -198,6 +198,7 @@ const programs =
 
    const deadline =
   detectDeadline(rawText);
+  console.log('PARSED DEADLINE:', deadline);
 
     // ================= SAVE JSON =================
 
@@ -701,6 +702,4 @@ async function insertEligibility(
     ]
   );
 
-console.log('RAW DEADLINE:', matchedDate);
-console.log('PARSED DEADLINE:', deadline);
 }
