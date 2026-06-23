@@ -98,29 +98,76 @@ const programs = [
           );
 
           const tabText =
-          await page.evaluate(() =>
-            document.body.innerText || ''
-          );
+            await page.evaluate(() =>
+              document.body.innerText || ''
+            );
 
-        if (tabName === 'Eligibility') {
+          combinedText +=
+            '\n\n' +
+            `===== ${tabName} =====\n` +
+            tabText;
 
-          console.log(
-            'FOUND 8As:',
-            tabText.includes('minimum of 8As')
-          );
+          // =====================================
+          // ELIGIBILITY SUB-TABS
+          // =====================================
 
-          console.log(
-            'FOUND B40:',
-            tabText.includes('low-income (B40)')
-          );
-        }
+          if (
+            tabName === 'Eligibility'
+          ) {
 
-        combinedText +=
-          '\n\n' +
-          `===== ${tabName} =====\n` +
-          tabText;
+            const subTabs = [
 
-          
+              'Foundation Studies',
+
+              'Undergraduate Studies',
+
+              'Bachelor Degree',
+
+              'Undergraduate'
+
+            ];
+
+            for (const subTab of subTabs) {
+
+              try {
+
+                const sub =
+                  page.getByText(
+                    subTab,
+                    { exact: false }
+                  );
+
+                if (
+                  await sub.count()
+                ) {
+
+                  await sub.first().click();
+
+                  await page.waitForTimeout(1000);
+
+                  const subText =
+                    await page.evaluate(() =>
+                      document.body.innerText || ''
+                    );
+
+                  combinedText +=
+                    '\n\n' +
+                    `===== ${subTab} =====\n` +
+                    subText;
+
+                  console.log(
+                    `✅ Opened sub-tab: ${subTab}`
+                  );
+                }
+
+              } catch {
+
+                console.log(
+                  `⚠️ Sub-tab not found: ${subTab}`
+                );
+              }
+            }
+          }
         }
 
       } catch {
@@ -133,11 +180,6 @@ const programs = [
 
     // guna combinedText
     const rawText = combinedText;
-
-    fs.writeFileSync(
-  'paynet_raw.txt',
-  rawText
-);
 
     console.log(
       '========== EXTRACTED CONTENT =========='
@@ -171,7 +213,7 @@ const programs = [
       application_deadline: deadline,
       rules,
       source: 'scraped',
-      source_website: 'khazanah.paynet',
+      source_website: 'khazanah_paynet',
       scraped_at: new Date().toISOString()
     });
 
@@ -535,7 +577,7 @@ Skipped  : ${skipped}
 `);
 
   console.log(
-    '🎉 Khazanah Paynet scraping completed'
+    '🎉 Khazanah paynet scraping completed'
   );
 
 })();
