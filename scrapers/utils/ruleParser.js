@@ -657,15 +657,9 @@ if (ordinalMatch) {
   const year =
     ordinalMatch[4];
 
-  const parsed =
-    new Date(`${day} ${month} ${year}`);
-
-  if (!isNaN(parsed)) {
-
-    return parsed
-      .toISOString()
-      .split('T')[0];
-  }
+  return formatDate(
+  `${day} ${month} ${year}`
+);
 }
 
   // ================= SINGLE DATE FORMAT =================
