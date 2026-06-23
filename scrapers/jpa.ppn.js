@@ -138,6 +138,7 @@ console.log('======================================');
       // ================= PARSE RULES =================
 
       const rules = parseRules(rawText);
+      console.log('INCOME CATEGORIES:', rules.income_categories);
       const deadline = detectDeadline(rawText);
 
       // ================= STORE JSON =================
