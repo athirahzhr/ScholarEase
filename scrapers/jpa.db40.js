@@ -1,4 +1,4 @@
-// scrapers/jpa.db40.js
+// scrapers/jpa.ppn.js
 
 import { chromium } from 'playwright';
 import fs from 'fs';
@@ -16,11 +16,11 @@ const db = await mysql.createConnection({
 
 // ================= PROGRAM CONFIG =================
 const programs = [
-  {
-    title: 'JPA Program Dermasiswa B40 (DB40)',
-    provider: 'Jabatan Perkhidmatan Awam (JPA)',
-    url: 'https://penajaan.jpa.gov.my/info-penajaan/latihan-sebelum-perkhidmatan/program-pelajar/program-dermasiswa-b40-db40.html'
-  }
+{
+  title: 'JPA Program Dermasiswa B40 (DB40)',
+  provider: 'Jabatan Perkhidmatan Awam (JPA)',
+  url: 'https://penajaan.jpa.gov.my/info-penajaan/latihan-sebelum-perkhidmatan/program-pelajar/program-dermasiswa-b40-db40.html'
+}
 ];
 
 (async () => {
@@ -58,8 +58,47 @@ const programs = [
       // allow rendering
       await page.waitForTimeout(3000);
 
-      // extract content
-      const rawText = await page.evaluate(() => {
+      // ================= EXTRACT ALL TAB CONTENT =================
+
+let rawText = '';
+
+// Base page content
+const pageContent = await page.evaluate(() => {
+
+  const main =
+    document.querySelector('main') ||
+    document.querySelector('article') ||
+    document.body;
+
+  return main.innerText;
+
+});
+
+rawText += pageContent;
+
+// Tabs to open
+const tabTexts = [
+  'Syarat Umum',
+  'Syarat Khusus',
+  'Institusi Pengajian',
+  'Bidang Pengajian'
+];
+
+for (const tab of tabTexts) {
+
+  try {
+
+    const tabElement =
+      page.getByText(tab, {
+        exact: false
+      }).first();
+
+    await tabElement.click();
+
+    await page.waitForTimeout(2000);
+
+    const tabContent =
+      await page.evaluate(() => {
 
         const main =
           document.querySelector('main') ||
@@ -70,6 +109,28 @@ const programs = [
 
       });
 
+    rawText += '\n\n' + tabContent;
+
+    console.log(`✅ Extracted tab: ${tab}`);
+
+  } catch (e) {
+
+    console.log(`⚠️ Could not extract tab: ${tab}`);
+  }
+}
+
+// Remove duplicate lines
+rawText = rawText
+  .split('\n')
+  .filter((line, index, arr) =>
+    arr.indexOf(line) === index
+  )
+  .join('\n');
+
+console.log('========== EXTRACTED CONTENT ==========');
+console.log(rawText.substring(0, 5000));
+console.log('======================================');
+
       if (!rawText || rawText.length < 300) {
         throw new Error('No usable text extracted');
       }
@@ -77,6 +138,7 @@ const programs = [
       // ================= PARSE RULES =================
 
       const rules = parseRules(rawText);
+      console.log('INCOME CATEGORIES:', rules.income_categories);
       const deadline = detectDeadline(rawText);
 
       // ================= STORE JSON =================
@@ -201,6 +263,8 @@ console.log('Deadline Changed:', deadlineChanged);
       required_subjects = ?,
 
       max_monthly_income = ?,
+      
+      income_categories = ?,
 
       study_paths = ?,
 
@@ -251,6 +315,8 @@ console.log('Deadline Changed:', deadlineChanged);
       JSON.stringify(rules.required_subjects),
 
       rules.max_monthly_income,
+
+      JSON.stringify(rules.income_categories),
 
       JSON.stringify(rules.study_paths),
 
@@ -365,6 +431,8 @@ console.log('Deadline Changed:', deadlineChanged);
 
       max_monthly_income,
 
+      income_categories,
+
       study_paths,
 
       fields_of_study,
@@ -420,6 +488,8 @@ console.log('Deadline Changed:', deadlineChanged);
       JSON.stringify(rules.required_subjects),
 
       rules.max_monthly_income,
+
+      JSON.stringify(rules.income_categories),
 
       JSON.stringify(rules.study_paths),
 
