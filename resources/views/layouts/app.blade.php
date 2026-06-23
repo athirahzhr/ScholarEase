@@ -296,7 +296,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-scholarease">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">
+            <a class="navbar-brand" href="/">
                 <i class="fas fa-graduation-cap me-2"></i> ScholarEase
             </a>
             
@@ -309,6 +309,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     @auth
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('welcome') }}">
+                                <i class="fas fa-house me-1"></i> Home
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('dashboard') }}">
                                 <i class="fas fa-home me-1"></i> Dashboard
