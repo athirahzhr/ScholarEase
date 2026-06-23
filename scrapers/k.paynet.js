@@ -93,6 +93,18 @@ const programs = [
 
           await page.waitForTimeout(1500);
 
+          const subText =
+  await page.evaluate(() =>
+    document.body.innerText || ''
+  );
+
+        console.log(
+          `FOUND B40:`,
+          subText.includes(
+            'Malaysian Muslim student from a low-income'
+          )
+        );
+
           console.log(
             `✅ Opened tab: ${tabName}`
           );
@@ -144,18 +156,6 @@ const programs = [
                   await sub.first().click();
 
                   await page.waitForTimeout(1000);
-
-                  const subText =
-                  await page.evaluate(() =>
-                    document.body.innerText || ''
-                  );
-
-                console.log(
-                  `FOUND B40:`,
-                  subText.includes(
-                    'Malaysian Muslim student from a low-income'
-                  )
-                );
 
                   const subText =
                     await page.evaluate(() =>
