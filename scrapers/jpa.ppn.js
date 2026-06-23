@@ -263,6 +263,8 @@ console.log('Deadline Changed:', deadlineChanged);
       required_subjects = ?,
 
       max_monthly_income = ?,
+      
+      income_categories = ?,
 
       study_paths = ?,
 
@@ -313,6 +315,8 @@ console.log('Deadline Changed:', deadlineChanged);
       JSON.stringify(rules.required_subjects),
 
       rules.max_monthly_income,
+
+      JSON.stringify(rules.income_categories),
 
       JSON.stringify(rules.study_paths),
 
