@@ -309,11 +309,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     @auth
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('welcome') }}">
-                                <i class="fas fa-house me-1"></i> Home
-                            </a>
-                        </li>
+                    
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('dashboard') }}">
                                 <i class="fas fa-home me-1"></i> Dashboard
