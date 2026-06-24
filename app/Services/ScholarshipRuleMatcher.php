@@ -10,7 +10,7 @@ namespace App\Services;
  * HOW IT WORKS:
  * ─────────────────────────────────────────────────────
  * STEP 1 — Hard Filters (Pass/Fail)
- *   Citizenship, Bumiputera, Study Level, Field of Study, Age,
+ *   Citizenship, Bumiputera, Study Level, Field of Study, Age, State, Leadership
  *   SPM (near-hard filter, shortfall > 2 = excluded),
  *   Income (ceiling OR single-category requirement)
  *   → Student must pass ALL. Any failure = excluded immediately.
@@ -216,6 +216,7 @@ class ScholarshipRuleMatcher
             'age'         => $this->checkAge($student, $criteria),
             'spm'         => $this->checkSpm($student, $criteria),
             'income'      => $this->checkIncome($student, $criteria),
+            'leadership'  => $this->checkLeadership($student, $criteria),
         ];
     }
 
@@ -247,6 +248,15 @@ class ScholarshipRuleMatcher
         }
 
         return (bool) $student->bumiputera;
+    }
+
+    private function checkLeadership($student, $criteria): bool
+    {
+        if (!$criteria->leadership_required) {
+            return true;
+        }
+
+        return (bool) $student->has_leadership;
     }
 
     private function checkStudyLevel($student, $criteria): bool
