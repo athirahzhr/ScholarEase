@@ -99,12 +99,6 @@
                                                 <label class="form-label fw-semibold">Minimum SPM A's</label>
                                                 <input type="number" name="min_spm_as" class="form-control" min="0" max="12" value="{{ old('min_spm_as') }}" placeholder="e.g., 5">
                                                 <small class="text-muted">Minimum number of A's required</small>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-semibold">Maximum SPM A's</label>
-                                                <input type="number" name="max_spm_as" class="form-control" min="0" max="12" value="{{ old('max_spm_as') }}" placeholder="e.g., 9">
-                                                <small class="text-muted">Maximum number of A's expected</small>
-                                            </div>
                                         </div>
 
                                         {{-- MONTHLY INCOME --}}
@@ -114,7 +108,7 @@
                                             <small class="text-muted">Income threshold for eligibility (if applicable)</small>
                                         </div>
 
-                                        
+
                                         <div class="mb-3">
 
                                         <label class="form-label fw-semibold">
