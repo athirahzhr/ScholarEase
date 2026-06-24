@@ -102,6 +102,15 @@ class OCRController extends Controller
             Log::error('OCR Error: ' . $e->getMessage());
             Log::error('OCR Trace: ' . $e->getTraceAsString());
             
+            // Check if it's a Tesseract installation issue
+            if (strpos($e->getMessage(), 'tesseract') !== false) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tesseract OCR is not properly installed. Please contact the administrator.',
+                    'debug' => $e->getMessage()
+                ], 500);
+            }
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to process SPM: ' . $e->getMessage()
@@ -118,22 +127,49 @@ class OCRController extends Controller
         
         // Check if file exists
         if (!file_exists($fullPath)) {
-            throw new \Exception('Image file not found at: ' . $fullPath);
+            throw new \Exception('Image file not found. Please try uploading again.');
         }
 
-        // Preprocess image - simple but effective
+        // Check if Tesseract is installed
+        if (!$this->checkTesseractInstallation()) {
+            throw new \Exception('Tesseract OCR is not installed or not accessible. Please contact the administrator.');
+        }
+
+        // Try to run OCR directly first (no preprocessing)
+        try {
+            $text = $this->runDirectOCR($fullPath);
+            if (!empty($text) && $this->isValidSPMResult($text)) {
+                // Parse grades
+                $grades = $this->parseGrades($text);
+                
+                if (!empty($grades) && count($grades) >= 3) {
+                    $confidence = $this->calculateGradeConfidence($grades, $text);
+                    return [
+                        'grades' => $grades,
+                        'total_as' => $this->countAsFromGrades($grades),
+                        'confidence' => $confidence,
+                        'raw_text' => $text
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            Log::info('Direct OCR failed, trying with preprocessing: ' . $e->getMessage());
+        }
+
+        // Preprocess image and try again
         $processedPath = $this->simplePreprocess($fullPath);
         
-        // Run OCR with basic settings
-        $text = $this->runSimpleOCR($processedPath);
-        
-        // Clean up temp file
-        if ($processedPath !== $fullPath && file_exists($processedPath)) {
-            unlink($processedPath);
+        try {
+            $text = $this->runSimpleOCR($processedPath);
+        } finally {
+            // Clean up temp file
+            if ($processedPath !== $fullPath && file_exists($processedPath)) {
+                unlink($processedPath);
+            }
         }
 
         if (empty($text)) {
-            throw new \Exception('No text could be extracted from the image. Please ensure the image is clear.');
+            throw new \Exception('No text could be extracted from the image. Please ensure the image is clear and well-lit.');
         }
 
         // Debug output
@@ -141,19 +177,7 @@ class OCRController extends Controller
 
         // Check if it's a valid SPM certificate
         if (!$this->isValidSPMResult($text)) {
-            // Try again with different preprocessing
-            $processedPath2 = $this->alternativePreprocess($fullPath);
-            $text2 = $this->runSimpleOCR($processedPath2);
-            
-            if ($processedPath2 !== $fullPath && file_exists($processedPath2)) {
-                unlink($processedPath2);
-            }
-            
-            if (!empty($text2) && $this->isValidSPMResult($text2)) {
-                $text = $text2;
-            } else {
-                throw new \Exception('Uploaded file is not a valid SPM result slip. Please ensure the image is clear and shows the SPM certificate.');
-            }
+            throw new \Exception('The uploaded file does not appear to be a valid SPM result slip. Please ensure you upload the SPM certificate.');
         }
 
         // Parse grades
@@ -171,6 +195,66 @@ class OCRController extends Controller
             'confidence' => $confidence,
             'raw_text' => $text
         ];
+    }
+
+    /**
+     * Check if Tesseract is installed
+     */
+    private function checkTesseractInstallation()
+    {
+        // Try multiple possible paths
+        $possiblePaths = [
+            '/usr/bin/tesseract',
+            '/usr/local/bin/tesseract',
+            '/opt/homebrew/bin/tesseract',
+            'C:\Program Files\Tesseract-OCR\tesseract.exe',
+            'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe',
+        ];
+        
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                return true;
+            }
+        }
+        
+        // Try to execute tesseract command
+        try {
+            $output = shell_exec('which tesseract 2>/dev/null');
+            if (!empty($output)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            // Ignore
+        }
+        
+        // Try with where (Windows)
+        try {
+            $output = shell_exec('where tesseract 2>nul');
+            if (!empty($output)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            // Ignore
+        }
+        
+        return false;
+    }
+
+    /**
+     * Run OCR directly without preprocessing
+     */
+    private function runDirectOCR($imagePath)
+    {
+        try {
+            $ocr = new TesseractOCR($imagePath);
+            $ocr->lang('eng+msa');
+            $ocr->psm(6);
+            $ocr->oem(3);
+            return $ocr->run();
+        } catch (\Exception $e) {
+            Log::info('Direct OCR error: ' . $e->getMessage());
+            return '';
+        }
     }
 
     /**
@@ -235,72 +319,12 @@ class OCRController extends Controller
     }
 
     /**
-     * Alternative preprocessing
-     */
-    private function alternativePreprocess($fullPath)
-    {
-        $imageInfo = getimagesize($fullPath);
-        if (!$imageInfo) {
-            return $fullPath;
-        }
-
-        switch ($imageInfo['mime']) {
-            case 'image/jpeg':
-                $image = imagecreatefromjpeg($fullPath);
-                break;
-            case 'image/png':
-                $image = imagecreatefrompng($fullPath);
-                break;
-            default:
-                return $fullPath;
-        }
-
-        if (!$image) {
-            return $fullPath;
-        }
-
-        $width = imagesx($image);
-        $height = imagesy($image);
-
-        // Scale up more
-        $newWidth = $width * 3;
-        $newHeight = $height * 3;
-
-        $resized = imagecreatetruecolor($newWidth, $newHeight);
-        imageantialias($resized, true);
-        imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-        // Different filter settings
-        imagefilter($resized, IMG_FILTER_GRAYSCALE);
-        imagefilter($resized, IMG_FILTER_CONTRAST, -60);
-        imagefilter($resized, IMG_FILTER_BRIGHTNESS, 15);
-
-        if (function_exists('imageconvolution')) {
-            $sharpen = array(
-                array(0, -1, 0),
-                array(-1, 5, -1),
-                array(0, -1, 0)
-            );
-            imageconvolution($resized, $sharpen, 1, 0);
-        }
-
-        $tempPath = storage_path('app/public/temp_' . uniqid() . '.jpg');
-        imagejpeg($resized, $tempPath, 90);
-
-        imagedestroy($image);
-        imagedestroy($resized);
-
-        return $tempPath;
-    }
-
-    /**
      * Run simple OCR with basic settings
      */
     private function runSimpleOCR($imagePath)
     {
         try {
             $ocr = new TesseractOCR($imagePath);
-            $ocr->executable('/usr/bin/tesseract');
             $ocr->lang('eng+msa');
             $ocr->psm(6);
             $ocr->oem(3);
@@ -312,13 +336,22 @@ class OCRController extends Controller
             // Try with just English
             try {
                 $ocr = new TesseractOCR($imagePath);
-                $ocr->executable('/usr/bin/tesseract');
                 $ocr->lang('eng');
                 $ocr->psm(6);
                 return $ocr->run();
             } catch (\Exception $e2) {
                 Log::error('OCR Fallback Error: ' . $e2->getMessage());
-                return '';
+                
+                // Try with different PSM mode
+                try {
+                    $ocr = new TesseractOCR($imagePath);
+                    $ocr->lang('eng');
+                    $ocr->psm(3);
+                    return $ocr->run();
+                } catch (\Exception $e3) {
+                    Log::error('OCR Final Fallback Error: ' . $e3->getMessage());
+                    return '';
+                }
             }
         }
     }
