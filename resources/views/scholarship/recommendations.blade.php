@@ -319,14 +319,30 @@
     }
 </style>
 
-<div class="container py-4">
-    <div class="recommendations-header" data-aos="fade-up">
-        <h2>
-            <i class="fas fa-graduation-cap me-2" style="color: var(--gold);"></i>
-            Scholarship Recommendations
-        </h2>
-        <p>Personalised scholarship matches based on your academic profile and preferences</p>
+<div class="recommendations-header" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+        <div>
+            <h2>
+                <i class="fas fa-graduation-cap me-2" style="color: var(--gold);"></i>
+                Scholarship Recommendations
+            </h2>
+
+            <p>
+                Personalised scholarship matches based on your academic profile and preferences
+            </p>
+        </div>
+
+        <div>
+            <a href="{{ route('profile.create') }}"
+               class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>
+                Edit Profile
+            </a>
+        </div>
+
     </div>
+</div>
 
     @if(session('success'))
         <div class="alert-success mb-4" data-aos="fade-down">
