@@ -30,9 +30,10 @@ class OCRController extends Controller
     ];
 
     /**
-     * Common OCR misreadings mapping
+     * Common OCR misreadings mapping - expanded for better accuracy
      */
     const OCR_CORRECTIONS = [
+        // Grade corrections
         'AT' => 'A+',
         'AS' => 'A+',
         'A®' => 'A+',
@@ -43,6 +44,8 @@ class OCRController extends Controller
         'A»' => 'A+',
         'A~' => 'A+',
         'A#' => 'A+',
+        'A1' => 'A+',
+        'A!' => 'A+',
         'BT' => 'B+',
         'BS' => 'B+',
         'B®' => 'B+',
@@ -63,24 +66,29 @@ class OCRController extends Controller
         'B -' => 'B-',
         'C -' => 'C-',
         'A -' => 'A-',
-        // Common OCR misreadings for Malay words
+        'A +' => 'A+',
+        'A .' => 'A',
+        'A .' => 'A',
+        // Subject corrections
         'BAHASA MELAYU' => 'BAHASA MELAYU',
         'BAHASA INGGERIS' => 'BAHASA INGGERIS',
         'PENDIDIKAN ISLAM' => 'PENDIDIKAN ISLAM',
         'MATEMATIK' => 'MATHEMATICS',
+        'MATEMATIK TAMBAHAN' => 'ADDITIONAL MATHEMATICS',
+        'GRAFIK KOMUNIKASI TEKNIKAL' => 'GRAFIK KOMUNIKASI TEKNIKAL',
     ];
 
     /**
-     * Comprehensive subject list with common variations
+     * Comprehensive subject list with all possible variations
      */
     const SUBJECTS = [
-        'BAHASA MELAYU' => ['BM', 'BAHASA MALAYSIA', 'MELAYU', 'B.MELAYU'],
-        'BAHASA INGGERIS' => ['ENGLISH', 'BI', 'INGGERIS', 'B.INGGERIS'],
-        'PENDIDIKAN ISLAM' => ['PI', 'ISLAM', 'PAI', 'P.ISLAM'],
-        'PENDIDIKAN MORAL' => ['PM', 'MORAL', 'P.MORAL'],
+        'BAHASA MELAYU' => ['BM', 'BAHASA MALAYSIA', 'MELAYU', 'B.MELAYU', 'BAHASA MELAYU'],
+        'BAHASA INGGERIS' => ['ENGLISH', 'BI', 'INGGERIS', 'B.INGGERIS', 'BAHASA INGGERIS'],
+        'PENDIDIKAN ISLAM' => ['PI', 'ISLAM', 'PAI', 'P.ISLAM', 'PENDIDIKAN ISLAM'],
+        'PENDIDIKAN MORAL' => ['PM', 'MORAL', 'P.MORAL', 'PENDIDIKAN MORAL'],
         'SEJARAH' => ['SEJ', 'HISTORY', 'SEJARAH'],
         'MATHEMATICS' => ['MATH', 'MATEMATIK', 'MM', 'MATHEMATICS'],
-        'ADDITIONAL MATHEMATICS' => ['ADD MATH', 'MATEMATIK TAMBAHAN', 'MT', 'ADDMATH', 'ADD.MATHS'],
+        'ADDITIONAL MATHEMATICS' => ['ADD MATH', 'MATEMATIK TAMBAHAN', 'MT', 'ADDMATH', 'ADD.MATHS', 'ADDITIONAL MATHEMATICS'],
         'PHYSICS' => ['FIZIK', 'PHY', 'PHYSICS'],
         'CHEMISTRY' => ['KIMIA', 'CHEM', 'CHEMISTRY'],
         'BIOLOGY' => ['BIOLOGI', 'BIO', 'BIOLOGY'],
@@ -95,7 +103,7 @@ class OCRController extends Controller
         'BAHASA ARAB' => ['ARAB', 'B.ARAB'],
         'BAHASA CINA' => ['CINA', 'CHINESE', 'B.CINA'],
         'BAHASA TAMIL' => ['TAMIL', 'B.TAMIL'],
-        'GRAFIK KOMUNIKASI TEKNIKAL' => ['GKT', 'TEKNIKAL', 'GRAFIK'],
+        'GRAFIK KOMUNIKASI TEKNIKAL' => ['GKT', 'TEKNIKAL', 'GRAFIK', 'GRAFIK KOMUNIKASI TEKNIKAL'],
     ];
 
     /**
@@ -224,7 +232,7 @@ class OCRController extends Controller
             $width = imagesx($image);
             $height = imagesy($image);
 
-            // Calculate optimal scaling (larger for better OCR)
+            // Calculate optimal scaling - increased for better OCR
             $scaleFactor = $this->calculateOptimalScale($width, $height);
             $newWidth = $width * $scaleFactor;
             $newHeight = $height * $scaleFactor;
@@ -277,14 +285,14 @@ class OCRController extends Controller
      */
     private function calculateOptimalScale($width, $height)
     {
-        $targetMinDimension = 2000; // Increased for better OCR
+        $targetMinDimension = 2500; // Increased for better OCR
         $currentMinDimension = min($width, $height);
         
         if ($currentMinDimension < $targetMinDimension) {
             return ceil($targetMinDimension / $currentMinDimension);
         }
         
-        return 2; // Minimum 2x scaling for better OCR
+        return 3; // Minimum 3x scaling for better OCR
     }
 
     /**
@@ -296,13 +304,16 @@ class OCRController extends Controller
         imagefilter($image, IMG_FILTER_GRAYSCALE);
         
         // Increase contrast significantly
-        imagefilter($image, IMG_FILTER_CONTRAST, -60);
+        imagefilter($image, IMG_FILTER_CONTRAST, -70);
         
         // Adjust brightness
-        imagefilter($image, IMG_FILTER_BRIGHTNESS, 10);
+        imagefilter($image, IMG_FILTER_BRIGHTNESS, 5);
         
         // Apply sharpening using convolution
         $this->applySharpening($image);
+        
+        // Additional contrast for better text clarity
+        imagefilter($image, IMG_FILTER_CONTRAST, -20);
     }
 
     /**
@@ -314,12 +325,12 @@ class OCRController extends Controller
             // Strong sharpening kernel
             $sharpenKernel = array(
                 array(-1, -1, -1),
-                array(-1, 16, -1),
+                array(-1, 20, -1),
                 array(-1, -1, -1)
             );
             
             // Apply sharpening
-            imageconvolution($image, $sharpenKernel, 8, 0);
+            imageconvolution($image, $sharpenKernel, 12, 0);
         }
     }
 
@@ -329,14 +340,20 @@ class OCRController extends Controller
     private function performOCRWithFallback($processedPath)
     {
         $configurations = [
-            // Primary: English + Malay with PSM 6
+            // Primary: English + Malay with PSM 6 (Assume uniform text block)
             [
                 'lang' => 'eng+msa',
                 'psm' => 6,
                 'oem' => 3,
                 'whitelist' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-:;.,() []/'
             ],
-            // Secondary: English only with PSM 6
+            // Secondary: English + Malay with PSM 4 (Assume variable text)
+            [
+                'lang' => 'eng+msa',
+                'psm' => 4,
+                'oem' => 3
+            ],
+            // Tertiary: English only
             [
                 'lang' => 'eng',
                 'psm' => 6,
@@ -376,7 +393,7 @@ class OCRController extends Controller
                 }
                 
                 // If we have high confidence, break early
-                if ($confidence > 0.8) {
+                if ($confidence > 0.85) {
                     break;
                 }
                 
@@ -419,7 +436,7 @@ class OCRController extends Controller
                 $foundKeywords++;
             }
         }
-        $score += ($foundKeywords / count($keywords)) * 0.3;
+        $score += ($foundKeywords / count($keywords)) * 0.25;
         
         // Check for common subjects
         $allSubjectNames = array_keys(self::SUBJECTS);
@@ -429,7 +446,7 @@ class OCRController extends Controller
                 $foundSubjects++;
             }
         }
-        $score += min(($foundSubjects / 10), 1) * 0.3;
+        $score += min(($foundSubjects / 10), 1) * 0.35;
         
         // Check for grade patterns
         preg_match_all('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $text, $matches);
@@ -480,6 +497,9 @@ class OCRController extends Controller
         $lines = preg_split('/\r\n|\r|\n/', $text);
         $lines = array_filter(array_map('trim', $lines));
         
+        // Debug: Log all lines
+        Log::info('OCR Lines:', ['lines' => $lines]);
+        
         $grades = [];
         $detectedSubjects = [];
         $allSubjectNames = array_keys(self::SUBJECTS);
@@ -498,9 +518,15 @@ class OCRController extends Controller
                     continue;
                 }
                 
-                // Check if subject exists in this line
+                // Check if subject exists in this line - exact match first
                 $found = false;
                 $aliases = array_merge([$subject], self::SUBJECTS[$subject]);
+                
+                // Sort aliases by length (longest first) for better matching
+                usort($aliases, function($a, $b) {
+                    return strlen($b) - strlen($a);
+                });
+                
                 foreach ($aliases as $alias) {
                     if (stripos($line, $alias) !== false) {
                         $found = true;
@@ -514,45 +540,53 @@ class OCRController extends Controller
                     if ($grade) {
                         $grades[$subject] = $grade;
                         $detectedSubjects[] = $subject;
+                        Log::info('Detected subject:', ['subject' => $subject, 'grade' => $grade, 'line' => $line]);
                     }
                 }
             }
         }
         
-        // SECOND PASS: Look for grades in proximity to subjects
-        if (count($grades) < 5) {
+        // SECOND PASS: Look for grades in proximity to subjects (next line)
+        if (count($grades) < 8) {
+            Log::info('Second pass: Looking for grades in proximity');
             $additionalGrades = $this->findGradesInProximity($lines);
             foreach ($additionalGrades as $subject => $grade) {
                 if (!isset($grades[$subject])) {
                     $grades[$subject] = $grade;
                     $detectedSubjects[] = $subject;
+                    Log::info('Added from proximity:', ['subject' => $subject, 'grade' => $grade]);
                 }
             }
         }
         
-        // THIRD PASS: If still not enough, extract all grades and try to match
-        if (count($grades) < 5) {
+        // THIRD PASS: Extract all grades and match with remaining subjects
+        if (count($grades) < 8) {
+            Log::info('Third pass: Matching remaining subjects with grades');
             $allGrades = $this->extractAllGrades($text);
             $remainingSubjects = array_diff($allSubjectNames, $detectedSubjects);
             
-            // Try to match remaining subjects with available grades
-            $gradeIndex = 0;
+            // Sort remaining subjects by likelihood of appearing in text
+            $subjectScores = [];
             foreach ($remainingSubjects as $subject) {
-                if ($gradeIndex < count($allGrades) && !isset($grades[$subject])) {
-                    // Check if this subject appears in the text
-                    $subjectFound = false;
-                    $aliases = array_merge([$subject], self::SUBJECTS[$subject]);
-                    foreach ($aliases as $alias) {
-                        if (stripos($text, $alias) !== false) {
-                            $subjectFound = true;
-                            break;
-                        }
+                $score = 0;
+                $aliases = array_merge([$subject], self::SUBJECTS[$subject]);
+                foreach ($aliases as $alias) {
+                    if (stripos($text, $alias) !== false) {
+                        $score += strlen($alias);
                     }
-                    
-                    if ($subjectFound) {
-                        $grades[$subject] = $allGrades[$gradeIndex];
-                        $gradeIndex++;
-                    }
+                }
+                $subjectScores[$subject] = $score;
+            }
+            
+            // Sort by score descending
+            arsort($subjectScores);
+            
+            $gradeIndex = 0;
+            foreach ($subjectScores as $subject => $score) {
+                if ($gradeIndex < count($allGrades) && !isset($grades[$subject]) && $score > 0) {
+                    $grades[$subject] = $allGrades[$gradeIndex];
+                    $gradeIndex++;
+                    Log::info('Added from all grades:', ['subject' => $subject, 'grade' => $allGrades[$gradeIndex - 1]]);
                 }
             }
         }
@@ -565,11 +599,14 @@ class OCRController extends Controller
             // Log the OCR text for debugging
             Log::error('OCR failed to detect enough subjects', [
                 'detected_count' => count($grades),
+                'detected_subjects' => array_keys($grades),
                 'ocr_text_preview' => substr($text, 0, 1000)
             ]);
             
             throw new \Exception('Unable to detect enough subjects from SPM slip. Please ensure the image is clear and try again, or use manual entry.');
         }
+        
+        Log::info('Final detected subjects:', ['grades' => $grades]);
         
         return $grades;
     }
@@ -580,7 +617,7 @@ class OCRController extends Controller
     private function shouldSkipLine($line)
     {
         // Skip short lines
-        if (strlen($line) < 3) {
+        if (strlen($line) < 5) {
             return true;
         }
         
@@ -611,6 +648,13 @@ class OCRController extends Controller
             '/SMK/i',
             '/SEKOLAH/i',
             '/SCHOOL/i',
+            '/MATA PELAJARAN/i',
+            '/SUBJECT/i',
+            '/GRED/i',
+            '/GRADE/i',
+            '/CEMERLANG/i',
+            '/TINGGI/i',
+            '/TERBAIK/i',
         ];
         
         foreach ($skipPatterns as $pattern) {
@@ -670,6 +714,18 @@ class OCRController extends Controller
                         }
                     }
                     
+                    // Try next next line (some certificates have the grade two lines after)
+                    if (isset($lines[$lineIndex + 2])) {
+                        $nextNextLine = $lines[$lineIndex + 2];
+                        if (!$this->shouldSkipLine($nextNextLine)) {
+                            $grade = $this->extractGradeFromLine($nextNextLine);
+                            if ($grade) {
+                                $grades[$subject] = $grade;
+                                continue;
+                            }
+                        }
+                    }
+                    
                     // Try previous line
                     if (isset($lines[$lineIndex - 1])) {
                         $prevLine = $lines[$lineIndex - 1];
@@ -701,16 +757,33 @@ class OCRController extends Controller
         $text = preg_replace('/([A-Z])\s*\+\s*/', '$1+', $text);
         $text = preg_replace('/([A-Z])\s*\-\s*/', '$1-', $text);
         
+        // Fix common OCR typos for subjects
+        $text = str_replace('BAHASA MELAYU', 'BAHASA MELAYU', $text);
+        $text = str_replace('BAHASA INGGERIS', 'BAHASA INGGERIS', $text);
+        $text = str_replace('PENDIDIKAN ISLAM', 'PENDIDIKAN ISLAM', $text);
+        $text = str_replace('MATEMATIK TAMBAHAN', 'ADDITIONAL MATHEMATICS', $text);
+        $text = str_replace('GRAFIK KOMUNIKASI TEKNIKAL', 'GRAFIK KOMUNIKASI TEKNIKAL', $text);
+        
         return $text;
     }
 
     /**
-     * Extract grade from a line of text
+     * Extract grade from a line of text - improved for A+ detection
      */
     private function extractGradeFromLine($line)
     {
         // Remove parenthetical grade descriptions
         $line = preg_replace('/\([^)]*\)/', '', $line);
+        
+        // Look for A+ specifically first (since it's often misread)
+        if (preg_match('/\b(A\s*\+)\b/i', $line, $matches)) {
+            return 'A+';
+        }
+        
+        // Look for A- specifically
+        if (preg_match('/\b(A\s*-)\b/i', $line, $matches)) {
+            return 'A-';
+        }
         
         // Look for grade patterns
         $gradePatterns = [
@@ -734,6 +807,11 @@ class OCRController extends Controller
             }
         }
         
+        // If no grade found, check for common OCR misreadings of A+
+        if (preg_match('/\b(A[+＊★✱])\b/', $line, $matches)) {
+            return 'A+';
+        }
+        
         return null;
     }
 
@@ -742,8 +820,24 @@ class OCRController extends Controller
      */
     private function extractAllGrades($text)
     {
-        preg_match_all('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $text, $matches);
-        return $matches[1] ?? [];
+        // First, try to find A+ specifically
+        preg_match_all('/\b(A\s*\+)\b/i', $text, $matches);
+        $grades = $matches[1] ?? [];
+        
+        // Then find other grades
+        preg_match_all('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $text, $matches2);
+        $grades = array_merge($grades, $matches2[1] ?? []);
+        
+        // Clean and convert to uppercase
+        $grades = array_map(function($g) {
+            $g = strtoupper(str_replace(' ', '', $g));
+            return $g;
+        }, $grades);
+        
+        // Remove duplicates
+        $grades = array_unique($grades);
+        
+        return array_values($grades);
     }
 
     /**
@@ -755,7 +849,7 @@ class OCRController extends Controller
         $cleaned = [];
         
         foreach ($grades as $subject => $grade) {
-            $grade = strtoupper(trim($grade));
+            $grade = strtoupper(trim(str_replace(' ', '', $grade)));
             // Only keep if grade is valid and subject exists in our list
             if (in_array($grade, $validGrades) && isset(self::SUBJECTS[$subject])) {
                 $cleaned[$subject] = $grade;
@@ -786,9 +880,9 @@ class OCRController extends Controller
         }
         $score += ($gradeCount / $totalGrades) * 0.4;
         
-        // Check if we have a reasonable number of subjects
-        $subjectRatio = $totalGrades / count(self::SUBJECTS);
-        $score += min($subjectRatio * 2, 1) * 0.3;
+        // Check if we have a reasonable number of subjects (aim for 8+)
+        $subjectRatio = min($totalGrades / 9, 1);
+        $score += $subjectRatio * 0.3;
         
         // Check for SPM certificate markers
         $markerCount = 0;
