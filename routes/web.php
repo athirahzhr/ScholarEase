@@ -64,6 +64,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile/create', [ProfileController::class, 'create'])->name('profile.create');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
+    
+    
 
     // Scholarship Finder
     Route::get('/find-scholarship', [ScholarshipController::class, 'showFinder'])->name('scholarship.finder');

@@ -27,8 +27,14 @@ class ProfileController extends Controller
      */
     public function create()
     {
-        return view('profile.create');
+        $profile = Auth::user()->profile;
+
+    return view(
+        'profile.create',
+        compact('profile')
+    );
     }
+    
 
     /**
      * Store / update profile

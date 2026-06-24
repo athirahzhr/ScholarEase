@@ -228,16 +228,20 @@
                                 </div>
 
                                 <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-chart-line"></i>
-                                        Income Category
-                                    </label>
-                                    <select name="income_category" class="form-select" required>
-                                        <option value="">Select Category</option>
-                                        <option value="B40" {{ old('income_category', $profile->income_category ?? '') == 'B40' ? 'selected' : '' }}>B40 - Lower Income (Below RM4,850)</option>
-                                        <option value="M40" {{ old('income_category', $profile->income_category ?? '') == 'M40' ? 'selected' : '' }}>M40 - Middle Income (RM4,850 - RM10,959)</option>
-                                        <option value="T20" {{ old('income_category', $profile->income_category ?? '') == 'T20' ? 'selected' : '' }}>T20 - Upper Income (Above RM10,959)</option>
-                                    </select>
+                                <label class="form-label required-field">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    Monthly Household Income (RM)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="monthly_income"
+                                    class="form-control"
+                                    min="0"
+                                    required
+                                    value="{{ old('monthly_income', $profile->monthly_income ?? '') }}"
+                                    placeholder="e.g. 4500"
+                                >
                                 </div>
 
                                 <div class="col-md-3">
@@ -276,12 +280,13 @@
                             </div>
 
                             <!-- Personal Information Section -->
-                            <div class="mb-4 mt-4">
-                                <h5 class="form-section-title">
+                            <div class="row g-3 mb-4">
+                                <div class="mb-4 mt-4">
+                                    <h5 class="form-section-title">
                                     <i class="fas fa-user-circle me-2"></i>
                                     Personal Information
-                                </h5>
-                            </div>
+                                    </h5>
+                                </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label required-field">
@@ -302,6 +307,23 @@
                                         <option value="International" {{ old('citizenship', $profile->citizenship ?? '') == 'International' ? 'selected' : '' }}>International</option>
                                     </select>
                                 </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label required-field">
+                                        <i class="fas fa-birthday-cake"></i>
+                                        Age
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        name="age"
+                                        class="form-control"
+                                        min="15"
+                                        max="100"
+                                        required
+                                        value="{{ old('age', $profile->age ?? '') }}"
+                                    >
+                                </div>
                             </div>
 
                             <!-- Additional Information Section -->
@@ -315,6 +337,7 @@
                             <div class="row g-3 mb-4">
                                 <div class="col-12">
                                     <div class="form-check form-check-inline">
+                                        <input type="hidden"name="bumiputera"value="0">
                                         <input class="form-check-input" type="checkbox" name="bumiputera" value="1" id="bumiputera" {{ old('bumiputera', $profile->bumiputera ?? false) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="bumiputera">
                                             <i class="fas fa-star-of-life me-1"></i> Bumiputera
@@ -322,6 +345,7 @@
                                     </div>
 
                                     <div class="form-check form-check-inline">
+                                        <input type="hidden"name="has_leadership"value="0">
                                         <input class="form-check-input" type="checkbox" name="has_leadership" value="1" id="leadership" {{ old('has_leadership', $profile->has_leadership ?? false) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="leadership">
                                             <i class="fas fa-trophy me-1"></i> Leadership Experience
