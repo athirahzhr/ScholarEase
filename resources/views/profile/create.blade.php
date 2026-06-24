@@ -358,7 +358,7 @@
                             <div class="mt-4 pt-3">
                                 <button type="submit" class="btn-save">
                                     <i class="fas fa-save"></i>
-                                    Save Profile
+                                    Save & Refresh Recommendations
                                 </button>
                             </div>
                         </form>
