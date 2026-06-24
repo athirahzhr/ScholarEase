@@ -73,7 +73,7 @@ class OCRController extends Controller
             $filename = 'spm_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('spm_documents', $filename, 'public');
 
-            $results = $this->processRealOCR($path);
+            $results = $this->processOCR($path);
             
             Session::put('ocr_temp_data', [
                 'file_path' => $path,
@@ -100,6 +100,8 @@ class OCRController extends Controller
 
         } catch (\Exception $e) {
             Log::error('OCR Error: ' . $e->getMessage());
+            Log::error('OCR Trace: ' . $e->getTraceAsString());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to process SPM: ' . $e->getMessage()
@@ -108,120 +110,77 @@ class OCRController extends Controller
     }
 
     /**
-     * Process OCR with extreme preprocessing
+     * Process OCR with simple but effective approach
      */
-    private function processRealOCR($path)
+    private function processOCR($path)
     {
         $fullPath = storage_path('app/public/' . $path);
         
-        // Create multiple preprocessed versions with extreme settings
-        $processedPaths = $this->createExtremePreprocessedImages($fullPath);
-        
-        $bestText = '';
-        $bestConfidence = 0;
-        $allTexts = [];
-        
-        foreach ($processedPaths as $processedPath) {
-            try {
-                $text = $this->runOCR($processedPath);
-                $allTexts[] = $text;
-                
-                // Clean up temp file
-                if (file_exists($processedPath) && $processedPath !== $fullPath) {
-                    unlink($processedPath);
-                }
-                
-                // Check if this text contains SPM keywords
-                if ($this->isValidSPMResult($text)) {
-                    $confidence = $this->calculateOCRConfidence($text);
-                    if ($confidence > $bestConfidence) {
-                        $bestConfidence = $confidence;
-                        $bestText = $text;
-                    }
-                }
-            } catch (\Exception $e) {
-                Log::warning('OCR attempt failed: ' . $e->getMessage());
-                continue;
-            }
-        }
-        
-        // If no text found with SPM keywords, try combining all texts
-        if (empty($bestText)) {
-            $combinedText = implode("\n", $allTexts);
-            if ($this->isValidSPMResult($combinedText)) {
-                $bestText = $combinedText;
-                $bestConfidence = $this->calculateOCRConfidence($combinedText);
-            }
+        // Check if file exists
+        if (!file_exists($fullPath)) {
+            throw new \Exception('Image file not found at: ' . $fullPath);
         }
 
-        if (empty($bestText)) {
-            throw new \Exception('Failed to extract text from image. Please ensure the image is clear and try again.');
+        // Preprocess image - simple but effective
+        $processedPath = $this->simplePreprocess($fullPath);
+        
+        // Run OCR with basic settings
+        $text = $this->runSimpleOCR($processedPath);
+        
+        // Clean up temp file
+        if ($processedPath !== $fullPath && file_exists($processedPath)) {
+            unlink($processedPath);
         }
 
-        // Debug
-        $this->debugOCROutput($bestText, $path);
+        if (empty($text)) {
+            throw new \Exception('No text could be extracted from the image. Please ensure the image is clear.');
+        }
+
+        // Debug output
+        $this->debugOCROutput($text, $path);
+
+        // Check if it's a valid SPM certificate
+        if (!$this->isValidSPMResult($text)) {
+            // Try again with different preprocessing
+            $processedPath2 = $this->alternativePreprocess($fullPath);
+            $text2 = $this->runSimpleOCR($processedPath2);
+            
+            if ($processedPath2 !== $fullPath && file_exists($processedPath2)) {
+                unlink($processedPath2);
+            }
+            
+            if (!empty($text2) && $this->isValidSPMResult($text2)) {
+                $text = $text2;
+            } else {
+                throw new \Exception('Uploaded file is not a valid SPM result slip. Please ensure the image is clear and shows the SPM certificate.');
+            }
+        }
 
         // Parse grades
-        $grades = $this->parseGrades($bestText);
+        $grades = $this->parseGrades($text);
         
-        // Calculate confidence
-        $gradeConfidence = $this->calculateGradeConfidence($grades, $bestText);
+        if (empty($grades) || count($grades) < 3) {
+            throw new \Exception('Unable to detect enough subjects from the SPM slip. Please try uploading a clearer image or use manual entry.');
+        }
+
+        $confidence = $this->calculateGradeConfidence($grades, $text);
 
         return [
             'grades' => $grades,
             'total_as' => $this->countAsFromGrades($grades),
-            'confidence' => $gradeConfidence,
-            'raw_text' => $bestText
+            'confidence' => $confidence,
+            'raw_text' => $text
         ];
     }
 
     /**
-     * Create multiple extreme preprocessed versions
+     * Simple image preprocessing
      */
-    private function createExtremePreprocessedImages($fullPath)
-    {
-        $paths = [];
-        $imageInfo = getimagesize($fullPath);
-        
-        if (!$imageInfo) {
-            return [$fullPath];
-        }
-
-        // Different preprocessing combinations
-        $configs = [
-            ['scale' => 5, 'contrast' => -60, 'brightness' => 20, 'sharpness' => true],
-            ['scale' => 4, 'contrast' => -70, 'brightness' => 15, 'sharpness' => true],
-            ['scale' => 6, 'contrast' => -50, 'brightness' => 25, 'sharpness' => true],
-            ['scale' => 4, 'contrast' => -80, 'brightness' => 10, 'sharpness' => false],
-            ['scale' => 3, 'contrast' => -40, 'brightness' => 30, 'sharpness' => true],
-        ];
-        
-        foreach ($configs as $config) {
-            try {
-                $processedPath = $this->preprocessImageExtreme($fullPath, $config);
-                if ($processedPath && file_exists($processedPath)) {
-                    $paths[] = $processedPath;
-                }
-            } catch (\Exception $e) {
-                Log::warning('Extreme preprocessing failed: ' . $e->getMessage());
-                continue;
-            }
-        }
-        
-        // Always include original
-        $paths[] = $fullPath;
-        
-        return $paths;
-    }
-
-    /**
-     * Extreme image preprocessing
-     */
-    private function preprocessImageExtreme($fullPath, $config)
+    private function simplePreprocess($fullPath)
     {
         $imageInfo = getimagesize($fullPath);
         if (!$imageInfo) {
-            return null;
+            return $fullPath;
         }
 
         switch ($imageInfo['mime']) {
@@ -232,62 +191,42 @@ class OCRController extends Controller
                 $image = imagecreatefrompng($fullPath);
                 break;
             default:
-                return null;
+                return $fullPath;
         }
 
         if (!$image) {
-            return null;
+            return $fullPath;
         }
 
         $width = imagesx($image);
         $height = imagesy($image);
 
-        // Extreme scaling
-        $scale = $config['scale'] ?? 5;
-        $newWidth = $width * $scale;
-        $newHeight = $height * $scale;
+        // Scale up for better OCR (2x)
+        $newWidth = $width * 2;
+        $newHeight = $height * 2;
 
         $resized = imagecreatetruecolor($newWidth, $newHeight);
         imageantialias($resized, true);
-        
-        // Use high quality resampling
         imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 
-        // Apply multiple filters
+        // Grayscale and contrast
         imagefilter($resized, IMG_FILTER_GRAYSCALE);
-        
-        // Extreme contrast
-        $contrast = $config['contrast'] ?? -60;
-        imagefilter($resized, IMG_FILTER_CONTRAST, $contrast);
-        
-        // Brightness adjustment
-        $brightness = $config['brightness'] ?? 20;
-        imagefilter($resized, IMG_FILTER_BRIGHTNESS, $brightness);
-        
-        // Apply sharpening if enabled
-        if (($config['sharpness'] ?? true) && function_exists('imageconvolution')) {
-            // Multiple sharpening passes
-            $sharpen1 = array(
+        imagefilter($resized, IMG_FILTER_CONTRAST, -40);
+        imagefilter($resized, IMG_FILTER_BRIGHTNESS, 10);
+
+        // Sharpen if available
+        if (function_exists('imageconvolution')) {
+            $sharpen = array(
                 array(-1, -1, -1),
-                array(-1, 24, -1),
+                array(-1, 16, -1),
                 array(-1, -1, -1)
             );
-            imageconvolution($resized, $sharpen1, 16, 0);
-            
-            $sharpen2 = array(
-                array(0, -1, 0),
-                array(-1, 5, -1),
-                array(0, -1, 0)
-            );
-            imageconvolution($resized, $sharpen2, 1, 0);
+            imageconvolution($resized, $sharpen, 8, 0);
         }
-        
-        // Additional filter for text enhancement
-        imagefilter($resized, IMG_FILTER_CONTRAST, -30);
 
         // Save
         $tempPath = storage_path('app/public/temp_' . uniqid() . '.jpg');
-        imagejpeg($resized, $tempPath, 100);
+        imagejpeg($resized, $tempPath, 90);
 
         imagedestroy($image);
         imagedestroy($resized);
@@ -296,82 +235,92 @@ class OCRController extends Controller
     }
 
     /**
-     * Run OCR with multiple page segmentation modes
+     * Alternative preprocessing
      */
-    private function runOCR($imagePath)
+    private function alternativePreprocess($fullPath)
     {
-        $psmModes = [6, 4, 3, 7, 8]; // Different page segmentation modes
-        
-        $bestText = '';
-        $bestScore = 0;
-        
-        foreach ($psmModes as $psm) {
-            try {
-                $ocr = new TesseractOCR($imagePath);
-                $ocr->executable('/usr/bin/tesseract');
-                $ocr->lang('eng+msa');
-                $ocr->psm($psm);
-                $ocr->oem(3);
-                
-                // Try with different character whitelists
-                if ($psm === 6) {
-                    $ocr->whitelist('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-:;.,() []/');
-                }
-                
-                $text = $ocr->run();
-                
-                // Score this result
-                $score = $this->scoreOCROutput($text);
-                
-                if ($score > $bestScore) {
-                    $bestScore = $score;
-                    $bestText = $text;
-                }
-                
-                // If we have a good result, stop
-                if ($score > 0.7) {
-                    break;
-                }
-            } catch (\Exception $e) {
-                continue;
-            }
+        $imageInfo = getimagesize($fullPath);
+        if (!$imageInfo) {
+            return $fullPath;
         }
-        
-        return $bestText;
+
+        switch ($imageInfo['mime']) {
+            case 'image/jpeg':
+                $image = imagecreatefromjpeg($fullPath);
+                break;
+            case 'image/png':
+                $image = imagecreatefrompng($fullPath);
+                break;
+            default:
+                return $fullPath;
+        }
+
+        if (!$image) {
+            return $fullPath;
+        }
+
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        // Scale up more
+        $newWidth = $width * 3;
+        $newHeight = $height * 3;
+
+        $resized = imagecreatetruecolor($newWidth, $newHeight);
+        imageantialias($resized, true);
+        imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        // Different filter settings
+        imagefilter($resized, IMG_FILTER_GRAYSCALE);
+        imagefilter($resized, IMG_FILTER_CONTRAST, -60);
+        imagefilter($resized, IMG_FILTER_BRIGHTNESS, 15);
+
+        if (function_exists('imageconvolution')) {
+            $sharpen = array(
+                array(0, -1, 0),
+                array(-1, 5, -1),
+                array(0, -1, 0)
+            );
+            imageconvolution($resized, $sharpen, 1, 0);
+        }
+
+        $tempPath = storage_path('app/public/temp_' . uniqid() . '.jpg');
+        imagejpeg($resized, $tempPath, 90);
+
+        imagedestroy($image);
+        imagedestroy($resized);
+
+        return $tempPath;
     }
 
     /**
-     * Score OCR output quality
+     * Run simple OCR with basic settings
      */
-    private function scoreOCROutput($text)
+    private function runSimpleOCR($imagePath)
     {
-        $score = 0;
-        $text = strtoupper($text);
-        
-        // Check for SPM keywords
-        $keywords = ['SIJIL', 'PELAJARAN', 'LEMBAGA', 'PEPERIKSAAN'];
-        $found = 0;
-        foreach ($keywords as $keyword) {
-            if (strpos($text, $keyword) !== false) {
-                $found++;
+        try {
+            $ocr = new TesseractOCR($imagePath);
+            $ocr->executable('/usr/bin/tesseract');
+            $ocr->lang('eng+msa');
+            $ocr->psm(6);
+            $ocr->oem(3);
+            
+            return $ocr->run();
+        } catch (\Exception $e) {
+            Log::error('OCR Execution Error: ' . $e->getMessage());
+            
+            // Try with just English
+            try {
+                $ocr = new TesseractOCR($imagePath);
+                $ocr->executable('/usr/bin/tesseract');
+                $ocr->lang('eng');
+                $ocr->psm(6);
+                return $ocr->run();
+            } catch (\Exception $e2) {
+                Log::error('OCR Fallback Error: ' . $e2->getMessage());
+                return '';
             }
         }
-        $score += ($found / count($keywords)) * 0.5;
-        
-        // Check for subjects
-        $subjectCount = 0;
-        foreach (array_keys(self::SUBJECTS) as $subject) {
-            if (strpos($text, $subject) !== false) {
-                $subjectCount++;
-            }
-        }
-        $score += min($subjectCount / 5, 1) * 0.3;
-        
-        // Check text length
-        $textLength = strlen(preg_replace('/\s+/', '', $text));
-        $score += min($textLength / 300, 1) * 0.2;
-        
-        return min($score, 1);
     }
 
     /**
@@ -383,46 +332,20 @@ class OCRController extends Controller
         $patterns = [
             '/SIJIL\s*PELAJARAN/',
             '/LEMBAGA\s*PEPERIKSAAN/',
-            '/KEMENTERIAN\s*PENDIDIKAN/'
+            '/KEMENTERIAN\s*PENDIDIKAN/',
+            '/SIJIL/',
+            '/PELAJARAN/',
+            '/PEPERIKSAAN/'
         ];
         
+        $matches = 0;
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $text)) {
-                return true;
+                $matches++;
             }
         }
         
-        return false;
-    }
-
-    /**
-     * Calculate OCR confidence
-     */
-    private function calculateOCRConfidence($text)
-    {
-        $score = 0;
-        $text = strtoupper($text);
-        
-        // Check for SPM keywords
-        $keywords = ['SIJIL', 'PELAJARAN', 'LEMBAGA', 'PEPERIKSAAN', 'KEMENTERIAN', 'PENDIDIKAN'];
-        $found = 0;
-        foreach ($keywords as $keyword) {
-            if (strpos($text, $keyword) !== false) $found++;
-        }
-        $score += ($found / count($keywords)) * 0.4;
-        
-        // Check for subjects
-        $subjectCount = 0;
-        foreach (array_keys(self::SUBJECTS) as $subject) {
-            if (strpos($text, $subject) !== false) $subjectCount++;
-        }
-        $score += min($subjectCount / 9, 1) * 0.4;
-        
-        // Check for grades
-        preg_match_all('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $text, $matches);
-        $score += min(count($matches[0]) / 9, 1) * 0.2;
-        
-        return min($score, 1);
+        return $matches >= 2;
     }
 
     /**
@@ -449,58 +372,72 @@ class OCRController extends Controller
         $lines = array_filter(array_map('trim', explode("\n", $text)));
         
         $grades = [];
+        $foundSubjects = [];
+        $allSubjectNames = array_keys(self::SUBJECTS);
         
-        // Method 1: Find subject-grade pairs
+        // First pass: Find subject-grade pairs in same line
         foreach ($lines as $line) {
             if ($this->isNonSubjectLine($line)) {
                 continue;
             }
             
-            foreach (self::SUBJECTS as $subject => $aliases) {
+            foreach ($allSubjectNames as $subject) {
                 if (isset($grades[$subject])) {
                     continue;
                 }
                 
-                foreach ($aliases as $alias) {
+                $found = false;
+                foreach (self::SUBJECTS[$subject] as $alias) {
                     if (stripos($line, $alias) !== false) {
-                        $grade = $this->extractGrade($line);
-                        if ($grade) {
-                            $grades[$subject] = $grade;
-                        }
-                        break 2;
+                        $found = true;
+                        break;
+                    }
+                }
+                
+                if ($found) {
+                    $grade = $this->extractGrade($line);
+                    if ($grade) {
+                        $grades[$subject] = $grade;
+                        $foundSubjects[] = $subject;
                     }
                 }
             }
         }
         
-        // Method 2: Find grades in next lines if we're missing subjects
+        // Second pass: If we found less than 5 subjects, look for grades in next lines
         if (count($grades) < 5) {
             foreach ($lines as $index => $line) {
-                foreach (self::SUBJECTS as $subject => $aliases) {
+                foreach ($allSubjectNames as $subject) {
                     if (isset($grades[$subject])) {
                         continue;
                     }
                     
-                    foreach ($aliases as $alias) {
+                    $found = false;
+                    foreach (self::SUBJECTS[$subject] as $alias) {
                         if (stripos($line, $alias) !== false) {
-                            // Check next 3 lines for grade
-                            for ($i = 1; $i <= 3; $i++) {
-                                if (isset($lines[$index + $i])) {
-                                    $grade = $this->extractGrade($lines[$index + $i]);
-                                    if ($grade) {
-                                        $grades[$subject] = $grade;
-                                        break 3;
-                                    }
+                            $found = true;
+                            break;
+                        }
+                    }
+                    
+                    if ($found) {
+                        // Check next 2 lines for grade
+                        for ($i = 1; $i <= 2; $i++) {
+                            if (isset($lines[$index + $i])) {
+                                $grade = $this->extractGrade($lines[$index + $i]);
+                                if ($grade) {
+                                    $grades[$subject] = $grade;
+                                    $foundSubjects[] = $subject;
+                                    break 2;
                                 }
                             }
-                            break 2;
                         }
                     }
                 }
             }
         }
         
-        // Method 3: Extract all grades and map to common subjects
+        // Third pass: Try to map extracted grades to common subjects
         if (count($grades) < 8) {
             $allGrades = $this->extractAllGrades($text);
             $commonSubjects = [
@@ -529,9 +466,7 @@ class OCRController extends Controller
         }
         
         // Clean and validate
-        $grades = $this->validateGrades($grades);
-        
-        return $grades;
+        return $this->validateGrades($grades);
     }
 
     /**
@@ -550,7 +485,6 @@ class OCRController extends Controller
             '/SMK/', '/SEKOLAH/', '/SCHOOL/',
             '/WAN/', '/BINTI/', '/BIN/', // Malay names
             '/[0-9]{8,}/', // Long numbers
-            '/^[0-9\s]+$/', // Only numbers
         ];
         
         foreach ($skipPatterns as $pattern) {
@@ -559,8 +493,8 @@ class OCRController extends Controller
             }
         }
         
-        // Skip short lines
-        if (strlen(trim($line)) < 3) {
+        // Skip lines with only numbers or very short
+        if (preg_match('/^[0-9\s]+$/', $line) || strlen(trim($line)) < 3) {
             return true;
         }
         
@@ -575,7 +509,7 @@ class OCRController extends Controller
         // Remove parentheses content
         $line = preg_replace('/\([^)]*\)/', '', $line);
         
-        // Check for A+ with possible spaces
+        // Check for A+ with spaces
         if (preg_match('/\b(A\s*\+)\b/i', $line)) {
             return 'A+';
         }
