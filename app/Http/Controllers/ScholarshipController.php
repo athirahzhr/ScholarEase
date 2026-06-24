@@ -55,49 +55,44 @@ class ScholarshipController extends Controller
     }
 
     /**
-     * Save student profile
+     * Save student profile - FIXED VERSION
+     * Now handles checkbox fields correctly
      */
     public function saveProfile(Request $request)
     {
         $validated = $request->validate([
             'monthly_income' => 'required|numeric|min:0',
-
             'study_level' => 'required|string|max:100',
             'field_of_study' => 'required|string|max:255',
-
-            'bumiputera' => 'required|boolean',
             'citizenship' => 'required|string|max:100',
-
             'age' => 'required|integer|min:15|max:30',
-            
-
             'state' => 'required|string|max:100',
-
-            'has_leadership' => 'required|boolean',
+            
+            // Checkbox fields - use 'boolean' instead of 'required|boolean'
+            // This allows the field to be optional in the request
+            'bumiputera' => 'boolean',
+            'has_leadership' => 'boolean',
         ]);
 
         $user = Auth::user();
-
         $verifiedData = Session::get('verified_ocr_data', []);
 
         UserProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'monthly_income' => $validated['monthly_income'],
-
                 'study_level' => $validated['study_level'],
                 'field_of_study' => $validated['field_of_study'],
-
-                'bumiputera' => $validated['bumiputera'],
                 'citizenship' => $validated['citizenship'],
-
                 'age' => $validated['age'],
-                
-
                 'state' => $validated['state'],
-
-                'has_leadership' => $validated['has_leadership'],
-
+                
+                // Handle checkbox values properly
+                // If checkbox is checked, value is 1 (true)
+                // If checkbox is unchecked, value is 0 (false)
+                'bumiputera' => $request->boolean('bumiputera'),
+                'has_leadership' => $request->boolean('has_leadership'),
+                
                 'total_as' => $verifiedData['total_as'] ?? 0,
                 'spm_results' => $verifiedData['grades'] ?? [],
             ]
@@ -168,7 +163,6 @@ class ScholarshipController extends Controller
             'study_paths' => 'nullable|array',
             'fields_of_study' => 'nullable|array',
 
-
             'citizenship_required' => 'nullable|string|max:100',
             'state_requirement' => 'nullable|string|max:100',
 
@@ -219,7 +213,6 @@ class ScholarshipController extends Controller
 
                 'study_paths' => $request->study_paths ?? [],
                 'fields_of_study' => $request->fields_of_study ?? [],
-
 
                 'citizenship_required' => $request->citizenship_required,
 
@@ -287,114 +280,91 @@ class ScholarshipController extends Controller
     /**
      * Update scholarship
      */
-    public function update(
-    Request $request,
-    $id
-) {
-
-    $request->validate([
-
-        'title' => 'required|string',
-
-        'provider' => 'required|string',
-
-        'description' => 'required|string',
-
-        'raw_eligibility' => 'nullable|string',
-
-        'deadline' => 'nullable|date',
-
-        'study_paths' => 'nullable|array',
-
-        'fields_of_study' => 'nullable|array',
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-
-        $scholarship =
-            Scholarship::findOrFail($id);
-
-        $oldCriteria =
-            $scholarship->eligibilityCriteria;
-
-        // ================= UPDATE SCHOLARSHIP =================
-
-        $scholarship->update([
-
-            'title' => $request->title,
-
-            'provider' => $request->provider,
-
-            'description' => $request->description,
-
-            'raw_eligibility' => $request->raw_eligibility,
-
-            'deadline' => $request->deadline,
-
-            'application_link' => $request->application_link,
-
-            'is_active' => $request->boolean('is_active'),
-
-            'is_official' => $request->boolean('is_official'),
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string',
+            'provider' => 'required|string',
+            'description' => 'required|string',
+            'raw_eligibility' => 'nullable|string',
+            'deadline' => 'nullable|date',
+            'study_paths' => 'nullable|array',
+            'fields_of_study' => 'nullable|array',
+            
+            // Add validation for checkbox fields
+            'is_active' => 'boolean',
+            'is_official' => 'boolean',
+            'bumiputera_required' => 'boolean',
+            'bumiputera_priority' => 'boolean',
+            'leadership_required' => 'boolean',
+            'leadership_priority' => 'boolean',
         ]);
 
-        // ================= ELIGIBILITY DATA =================
+        DB::beginTransaction();
 
-        $criteriaData =
-            $this->getEligibilityCriteriaData(
+        try {
+
+            $scholarship = Scholarship::findOrFail($id);
+
+            $oldCriteria = $scholarship->eligibilityCriteria;
+
+            // UPDATE SCHOLARSHIP
+            $scholarship->update([
+                'title' => $request->title,
+                'provider' => $request->provider,
+                'description' => $request->description,
+                'raw_eligibility' => $request->raw_eligibility,
+                'deadline' => $request->deadline,
+                'application_link' => $request->application_link,
+                'is_active' => $request->boolean('is_active'),
+                'is_official' => $request->boolean('is_official'),
+            ]);
+
+            // ELIGIBILITY DATA
+            $criteriaData = $this->getEligibilityCriteriaData(
                 $request,
                 $oldCriteria
             );
 
-        $criteriaData['scholarship_id'] =
-            $scholarship->id;
+            $criteriaData['scholarship_id'] = $scholarship->id;
 
-        // ================= CREATE OR UPDATE ELIGIBILITY =================
-
-        \App\Models\ScholarshipEligibilityCriteria
-            ::updateOrCreate(
-
-                [
-                    'scholarship_id' =>
-                        $scholarship->id
-                ],
-
+            // CREATE OR UPDATE ELIGIBILITY
+            \App\Models\ScholarshipEligibilityCriteria::updateOrCreate(
+                ['scholarship_id' => $scholarship->id],
                 $criteriaData
             );
 
-        DB::commit();
+            DB::commit();
 
-        return redirect()
-            ->route('admin.scholarships.index')
-            ->with(
-                'success',
-                'Scholarship updated successfully'
-            );
+            return redirect()
+                ->route('admin.scholarships.index')
+                ->with(
+                    'success',
+                    'Scholarship updated successfully'
+                );
 
-    } catch (\Exception $e) {
+        } catch (\Exception $e) {
 
-        DB::rollBack();
+            DB::rollBack();
 
-        return back()
-            ->withInput()
-            ->with(
-                'error',
-                $e->getMessage()
-            );
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                );
+        }
     }
-}
 
     /**
-     * Eligibility update helper
+     * Eligibility update helper - FIXED VERSION
+     * Now correctly handles checkbox values
      */
     protected function getEligibilityCriteriaData(
         Request $request,
         $oldCriteria
     ) {
         return [
-
             'min_spm_as' => $request->input(
                 'min_spm_as',
                 $oldCriteria->min_spm_as ?? null
@@ -436,7 +406,6 @@ class ScholarshipController extends Controller
                 $oldCriteria->max_age ?? null
             ),
 
-
             'citizenship_required' => $request->input(
                 'citizenship_required',
                 $oldCriteria->citizenship_required ?? null
@@ -447,24 +416,21 @@ class ScholarshipController extends Controller
                 $oldCriteria->state_requirement ?? null
             ),
 
+            // FIXED: Use boolean() method for checkbox fields
             'bumiputera_required' => $request->boolean(
-                'bumiputera_required',
-                $oldCriteria->bumiputera_required ?? false
+                'bumiputera_required'
             ),
 
             'bumiputera_priority' => $request->boolean(
-                'bumiputera_priority',
-                $oldCriteria->bumiputera_priority ?? false
+                'bumiputera_priority'
             ),
 
             'leadership_required' => $request->boolean(
-                'leadership_required',
-                $oldCriteria->leadership_required ?? false
+                'leadership_required'
             ),
 
             'leadership_priority' => $request->boolean(
-                'leadership_priority',
-                $oldCriteria->leadership_priority ?? false
+                'leadership_priority'
             ),
 
             'priority_weight' => $request->input(
