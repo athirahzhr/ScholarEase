@@ -226,6 +226,10 @@ class OCRController extends Controller
                     throw new \Exception('Unsupported image format. Please use JPEG or PNG.');
             }
 
+            if (!$image) {
+                throw new \Exception('Failed to create image resource.');
+            }
+
             $width = imagesx($image);
             $height = imagesy($image);
 
@@ -236,6 +240,10 @@ class OCRController extends Controller
 
             // Create resized image with high quality
             $resized = imagecreatetruecolor($newWidth, $newHeight);
+            
+            if (!$resized) {
+                throw new \Exception('Failed to create resized image.');
+            }
             
             // Enable anti-aliasing
             imageantialias($resized, true);
@@ -254,7 +262,7 @@ class OCRController extends Controller
                 $height
             );
 
-            // Enhanced image processing chain
+            // Enhanced image processing chain (removed imageedge)
             $this->applyImageFilters($resized);
 
             // Save processed image
@@ -302,19 +310,40 @@ class OCRController extends Controller
         // Adjust brightness
         imagefilter($image, IMG_FILTER_BRIGHTNESS, 15);
         
-        // Apply sharpening effect (if available)
+        // Apply sharpening effect using convolution
+        $this->applySharpening($image);
+        
+        // Optional: Apply edge enhancement using contrast
+        imagefilter($image, IMG_FILTER_CONTRAST, -20);
+    }
+
+    /**
+     * Apply sharpening using convolution (replacement for imageedge)
+     */
+    private function applySharpening($image)
+    {
         if (function_exists('imageconvolution')) {
-            $sharpen = array(
+            // Sharpening kernel
+            $sharpenKernel = array(
                 array(-1, -1, -1),
                 array(-1, 16, -1),
                 array(-1, -1, -1)
             );
-            imageconvolution($image, $sharpen, 8, 0);
-        }
-        
-        // Enhance edges (if available)
-        if (function_exists('imageedge')) {
-            imageedge($image, 0);
+            
+            // Apply sharpening
+            imageconvolution($image, $sharpenKernel, 8, 0);
+            
+            // Additional mild sharpening
+            $mildSharpen = array(
+                array(0, -1, 0),
+                array(-1, 5, -1),
+                array(0, -1, 0)
+            );
+            imageconvolution($image, $mildSharpen, 1, 0);
+        } else {
+            // Fallback: Use contrast enhancement as alternative
+            imagefilter($image, IMG_FILTER_CONTRAST, -30);
+            imagefilter($image, IMG_FILTER_BRIGHTNESS, 5);
         }
     }
 
@@ -646,7 +675,7 @@ class OCRController extends Controller
         $cleaned = [];
         
         foreach ($grades as $subject => $grade) {
-            $grade = strtoupper($grade);
+            $grade = strtoupper(trim($grade));
             if (in_array($grade, $validGrades)) {
                 $cleaned[$subject] = $grade;
             }
@@ -806,13 +835,11 @@ class OCRController extends Controller
 
         if (!$request->confirm) {
             // Clear session data
-            Session::forget('ocr_temp_data');
-            
-            // Delete uploaded file
             $tempData = Session::get('ocr_temp_data');
             if ($tempData && isset($tempData['file_path'])) {
                 Storage::disk('public')->delete($tempData['file_path']);
             }
+            Session::forget('ocr_temp_data');
 
             return response()->json([
                 'success' => true,
@@ -857,7 +884,7 @@ class OCRController extends Controller
     public function addSubject(Request $request)
     {
         $request->validate([
-            'subject' => 'required|string|max:100|not_in:' . implode(',', array_keys(self::SUBJECTS)),
+            'subject' => 'required|string|max:100',
             'grade' => 'required|in:A+,A,A-,B+,B,B-,C+,C,C-,D,E,G'
         ]);
 
