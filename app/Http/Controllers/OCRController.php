@@ -63,35 +63,39 @@ class OCRController extends Controller
         'B -' => 'B-',
         'C -' => 'C-',
         'A -' => 'A-',
+        // Common OCR misreadings for Malay words
+        'BAHASA MELAYU' => 'BAHASA MELAYU',
+        'BAHASA INGGERIS' => 'BAHASA INGGERIS',
+        'PENDIDIKAN ISLAM' => 'PENDIDIKAN ISLAM',
+        'MATEMATIK' => 'MATHEMATICS',
     ];
 
     /**
      * Comprehensive subject list with common variations
-     * Only include subjects that actually appear in SPM
      */
     const SUBJECTS = [
-        'BAHASA MELAYU' => ['BM', 'BAHASA MALAYSIA', 'MELAYU'],
-        'BAHASA INGGERIS' => ['ENGLISH', 'BI', 'INGGERIS'],
-        'PENDIDIKAN ISLAM' => ['PI', 'ISLAM', 'PAI'],
-        'PENDIDIKAN MORAL' => ['PM', 'MORAL'],
-        'SEJARAH' => ['SEJ', 'HISTORY'],
-        'MATHEMATICS' => ['MATH', 'MATEMATIK', 'MM'],
-        'ADDITIONAL MATHEMATICS' => ['ADD MATH', 'MATEMATIK TAMBAHAN', 'MT', 'ADDMATH'],
-        'PHYSICS' => ['FIZIK', 'PHY'],
-        'CHEMISTRY' => ['KIMIA', 'CHEM'],
-        'BIOLOGY' => ['BIOLOGI', 'BIO'],
-        'SAINS' => ['SCIENCE', 'SC'],
-        'PRINSIP PERAKAUNAN' => ['PERAKAUNAN', 'PP', 'ACCOUNTING'],
-        'EKONOMI' => ['ECONOMICS', 'ECO'],
-        'PERDAGANGAN' => ['COMMERCE', 'PD'],
-        'GEOGRAFI' => ['GEOGRAPHY', 'GEO'],
-        'PENDIDIKAN SENI' => ['ART', 'PSV', 'SENI'],
-        'REKA CIPTA' => ['RBT', 'REKA BENTUK'],
-        'ASAS SAINS KOMPUTER' => ['ASK', 'COMPUTER SCIENCE', 'SAINS KOMPUTER'],
-        'BAHASA ARAB' => ['ARAB'],
-        'BAHASA CINA' => ['CINA', 'CHINESE'],
-        'BAHASA TAMIL' => ['TAMIL'],
-        'GRAFIK KOMUNIKASI TEKNIKAL' => ['GKT', 'TEKNIKAL'],
+        'BAHASA MELAYU' => ['BM', 'BAHASA MALAYSIA', 'MELAYU', 'B.MELAYU'],
+        'BAHASA INGGERIS' => ['ENGLISH', 'BI', 'INGGERIS', 'B.INGGERIS'],
+        'PENDIDIKAN ISLAM' => ['PI', 'ISLAM', 'PAI', 'P.ISLAM'],
+        'PENDIDIKAN MORAL' => ['PM', 'MORAL', 'P.MORAL'],
+        'SEJARAH' => ['SEJ', 'HISTORY', 'SEJARAH'],
+        'MATHEMATICS' => ['MATH', 'MATEMATIK', 'MM', 'MATHEMATICS'],
+        'ADDITIONAL MATHEMATICS' => ['ADD MATH', 'MATEMATIK TAMBAHAN', 'MT', 'ADDMATH', 'ADD.MATHS'],
+        'PHYSICS' => ['FIZIK', 'PHY', 'PHYSICS'],
+        'CHEMISTRY' => ['KIMIA', 'CHEM', 'CHEMISTRY'],
+        'BIOLOGY' => ['BIOLOGI', 'BIO', 'BIOLOGY'],
+        'SAINS' => ['SCIENCE', 'SC', 'SAINS'],
+        'PRINSIP PERAKAUNAN' => ['PERAKAUNAN', 'PP', 'ACCOUNTING', 'PRINSIP'],
+        'EKONOMI' => ['ECONOMICS', 'ECO', 'EKONOMI'],
+        'PERDAGANGAN' => ['COMMERCE', 'PD', 'PERDAGANGAN'],
+        'GEOGRAFI' => ['GEOGRAPHY', 'GEO', 'GEOGRAFI'],
+        'PENDIDIKAN SENI' => ['ART', 'PSV', 'SENI', 'P.SENI'],
+        'REKA CIPTA' => ['RBT', 'REKA BENTUK', 'REKA CIPTA'],
+        'ASAS SAINS KOMPUTER' => ['ASK', 'COMPUTER SCIENCE', 'SAINS KOMPUTER', 'ASK'],
+        'BAHASA ARAB' => ['ARAB', 'B.ARAB'],
+        'BAHASA CINA' => ['CINA', 'CHINESE', 'B.CINA'],
+        'BAHASA TAMIL' => ['TAMIL', 'B.TAMIL'],
+        'GRAFIK KOMUNIKASI TEKNIKAL' => ['GKT', 'TEKNIKAL', 'GRAFIK'],
     ];
 
     /**
@@ -273,7 +277,7 @@ class OCRController extends Controller
      */
     private function calculateOptimalScale($width, $height)
     {
-        $targetMinDimension = 1800;
+        $targetMinDimension = 2000; // Increased for better OCR
         $currentMinDimension = min($width, $height);
         
         if ($currentMinDimension < $targetMinDimension) {
@@ -292,10 +296,10 @@ class OCRController extends Controller
         imagefilter($image, IMG_FILTER_GRAYSCALE);
         
         // Increase contrast significantly
-        imagefilter($image, IMG_FILTER_CONTRAST, -50);
+        imagefilter($image, IMG_FILTER_CONTRAST, -60);
         
         // Adjust brightness
-        imagefilter($image, IMG_FILTER_BRIGHTNESS, 15);
+        imagefilter($image, IMG_FILTER_BRIGHTNESS, 10);
         
         // Apply sharpening using convolution
         $this->applySharpening($image);
@@ -307,7 +311,7 @@ class OCRController extends Controller
     private function applySharpening($image)
     {
         if (function_exists('imageconvolution')) {
-            // Sharpening kernel
+            // Strong sharpening kernel
             $sharpenKernel = array(
                 array(-1, -1, -1),
                 array(-1, 16, -1),
@@ -316,18 +320,6 @@ class OCRController extends Controller
             
             // Apply sharpening
             imageconvolution($image, $sharpenKernel, 8, 0);
-            
-            // Additional mild sharpening
-            $mildSharpen = array(
-                array(0, -1, 0),
-                array(-1, 5, -1),
-                array(0, -1, 0)
-            );
-            imageconvolution($image, $mildSharpen, 1, 0);
-        } else {
-            // Fallback: Use contrast enhancement as alternative
-            imagefilter($image, IMG_FILTER_CONTRAST, -30);
-            imagefilter($image, IMG_FILTER_BRIGHTNESS, 5);
         }
     }
 
@@ -337,24 +329,24 @@ class OCRController extends Controller
     private function performOCRWithFallback($processedPath)
     {
         $configurations = [
-            // Primary: English + Digits + Whitelist
-            [
-                'lang' => 'eng',
-                'psm' => 6, // Assume uniform block of text
-                'oem' => 3, // Default + LSTM
-                'whitelist' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-:;.,() []/'
-            ],
-            // Secondary: English + Malay
+            // Primary: English + Malay with PSM 6
             [
                 'lang' => 'eng+msa',
+                'psm' => 6,
+                'oem' => 3,
+                'whitelist' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-:;.,() []/'
+            ],
+            // Secondary: English only with PSM 6
+            [
+                'lang' => 'eng',
                 'psm' => 6,
                 'oem' => 3
             ],
             // Fallback: Default settings
             [
-                'lang' => 'eng',
-                'psm' => 3, // Fully automatic
-                'oem' => 1 // Only LSTM
+                'lang' => 'eng+msa',
+                'psm' => 3,
+                'oem' => 1
             ]
         ];
 
@@ -462,8 +454,6 @@ class OCRController extends Controller
             '/SIJIL\s*PELAJARAN/i',
             '/LEMBAGA\s*PEPERIKSAAN/i',
             '/KEMENTERIAN\s*PENDIDIKAN/i',
-            '/SIJIL/i',
-            '/PELAJARAN/i',
         ];
         
         $matches = 0;
@@ -473,12 +463,11 @@ class OCRController extends Controller
             }
         }
         
-        return $matches >= 2;
+        return $matches >= 1;
     }
 
     /**
      * Enhanced SPM grade parsing with better subject detection
-     * Now only detects subjects that are actually in the certificate
      */
     private function parseSPMGradesEnhanced($text)
     {
@@ -493,150 +482,204 @@ class OCRController extends Controller
         
         $grades = [];
         $detectedSubjects = [];
+        $allSubjectNames = array_keys(self::SUBJECTS);
         
-        // Find the subject section in the certificate
-        $subjectSection = $this->findSubjectSection($lines);
+        // FIRST PASS: Look for subject-grade pairs in the same line
+        foreach ($lines as $line) {
+            $line = preg_replace('/\s+/', ' ', $line);
+            
+            // Skip lines that are clearly not subject lines
+            if ($this->shouldSkipLine($line)) {
+                continue;
+            }
+            
+            foreach ($allSubjectNames as $subject) {
+                if (isset($grades[$subject])) {
+                    continue;
+                }
+                
+                // Check if subject exists in this line
+                $found = false;
+                $aliases = array_merge([$subject], self::SUBJECTS[$subject]);
+                foreach ($aliases as $alias) {
+                    if (stripos($line, $alias) !== false) {
+                        $found = true;
+                        break;
+                    }
+                }
+                
+                if ($found) {
+                    // Extract grade from this line
+                    $grade = $this->extractGradeFromLine($line);
+                    if ($grade) {
+                        $grades[$subject] = $grade;
+                        $detectedSubjects[] = $subject;
+                    }
+                }
+            }
+        }
         
-        if ($subjectSection) {
-            // Parse subjects from the subject section only
-            $grades = $this->parseSubjectsFromSection($subjectSection);
-        } else {
-            // Fallback: Parse from all lines but be more selective
-            $grades = $this->parseSubjectsSelectively($lines);
+        // SECOND PASS: Look for grades in proximity to subjects
+        if (count($grades) < 5) {
+            $additionalGrades = $this->findGradesInProximity($lines);
+            foreach ($additionalGrades as $subject => $grade) {
+                if (!isset($grades[$subject])) {
+                    $grades[$subject] = $grade;
+                    $detectedSubjects[] = $subject;
+                }
+            }
+        }
+        
+        // THIRD PASS: If still not enough, extract all grades and try to match
+        if (count($grades) < 5) {
+            $allGrades = $this->extractAllGrades($text);
+            $remainingSubjects = array_diff($allSubjectNames, $detectedSubjects);
+            
+            // Try to match remaining subjects with available grades
+            $gradeIndex = 0;
+            foreach ($remainingSubjects as $subject) {
+                if ($gradeIndex < count($allGrades) && !isset($grades[$subject])) {
+                    // Check if this subject appears in the text
+                    $subjectFound = false;
+                    $aliases = array_merge([$subject], self::SUBJECTS[$subject]);
+                    foreach ($aliases as $alias) {
+                        if (stripos($text, $alias) !== false) {
+                            $subjectFound = true;
+                            break;
+                        }
+                    }
+                    
+                    if ($subjectFound) {
+                        $grades[$subject] = $allGrades[$gradeIndex];
+                        $gradeIndex++;
+                    }
+                }
+            }
         }
         
         // Validate and clean grades
         $grades = $this->validateAndCleanGrades($grades);
         
+        // If we still don't have enough subjects, throw an exception with helpful message
         if (count($grades) < 3) {
-            throw new \Exception('Unable to detect enough subjects from SPM slip. Please ensure the image is clear.');
+            // Log the OCR text for debugging
+            Log::error('OCR failed to detect enough subjects', [
+                'detected_count' => count($grades),
+                'ocr_text_preview' => substr($text, 0, 1000)
+            ]);
+            
+            throw new \Exception('Unable to detect enough subjects from SPM slip. Please ensure the image is clear and try again, or use manual entry.');
         }
         
         return $grades;
     }
 
     /**
-     * Find the subject section in the certificate
+     * Check if a line should be skipped during subject detection
      */
-    private function findSubjectSection($lines)
+    private function shouldSkipLine($line)
     {
-        $subjectSection = [];
-        $inSubjectSection = false;
-        $subjectKeywords = ['MATA PELAJARAN', 'SUBJECT', 'PELAJARAN', 'GRED', 'GRADE'];
+        // Skip short lines
+        if (strlen($line) < 3) {
+            return true;
+        }
         
-        foreach ($lines as $index => $line) {
-            // Look for the start of subject section
-            foreach ($subjectKeywords as $keyword) {
-                if (stripos($line, $keyword) !== false) {
-                    $inSubjectSection = true;
-                    // Skip the header line
-                    continue 2;
-                }
-            }
-            
-            // If we're in the subject section, collect lines until we hit a line with no subject
-            if ($inSubjectSection) {
-                // Check if this line contains a subject or grade
-                $hasSubject = false;
-                foreach (array_keys(self::SUBJECTS) as $subject) {
-                    if (stripos($line, $subject) !== false) {
-                        $hasSubject = true;
-                        break;
-                    }
-                }
-                
-                // Check if line has a grade
-                $hasGrade = preg_match('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $line);
-                
-                if ($hasSubject || $hasGrade) {
-                    $subjectSection[] = $line;
-                } else {
-                    // Check if this is a student info line (like name, IC, school)
-                    $isStudentInfo = preg_match('/\d{6}-\d{2}-\d{4}/', $line) || // IC number
-                                     preg_match('/\d{10}/', $line) || // Other numbers
-                                     stripos($line, 'SMK') !== false ||
-                                     stripos($line, 'SEKOLAH') !== false;
-                    
-                    if (!$isStudentInfo && !empty($line) && count($subjectSection) > 0) {
-                        // We've likely left the subject section
-                        break;
-                    }
-                }
+        // Skip lines with only numbers
+        if (preg_match('/^[0-9\s]+$/', $line)) {
+            return true;
+        }
+        
+        // Skip certificate header/footer lines
+        $skipPatterns = [
+            '/SIJIL/i',
+            '/PELAJARAN/i',
+            '/LEMBAGA/i',
+            '/PEPERIKSAAN/i',
+            '/KEMENTERIAN/i',
+            '/PENDIDIKAN/i',
+            '/MINISTRY/i',
+            '/EDUCATION/i',
+            '/EXAMINATIONS/i',
+            '/SYNDICATE/i',
+            '/PENGARAH/i',
+            '/DIRECTOR/i',
+            '/CALON/i',
+            '/CANDIDATE/i',
+            '/JUMLAH/i',
+            '/TAHUN/i',
+            '/[0-9]{6}-[0-9]{2}-[0-9]{4}/', // IC number
+            '/SMK/i',
+            '/SEKOLAH/i',
+            '/SCHOOL/i',
+        ];
+        
+        foreach ($skipPatterns as $pattern) {
+            if (preg_match($pattern, $line)) {
+                return true;
             }
         }
         
-        return $subjectSection;
+        return false;
     }
 
     /**
-     * Parse subjects from the subject section
+     * Find grades in proximity to subject names
      */
-    private function parseSubjectsFromSection($subjectSection)
+    private function findGradesInProximity($lines)
     {
         $grades = [];
         
-        foreach ($subjectSection as $line) {
-            $line = preg_replace('/\s+/', ' ', $line);
-            
-            // Try to find a subject in this line
-            foreach (self::SUBJECTS as $subject => $aliases) {
-                $subjectFound = false;
-                $allAliases = array_merge([$subject], $aliases);
-                
-                foreach ($allAliases as $alias) {
-                    if (stripos($line, $alias) !== false) {
-                        $subjectFound = true;
-                        break;
-                    }
-                }
-                
-                if ($subjectFound && !isset($grades[$subject])) {
-                    // Extract grade from this line
-                    $grade = $this->extractGradeFromLine($line);
-                    if ($grade) {
-                        $grades[$subject] = $grade;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        return $grades;
-    }
-
-    /**
-     * Parse subjects selectively (fallback method)
-     */
-    private function parseSubjectsSelectively($lines)
-    {
-        $grades = [];
-        $allSubjectNames = array_keys(self::SUBJECTS);
-        
-        foreach ($lines as $line) {
-            $line = preg_replace('/\s+/', ' ', $line);
-            
-            // Skip lines that are clearly not subject lines
-            if (strlen($line) < 3 || 
-                preg_match('/\d{6}-\d{2}-\d{4}/', $line) || // IC number
-                preg_match('/^[0-9\s]+$/', $line) || // Only numbers
-                stripos($line, 'SIJIL') !== false ||
-                stripos($line, 'PELAJARAN') !== false ||
-                stripos($line, 'LEMBAGA') !== false ||
-                stripos($line, 'PEPERIKSAAN') !== false ||
-                stripos($line, 'KEMENTERIAN') !== false ||
-                stripos($line, 'PENGARAH') !== false ||
-                stripos($line, 'DIRECTOR') !== false) {
+        foreach ($lines as $lineIndex => $line) {
+            // Skip lines that should be skipped
+            if ($this->shouldSkipLine($line)) {
                 continue;
             }
             
-            // Try to find a subject in this line
-            foreach ($allSubjectNames as $subject) {
-                if (stripos($line, $subject) !== false && !isset($grades[$subject])) {
-                    // Extract grade
+            foreach (self::SUBJECTS as $subject => $aliases) {
+                if (isset($grades[$subject])) {
+                    continue;
+                }
+                
+                $allAliases = array_merge([$subject], $aliases);
+                $found = false;
+                
+                foreach ($allAliases as $alias) {
+                    if (stripos($line, $alias) !== false) {
+                        $found = true;
+                        break;
+                    }
+                }
+                
+                if ($found) {
+                    // Try current line first
                     $grade = $this->extractGradeFromLine($line);
                     if ($grade) {
                         $grades[$subject] = $grade;
-                        break;
+                        continue;
+                    }
+                    
+                    // Try next line
+                    if (isset($lines[$lineIndex + 1])) {
+                        $nextLine = $lines[$lineIndex + 1];
+                        if (!$this->shouldSkipLine($nextLine)) {
+                            $grade = $this->extractGradeFromLine($nextLine);
+                            if ($grade) {
+                                $grades[$subject] = $grade;
+                                continue;
+                            }
+                        }
+                    }
+                    
+                    // Try previous line
+                    if (isset($lines[$lineIndex - 1])) {
+                        $prevLine = $lines[$lineIndex - 1];
+                        if (!$this->shouldSkipLine($prevLine)) {
+                            $grade = $this->extractGradeFromLine($prevLine);
+                            if ($grade) {
+                                $grades[$subject] = $grade;
+                                continue;
+                            }
+                        }
                     }
                 }
             }
@@ -669,28 +712,38 @@ class OCRController extends Controller
         // Remove parenthetical grade descriptions
         $line = preg_replace('/\([^)]*\)/', '', $line);
         
+        // Look for grade patterns
         $gradePatterns = [
-            '/\b(A\+)\b/i',
-            '/\b(A-)\b/i',
-            '/\b(A)\b(?![+-])/i',
-            '/\b(B\+)\b/i',
-            '/\b(B-)\b/i',
-            '/\b(B)\b(?![+-])/i',
-            '/\b(C\+)\b/i',
-            '/\b(C-)\b/i',
-            '/\b(C)\b(?![+-])/i',
-            '/\b(D)\b/i',
-            '/\b(E)\b/i',
-            '/\b(G)\b/i'
+            '/\b(A\+)\b/i' => 'A+',
+            '/\b(A-)\b/i' => 'A-',
+            '/\b(A)\b(?![+-])/i' => 'A',
+            '/\b(B\+)\b/i' => 'B+',
+            '/\b(B-)\b/i' => 'B-',
+            '/\b(B)\b(?![+-])/i' => 'B',
+            '/\b(C\+)\b/i' => 'C+',
+            '/\b(C-)\b/i' => 'C-',
+            '/\b(C)\b(?![+-])/i' => 'C',
+            '/\b(D)\b/i' => 'D',
+            '/\b(E)\b/i' => 'E',
+            '/\b(G)\b/i' => 'G'
         ];
         
-        foreach ($gradePatterns as $pattern) {
+        foreach ($gradePatterns as $pattern => $grade) {
             if (preg_match($pattern, $line, $matches)) {
-                return strtoupper(trim($matches[1]));
+                return $grade;
             }
         }
         
         return null;
+    }
+
+    /**
+     * Extract all grades from text
+     */
+    private function extractAllGrades($text)
+    {
+        preg_match_all('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $text, $matches);
+        return $matches[1] ?? [];
     }
 
     /**
@@ -733,14 +786,9 @@ class OCRController extends Controller
         }
         $score += ($gradeCount / $totalGrades) * 0.4;
         
-        // Check text for subject validity
-        $subjectCount = 0;
-        foreach (array_keys(self::SUBJECTS) as $subject) {
-            if (stripos($text, $subject) !== false) {
-                $subjectCount++;
-            }
-        }
-        $score += min(($subjectCount / 10), 1) * 0.3;
+        // Check if we have a reasonable number of subjects
+        $subjectRatio = $totalGrades / count(self::SUBJECTS);
+        $score += min($subjectRatio * 2, 1) * 0.3;
         
         // Check for SPM certificate markers
         $markerCount = 0;
@@ -765,9 +813,10 @@ class OCRController extends Controller
                 'timestamp' => now()->toDateTimeString(),
                 'file_path' => $path,
                 'text_length' => strlen($text),
-                'text_preview' => substr($text, 0, 500),
+                'text_preview' => substr($text, 0, 1000),
                 'full_text' => $text,
-                'grade_matches' => $this->extractAllGrades($text)
+                'grade_matches' => $this->extractAllGrades($text),
+                'detected_subjects' => $this->findPotentialSubjects($text)
             ];
             
             $debugDir = storage_path('app/ocr_debug');
@@ -799,12 +848,21 @@ class OCRController extends Controller
     }
 
     /**
-     * Extract all grades from text (for debugging)
+     * Find potential subjects in text (for debugging)
      */
-    private function extractAllGrades($text)
+    private function findPotentialSubjects($text)
     {
-        preg_match_all('/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G)\b/', $text, $matches);
-        return $matches[1] ?? [];
+        $found = [];
+        foreach (self::SUBJECTS as $subject => $aliases) {
+            $allAliases = array_merge([$subject], $aliases);
+            foreach ($allAliases as $alias) {
+                if (stripos($text, $alias) !== false) {
+                    $found[] = $subject;
+                    break;
+                }
+            }
+        }
+        return $found;
     }
 
     /**
