@@ -210,6 +210,7 @@ class ScholarshipRuleMatcher
         return [
             'citizenship' => $this->checkCitizenship($student, $criteria),
             'bumiputera'  => $this->checkBumiputera($student, $criteria),
+            'state'       => $this->checkState($student, $criteria),
             'study_level' => $this->checkStudyLevel($student, $criteria),
             'field'       => $this->checkField($student, $criteria),
             'age'         => $this->checkAge($student, $criteria),
@@ -225,6 +226,18 @@ class ScholarshipRuleMatcher
         }
 
         return strcasecmp($student->citizenship, $criteria->citizenship_required) === 0;
+    }
+
+    private function checkState($student, $criteria): bool
+    {
+        if (!$criteria->state_requirement) {
+            return true;
+        }
+
+        return strcasecmp(
+            trim($student->state),
+            trim($criteria->state_requirement)
+        ) === 0;
     }
 
     private function checkBumiputera($student, $criteria): bool

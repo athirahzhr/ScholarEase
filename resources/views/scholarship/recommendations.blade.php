@@ -384,6 +384,7 @@
                 $passedStudyLevel  = $breakdown['study_level']  ?? true;
                 $passedField       = $breakdown['field']        ?? true;
                 $passedAge         = $breakdown['age']          ?? true;
+                $passedState = $breakdown['state'] ?? true;
 
                 // SPM status
                 $spmEarned  = $spmData['earned'] ?? 0;
@@ -517,6 +518,21 @@
                                     {{ $passedAge ? 'Within age requirement' : 'Outside the required age range' }}
                                 </span>
                             </div>
+
+                            {{-- 5. Hard filter — State --}}
+                            <div class="breakdown-item">
+                            <i class="fas breakdown-icon {{ $passedState ? 'fa-check-circle pass' : 'fa-times-circle fail' }}"></i>
+
+                            <span class="breakdown-label">
+                                State
+                            </span>
+
+                            <span class="breakdown-detail">
+                                {{ $passedState
+                                    ? 'Eligible'
+                                    : 'State requirement not met' }}
+                            </span>
+                        </div>
 
                             {{-- 6. Hard filter — Citizenship --}}
                             <div class="breakdown-item">
