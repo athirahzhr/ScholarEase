@@ -14,6 +14,8 @@
         --cream-dark: #f5ebe0;
         --gray-800: #1f2937;
         --gray-600: #4b5563;
+        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
 
     .profile-container {
@@ -25,30 +27,68 @@
     .profile-card {
         background: white;
         border-radius: 24px;
-        box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.15);
         overflow: hidden;
+        border: 1px solid rgba(122, 0, 25, 0.08);
     }
 
     .profile-header {
         background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
-        padding: 1.5rem 2rem;
-        border-bottom: 3px solid var(--gold);
+        padding: 1.75rem 2.5rem;
+        border-bottom: 4px solid var(--gold);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(244, 197, 66, 0.08);
+        border-radius: 50%;
+        pointer-events: none;
     }
 
     .profile-header h3 {
         color: white;
         font-weight: 700;
         margin: 0;
+        font-size: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-header h3 i {
+        color: var(--gold);
     }
 
     .profile-header p {
         color: rgba(255, 255, 255, 0.9);
         margin: 0.5rem 0 0;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        position: relative;
+        z-index: 1;
     }
 
     .profile-body {
-        padding: 2rem;
+        padding: 2.5rem;
+    }
+
+    .form-section {
+        background: #faf8f6;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #f0ece6;
+        transition: all 0.3s ease;
+    }
+
+    .form-section:hover {
+        border-color: var(--gold);
+        box-shadow: var(--shadow-sm);
     }
 
     .form-section-title {
@@ -59,6 +99,11 @@
         padding-bottom: 0.5rem;
         border-bottom: 2px solid var(--gold);
         display: inline-block;
+        letter-spacing: 0.5px;
+    }
+
+    .form-section-title i {
+        color: var(--gold);
     }
 
     .form-label {
@@ -67,11 +112,14 @@
         margin-bottom: 0.5rem;
         display: block;
         font-size: 0.85rem;
+        letter-spacing: 0.3px;
     }
 
     .form-label i {
         color: var(--maroon);
         margin-right: 8px;
+        width: 18px;
+        text-align: center;
     }
 
     .form-control, .form-select {
@@ -82,23 +130,50 @@
         font-size: 0.9rem;
         transition: all 0.3s ease;
         background: white;
+        color: var(--gray-800);
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #c5c7ca;
     }
 
     .form-control:focus, .form-select:focus {
         outline: none;
         border-color: var(--gold);
-        box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.2);
+        box-shadow: 0 0 0 4px rgba(244, 197, 66, 0.15);
+        background: white;
+    }
+
+    .form-control::placeholder {
+        color: #aab0b9;
+        font-size: 0.85rem;
+    }
+
+    .form-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237A0019' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 2.5rem;
+        cursor: pointer;
+    }
+
+    .form-select option {
+        padding: 0.5rem;
     }
 
     .form-check {
-        margin-right: 1.5rem;
+        margin-right: 2rem;
+        padding-left: 2rem;
     }
 
     .form-check-input {
-        width: 1.1rem;
-        height: 1.1rem;
+        width: 1.2rem;
+        height: 1.2rem;
         margin-top: 0.1rem;
         cursor: pointer;
+        border: 2px solid #d1d5db;
+        transition: all 0.2s ease;
     }
 
     .form-check-input:checked {
@@ -115,12 +190,18 @@
         color: var(--gray-600);
         cursor: pointer;
         font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .form-check-label i {
+        color: var(--maroon);
+        margin-right: 4px;
     }
 
     .btn-save {
         background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
         color: white;
-        padding: 0.75rem 2rem;
+        padding: 0.85rem 2.5rem;
         border: none;
         border-radius: 40px;
         font-weight: 700;
@@ -129,20 +210,26 @@
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        box-shadow: 0 4px 12px rgba(122, 0, 25, 0.3);
+        gap: 12px;
+        box-shadow: 0 4px 16px rgba(122, 0, 25, 0.3);
+        letter-spacing: 0.5px;
     }
 
     .btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(122, 0, 25, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(122, 0, 25, 0.4);
         background: linear-gradient(115deg, var(--maroon-dark), var(--maroon));
+    }
+
+    .btn-save:active {
+        transform: translateY(0px);
     }
 
     .required-field::after {
         content: '*';
         color: #dc2626;
         margin-left: 4px;
+        font-weight: 700;
     }
 
     .alert-danger {
@@ -151,8 +238,38 @@
         border-left: 4px solid #dc2626;
         border-radius: 12px;
         color: #991b1b;
-        padding: 1rem;
+        padding: 1.25rem;
         margin-bottom: 1.5rem;
+    }
+
+    .alert-danger ul {
+        padding-left: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .text-muted-sm {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .form-hint {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .checkbox-group {
+        background: #f8f6f4;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        border: 1px solid #e8e4de;
+    }
+
+    .checkbox-group .form-check {
+        margin-bottom: 0;
     }
 
     @media (max-width: 768px) {
@@ -161,13 +278,82 @@
         }
         
         .profile-body {
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
-        
+
+        .form-section {
+            padding: 1rem;
+        }
+
         .btn-save {
             width: 100%;
             justify-content: center;
+            padding: 0.85rem 1.5rem;
         }
+
+        .form-check {
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkbox-group {
+            padding: 0.75rem 1rem;
+        }
+
+        .checkbox-group .form-check {
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .profile-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .form-section-title {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Custom styling for number inputs */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Progress indicator */
+    .step-indicator {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #d1d5db;
+        transition: all 0.3s ease;
+    }
+
+    .step-dot.active {
+        background: var(--gold);
+        width: 24px;
+        border-radius: 4px;
+    }
+
+    .step-dot.completed {
+        background: var(--maroon);
+    }
+
+    .field-icon {
+        color: var(--maroon);
+        opacity: 0.6;
     }
 </style>
 
@@ -201,161 +387,195 @@
                             @csrf
 
                             <!-- Academic Information Section -->
-                            <div class="mb-4">
+                            <div class="form-section">
                                 <h5 class="form-section-title">
                                     <i class="fas fa-graduation-cap me-2"></i>
                                     Academic Information
                                 </h5>
-                            </div>
 
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-star"></i>
-                                        Total A's (SPM)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="total_as"
-                                        class="form-control"
-                                        min="0"
-                                        max="12"
-                                        required
-                                        value="{{ old('total_as', $profile->total_as ?? '') }}"
-                                        placeholder="e.g., 8"
-                                    >
-                                    <small class="text-muted">Number of A's in SPM (0-12)</small>
-                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label required-field">
+                                            <i class="fas fa-star"></i>
+                                            Total A's (SPM)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="total_as"
+                                            class="form-control"
+                                            min="0"
+                                            max="12"
+                                            required
+                                            value="{{ old('total_as', $profile->total_as ?? '') }}"
+                                            placeholder="e.g., 8"
+                                        >
+                                        <span class="form-hint">Number of A's in SPM (0-12)</span>
+                                    </div>
 
-                                <div class="col-md-3">
-                                <label class="form-label required-field">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                    Monthly Household Income (RM)
-                                </label>
+                                    <div class="col-md-4">
+                                        <label class="form-label required-field">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                            Monthly Household Income (RM)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="monthly_income"
+                                            class="form-control"
+                                            min="0"
+                                            step="100"
+                                            required
+                                            value="{{ old('monthly_income', $profile->monthly_income ?? '') }}"
+                                            placeholder="e.g., 4500"
+                                        >
+                                        <span class="form-hint">Enter your family's total monthly income</span>
+                                    </div>
 
-                                <input
-                                    type="number"
-                                    name="monthly_income"
-                                    class="form-control"
-                                    min="0"
-                                    required
-                                    value="{{ old('monthly_income', $profile->monthly_income ?? '') }}"
-                                    placeholder="e.g. 4500"
-                                >
-                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label required-field">
+                                            <i class="fas fa-road"></i>
+                                            Study Path
+                                        </label>
+                                        <select name="study_path" class="form-select" required>
+                                            <option value="">Select Study Path</option>
+                                            @php $studyPaths = ['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate']; @endphp
+                                            @foreach ($studyPaths as $level)
+                                                <option value="{{ $level }}" {{ old('study_path', $profile->study_level ?? '') == $level ? 'selected' : '' }}>
+                                                    {{ $level }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                                <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-road"></i>
-                                        Study Path
-                                    </label>
-                                    <select name="study_path" class="form-select" required>
-                                        <option value="">Select Study Path</option>
-                                        @php $studyPaths = ['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate']; @endphp
-                                        @foreach ($studyPaths as $level)
-                                            <option value="{{ $level }}" {{ old('study_path', $profile->study_level ?? '') == $level ? 'selected' : '' }}>
-                                                {{ $level }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-book"></i>
-                                        Field of Study
-                                    </label>
-                                    <select name="field_of_study" class="form-select" required>
-                                        <option value="">Select Field of Study</option>
-                                        @php
-                                        $fieldOptions = ['Computer Science', 'Engineering', 'Business', 'Medicine', 'Education', 'TVET', 'Data Science', 'Finance', 'Accounting', 'Economics', 'Law', 'Actuarial Science', 'Mathematics', 'Statistics', 'Science', 'Physics', 'Chemistry', 'Biological Science', 'Pharmacy', 'Environmental Science', 'Architecture', 'Technical', 'Social Science', 'Communication', 'Hospitality', 'Anthropology', 'History', 'Linguistics', 'Performing Arts', 'Philosophy', 'Art & Design', 'Archaeology'];
-                                        @endphp
-                                        @foreach ($fieldOptions as $field)
-                                            <option value="{{ $field }}" {{ old('field_of_study', $profile->field_of_study ?? '') == $field ? 'selected' : '' }}>
-                                                {{ $field }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <div class="col-md-12 mt-3">
+                                        <label class="form-label required-field">
+                                            <i class="fas fa-book"></i>
+                                            Field of Study
+                                        </label>
+                                        <select name="field_of_study" class="form-select" required>
+                                            <option value="">Select Field of Study</option>
+                                            @php
+                                            $fieldOptions = ['Computer Science', 'Engineering', 'Business', 'Medicine', 'Education', 'TVET', 'Data Science', 'Finance', 'Accounting', 'Economics', 'Law', 'Actuarial Science', 'Mathematics', 'Statistics', 'Science', 'Physics', 'Chemistry', 'Biological Science', 'Pharmacy', 'Environmental Science', 'Architecture', 'Technical', 'Social Science', 'Communication', 'Hospitality', 'Anthropology', 'History', 'Linguistics', 'Performing Arts', 'Philosophy', 'Art & Design', 'Archaeology'];
+                                            @endphp
+                                            @foreach ($fieldOptions as $field)
+                                                <option value="{{ $field }}" {{ old('field_of_study', $profile->field_of_study ?? '') == $field ? 'selected' : '' }}>
+                                                    {{ $field }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Personal Information Section -->
-                            <div class="row g-3 mb-4">
-                                <div class="mb-4 mt-4">
-                                    <h5 class="form-section-title">
+                            <div class="form-section">
+                                <h5 class="form-section-title">
                                     <i class="fas fa-user-circle me-2"></i>
                                     Personal Information
-                                    </h5>
-                                </div>
+                                </h5>
 
-                                <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        State
-                                    </label>
-                                    <input type="text" name="state" class="form-control" required value="{{ old('state', $profile->state ?? '') }}" placeholder="e.g., Selangor, Kuala Lumpur">
-                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label required-field">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            State
+                                        </label>
+                                        <select name="state" class="form-select" required>
+                                            <option value="">Select Your State</option>
+                                            @php
+                                            $states = [
+                                                'Johor', 'Kedah', 'Kelantan', 'Kuala Lumpur', 'Labuan', 
+                                                'Malacca', 'Negeri Sembilan', 'Pahang', 'Penang', 'Perak', 
+                                                'Perlis', 'Putrajaya', 'Sabah', 'Sarawak', 'Selangor', 
+                                                'Terengganu'
+                                            ];
+                                            @endphp
+                                            @foreach ($states as $state)
+                                                <option value="{{ $state }}" {{ old('state', $profile->state ?? '') == $state ? 'selected' : '' }}>
+                                                    {{ $state }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                                <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-passport"></i>
-                                        Citizenship
-                                    </label>
-                                    <select name="citizenship" class="form-select" required>
-                                        <option value="">-- Select --</option>
-                                        <option value="Malaysia" {{ old('citizenship', $profile->citizenship ?? '') == 'Malaysia' ? 'selected' : '' }}>Malaysia</option>
-                                        <option value="International" {{ old('citizenship', $profile->citizenship ?? '') == 'International' ? 'selected' : '' }}>International</option>
-                                    </select>
-                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label required-field">
+                                            <i class="fas fa-passport"></i>
+                                            Citizenship
+                                        </label>
+                                        <select name="citizenship" class="form-select" required>
+                                            <option value="">Select Citizenship</option>
+                                            <option value="Malaysia" {{ old('citizenship', $profile->citizenship ?? '') == 'Malaysia' ? 'selected' : '' }}>
+                                                <i class="fas fa-flag"></i> Malaysia
+                                            </option>
+                                            <option value="International" {{ old('citizenship', $profile->citizenship ?? '') == 'International' ? 'selected' : '' }}>
+                                                <i class="fas fa-globe"></i> International
+                                            </option>
+                                        </select>
+                                    </div>
 
-                                <div class="col-md-3">
-                                    <label class="form-label required-field">
-                                        <i class="fas fa-birthday-cake"></i>
-                                        Age
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        name="age"
-                                        class="form-control"
-                                        min="15"
-                                        max="100"
-                                        required
-                                        value="{{ old('age', $profile->age ?? '') }}"
-                                    >
+                                    <div class="col-md-4">
+                                        <label class="form-label required-field">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            Age
+                                        </label>
+                                        <select name="age" class="form-select" required>
+                                            <option value="">Select Your Age</option>
+                                            @php
+                                            $currentYear = date('Y');
+                                            $birthYears = range(2000, $currentYear - 15);
+                                            @endphp
+                                            @foreach ($birthYears as $year)
+                                                @php $age = $currentYear - $year; @endphp
+                                                <option value="{{ $age }}" {{ old('age', $profile->age ?? '') == $age ? 'selected' : '' }}>
+                                                    {{ $age }} years old (Born {{ $year }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <span class="form-hint">Minimum age for scholarship applications</span>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Additional Information Section -->
-                            <div class="mb-4 mt-4">
+                            <div class="form-section">
                                 <h5 class="form-section-title">
                                     <i class="fas fa-plus-circle me-2"></i>
                                     Additional Information
                                 </h5>
-                            </div>
 
-                            <div class="row g-3 mb-4">
-                                <div class="col-12">
-                                    <div class="form-check form-check-inline">
-                                        <input type="hidden"name="bumiputera"value="0">
-                                        <input class="form-check-input" type="checkbox" name="bumiputera" value="1" id="bumiputera" {{ old('bumiputera', $profile->bumiputera ?? false) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="bumiputera">
-                                            <i class="fas fa-star-of-life me-1"></i> Bumiputera
-                                        </label>
-                                    </div>
+                                <div class="checkbox-group">
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input type="hidden" name="bumiputera" value="0">
+                                                <input class="form-check-input" type="checkbox" name="bumiputera" value="1" id="bumiputera" {{ old('bumiputera', $profile->bumiputera ?? false) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="bumiputera">
+                                                    <i class="fas fa-star-of-life"></i> Bumiputera
+                                                </label>
+                                            </div>
+                                        </div>
 
-                                    <div class="form-check form-check-inline">
-                                        <input type="hidden"name="has_leadership"value="0">
-                                        <input class="form-check-input" type="checkbox" name="has_leadership" value="1" id="leadership" {{ old('has_leadership', $profile->has_leadership ?? false) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="leadership">
-                                            <i class="fas fa-trophy me-1"></i> Leadership Experience
-                                        </label>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input type="hidden" name="has_leadership" value="0">
+                                                <input class="form-check-input" type="checkbox" name="has_leadership" value="1" id="leadership" {{ old('has_leadership', $profile->has_leadership ?? false) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="leadership">
+                                                    <i class="fas fa-trophy"></i> Leadership Experience
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <span class="form-hint mt-2">Select all that apply to you</span>
                             </div>
 
                             <!-- Submit Button -->
-                            <div class="mt-4 pt-3">
+                            <div class="mt-4 pt-2 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                <div>
+                                    <span class="text-muted" style="font-size: 0.85rem;">
+                                        <i class="fas fa-info-circle"></i> All fields marked with <span style="color: #dc2626;">*</span> are required
+                                    </span>
+                                </div>
                                 <button type="submit" class="btn-save">
                                     <i class="fas fa-save"></i>
                                     Save & Refresh Recommendations
@@ -373,23 +593,6 @@
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({ duration: 800, once: true });
-    
-    // Preselect values from old input or profile data
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set income category
-        const incomeCategory = "{{ old('income_category', $profile->income_category ?? '') }}";
-        if(incomeCategory) {
-            const incomeSelect = document.querySelector('select[name="income_category"]');
-            if(incomeSelect) incomeSelect.value = incomeCategory;
-        }
-        
-        // Set citizenship
-        const citizenship = "{{ old('citizenship', $profile->citizenship ?? '') }}";
-        if(citizenship) {
-            const citizenshipSelect = document.querySelector('select[name="citizenship"]');
-            if(citizenshipSelect) citizenshipSelect.value = citizenship;
-        }
-    });
 </script>
 @endpush
 @endsection
