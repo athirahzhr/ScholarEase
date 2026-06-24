@@ -216,10 +216,12 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-check mb-2">
+                                                        <input type="hidden"name="bumiputera_required"value="0">
                                                         <input class="form-check-input" type="checkbox" name="bumiputera_required" value="1" id="bumiputera_required" {{ old('bumiputera_required', $scholarship->eligibilityCriteria->bumiputera_required ?? false) ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="bumiputera_required">Bumiputera Required</label>
                                                     </div>
                                                     <div class="form-check mb-2">
+                                                        <input type="hidden"name="bumiputera_required"value="0">
                                                         <input class="form-check-input" type="checkbox" name="bumiputera_priority" value="1" id="bumiputera_priority" {{ old('bumiputera_priority', $scholarship->eligibilityCriteria->bumiputera_priority ?? false) ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="bumiputera_priority">Bumiputera Priority</label>
                                                     </div>
