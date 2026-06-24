@@ -114,6 +114,64 @@
                                             <small class="text-muted">Income threshold for eligibility (if applicable)</small>
                                         </div>
 
+                                        
+                                        <div class="mb-3">
+
+                                        <label class="form-label fw-semibold">
+                                            Income Categories
+                                        </label>
+
+                                        <div class="row">
+
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                        type="checkbox"
+                                                        name="income_categories[]"
+                                                        value="B40"
+                                                        id="income_b40">
+
+                                                    <label class="form-check-label"
+                                                        for="income_b40">
+                                                        B40
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                        type="checkbox"
+                                                        name="income_categories[]"
+                                                        value="M40"
+                                                        id="income_m40">
+
+                                                    <label class="form-check-label"
+                                                        for="income_m40">
+                                                        M40
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                        type="checkbox"
+                                                        name="income_categories[]"
+                                                        value="T20"
+                                                        id="income_t20">
+
+                                                    <label class="form-check-label"
+                                                        for="income_t20">
+                                                        T20
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
                                         {{-- STUDY LEVEL --}}
                                         <div class="mb-3">
                                             <label class="form-label fw-semibold">Study Levels</label>
