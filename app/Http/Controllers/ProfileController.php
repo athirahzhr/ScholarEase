@@ -78,6 +78,19 @@ class ProfileController extends Controller
             $monthlyIncome
         );
 
+    $existingProfile = Auth::user()->profile;
+
+    $verifiedOCR = session('verified_ocr_data');
+
+    if ($verifiedOCR && isset($verifiedOCR['grades'])) {
+
+        $spmResults = $verifiedOCR['grades'];
+
+    } else {
+
+        $spmResults = $existingProfile?->spm_results;
+
+    }
     UserProfile::updateOrCreate(
 
         ['user_id' => Auth::id()],
@@ -86,6 +99,7 @@ class ProfileController extends Controller
 
             // Academic
             'total_as' => $validated['total_as'],
+            'spm_results' => $spmResults,
 
             // Financial
             'income_category' => $incomeCategory,
