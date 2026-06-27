@@ -412,6 +412,47 @@
                                         <span class="form-hint">Number of A's in SPM (0-12)</span>
                                     </div>
 
+                                    @if(!empty($profile?->spm_results))
+
+                                    <div class="col-12 mt-3">
+
+                                        <label class="form-label">
+                                            <i class="fas fa-file-alt"></i>
+                                            OCR Extracted SPM Results
+                                        </label>
+
+                                        <div class="table-responsive">
+
+                                            <table class="table table-bordered">
+
+                                                <thead>
+                                                    <tr>
+                                                        <th>Subject</th>
+                                                        <th>Grade</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+
+                                                @foreach($profile->spm_results as $subject => $grade)
+
+                                                    <tr>
+                                                        <td>{{ $subject }}</td>
+                                                        <td>{{ $grade }}</td>
+                                                    </tr>
+
+                                                @endforeach
+
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+
+                                    @endif
+
                                     <div class="col-md-4">
                                         <label class="form-label required-field">
                                             <i class="fas fa-money-bill-wave"></i>
