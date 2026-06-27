@@ -331,31 +331,6 @@
     .d-none { display: none !important; }
     .d-grid { display: grid; }
     
-    /* Custom Toast Notification (fallback) */
-    .toast-fallback {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 16px 24px;
-        border-radius: 12px;
-        color: white;
-        font-weight: 600;
-        z-index: 9999;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        max-width: 400px;
-        transform: translateX(120%);
-        transition: transform 0.4s ease;
-    }
-    
-    .toast-fallback.show {
-        transform: translateX(0);
-    }
-    
-    .toast-fallback.success { background: linear-gradient(135deg, #10b981, #059669); }
-    .toast-fallback.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
-    .toast-fallback.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .toast-fallback.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-    
     @media (max-width: 768px) {
         .step-card {
             padding: 1.25rem;
@@ -717,190 +692,185 @@
 </div>
 
 @push('scripts')
-<!-- Load SweetAlert2 with fallback -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
 <script>
-    // Handle SweetAlert2 load failure - use native fallback
-    function handleSwalError() {
-        console.warn('SweetAlert2 failed to load, using native fallback');
-        window.Swal = null;
-    }
+    // =============================================
+    // SWEETALERT2 - FORCE LOAD WITH MULTIPLE CDN
+    // =============================================
+    (function ensureSwal() {
+        if (typeof Swal !== 'undefined' && Swal) {
+            console.log('✅ SweetAlert2 already loaded');
+            return;
+        }
+        
+        console.log('⏳ Loading SweetAlert2...');
+        
+        // Try multiple CDN sources
+        const cdnUrls = [
+            'https://cdn.jsdelivr.net/npm/sweetalert2@11',
+            'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js',
+            'https://unpkg.com/sweetalert2@11/dist/sweetalert2.all.min.js'
+        ];
+        
+        let loaded = false;
+        
+        cdnUrls.forEach(function(url, index) {
+            if (loaded) return;
+            
+            var script = document.createElement('script');
+            script.src = url;
+            script.async = false;
+            
+            script.onload = function() {
+                if (typeof Swal !== 'undefined' && Swal) {
+                    loaded = true;
+                    console.log('✅ SweetAlert2 loaded from:', url);
+                }
+            };
+            
+            script.onerror = function() {
+                console.warn('❌ Failed to load from:', url);
+            };
+            
+            document.head.appendChild(script);
+        });
+        
+        // Fallback: After 3 seconds, if still not loaded, use native
+        setTimeout(function() {
+            if (typeof Swal === 'undefined' || !Swal) {
+                console.warn('⚠️ SweetAlert2 not loaded, using native fallback');
+                window.Swal = null;
+            }
+        }, 3000);
+    })();
     
-    // Wait for Swal to load, fallback to native
+    // =============================================
+    // GET SWAL INSTANCE (with fallback)
+    // =============================================
     function getSwal() {
         if (typeof Swal !== 'undefined' && Swal) {
             return Swal;
         }
-        // Native fallback
-        return {
-            fire: function(options) {
-                const icon = options.icon || 'info';
-                const title = options.title || '';
-                const text = options.text || '';
-                const html = options.html || '';
-                const confirmText = options.confirmButtonText || 'OK';
-                const cancelText = options.cancelButtonText || 'Cancel';
-                const showCancel = options.showCancelButton || false;
-                const timer = options.timer || 0;
-                
-                return new Promise((resolve) => {
-                    // Create custom modal
-                    const modal = document.createElement('div');
-                    modal.style.cssText = `
-                        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                        background: rgba(0,0,0,0.5); display: flex; align-items: center;
-                        justify-content: center; z-index: 99999; padding: 20px;
-                    `;
-                    
-                    const colors = {
-                        success: '#10b981',
-                        error: '#ef4444',
-                        warning: '#f59e0b',
-                        info: '#3b82f6',
-                        question: '#6b7280'
-                    };
-                    
-                    const iconMap = {
-                        success: '✅',
-                        error: '❌',
-                        warning: '⚠️',
-                        info: 'ℹ️',
-                        question: '❓'
-                    };
-                    
-                    const content = document.createElement('div');
-                    content.style.cssText = `
-                        background: white; border-radius: 16px; padding: 24px;
-                        max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                        animation: modalFadeIn 0.3s ease;
-                    `;
-                    
-                    if (options.html) {
-                        content.innerHTML = options.html;
-                    } else {
-                        content.innerHTML = `
-                            <div style="text-align: center;">
-                                <div style="font-size: 48px; margin-bottom: 12px;">${iconMap[icon] || 'ℹ️'}</div>
-                                <h3 style="margin: 0 0 8px; color: #1f2937;">${title}</h3>
-                                <p style="margin: 0 0 20px; color: #4b5563;">${text}</p>
-                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                                    ${showCancel ? `<button id="swal-cancel" style="padding: 10px 24px; border: 2px solid #6b7280; background: transparent; border-radius: 40px; font-weight: 600; cursor: pointer;">${cancelText}</button>` : ''}
-                                    <button id="swal-confirm" style="padding: 10px 24px; border: none; background: ${colors[icon] || '#7A0019'}; color: white; border-radius: 40px; font-weight: 600; cursor: pointer;">${confirmText}</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    modal.appendChild(content);
-                    document.body.appendChild(modal);
-                    
-                    // Add animation
-                    const style = document.createElement('style');
-                    style.textContent = `
-                        @keyframes modalFadeIn {
-                            from { opacity: 0; transform: scale(0.9); }
-                            to { opacity: 1; transform: scale(1); }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                    
-                    // Handle timer
-                    if (timer > 0) {
-                        setTimeout(() => {
-                            if (modal.parentNode) modal.remove();
-                            resolve({ isConfirmed: false, isDismissed: true });
-                        }, timer);
-                    }
-                    
-                    const confirmBtn = content.querySelector('#swal-confirm');
-                    const cancelBtn = content.querySelector('#swal-cancel');
-                    
-                    confirmBtn.onclick = () => {
-                        modal.remove();
-                        resolve({ isConfirmed: true });
-                    };
-                    
-                    if (cancelBtn) {
-                        cancelBtn.onclick = () => {
-                            modal.remove();
-                            resolve({ isConfirmed: false, isDismissed: true });
-                        };
-                    }
-                    
-                    // Close on backdrop click
-                    modal.onclick = (e) => {
-                        if (e.target === modal && !showCancel) {
-                            modal.remove();
-                            resolve({ isConfirmed: false, isDismissed: true });
-                        }
-                    };
-                });
-            },
-            close: function() {
-                const modals = document.querySelectorAll('[style*="position: fixed"][style*="z-index: 99999"]');
-                modals.forEach(m => m.remove());
-            }
-        };
+        return null;
     }
     
-    AOS.init({ duration: 800, once: true });
-
+    // =============================================
+    // SHOW TOAST/NOTIFICATION (fallback)
+    // =============================================
+    function showToast(message, type) {
+        type = type || 'info';
+        var colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+        
+        var toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; top: 20px; right: 20px; 
+            padding: 16px 24px; border-radius: 12px;
+            background: ${colors[type] || '#6b7280'};
+            color: white; font-weight: 600;
+            z-index: 99999; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 400px; transform: translateX(120%);
+            transition: transform 0.4s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(function() {
+            toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        setTimeout(function() {
+            toast.style.transform = 'translateX(120%)';
+            setTimeout(function() {
+                if (toast.parentNode) toast.remove();
+            }, 400);
+        }, 3000);
+    }
+    
+    // =============================================
+    // AOS INIT
+    // =============================================
+    if (typeof AOS !== 'undefined') {
+        AOS.init({ duration: 800, once: true });
+    }
+    
+    // =============================================
+    // VARIABLES
+    // =============================================
     let currentStep = 1;
     let ocrData = null;
     
+    // =============================================
+    // DRAG & DROP
+    // =============================================
     const dropArea = document.getElementById('dropArea');
     const fileInput = document.getElementById('spmFile');
     
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
-    });
+    if (dropArea) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+    }
     
     function preventDefaults(e) {
         e.preventDefault();
         e.stopPropagation();
     }
     
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, highlight, false);
-    });
-    
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, unhighlight, false);
-    });
+    if (dropArea) {
+        ['dragenter', 'dragover'].forEach(function(eventName) {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(function(eventName) {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+    }
     
     function highlight() {
-        dropArea.classList.add('dragover');
+        if (dropArea) dropArea.classList.add('dragover');
     }
     
     function unhighlight() {
-        dropArea.classList.remove('dragover');
+        if (dropArea) dropArea.classList.remove('dragover');
     }
     
-    dropArea.addEventListener('drop', handleDrop, false);
+    if (dropArea) {
+        dropArea.addEventListener('drop', handleDrop, false);
+    }
     
     function handleDrop(e) {
         const dt = e.dataTransfer;
         const files = dt.files;
-        fileInput.files = files;
-        handleFiles(files);
+        if (fileInput) {
+            fileInput.files = files;
+            handleFiles(files);
+        }
     }
     
-    fileInput.addEventListener('change', function() {
-        handleFiles(this.files);
-    });
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+    }
     
     function handleFiles(files) {
         if (files.length > 0) {
             const file = files[0];
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileInfo').classList.remove('d-none');
+            var fileNameEl = document.getElementById('fileName');
+            var fileInfoEl = document.getElementById('fileInfo');
+            var fileProgressEl = document.getElementById('fileProgress');
+            
+            if (fileNameEl) fileNameEl.textContent = file.name;
+            if (fileInfoEl) fileInfoEl.classList.remove('d-none');
             
             let progress = 0;
-            const interval = setInterval(() => {
+            const interval = setInterval(function() {
                 progress += 10;
-                document.getElementById('fileProgress').style.width = progress + '%';
+                if (fileProgressEl) fileProgressEl.style.width = progress + '%';
                 if (progress >= 100) {
                     clearInterval(interval);
                 }
@@ -908,22 +878,34 @@
         }
     }
     
+    // =============================================
+    // PROCESS UPLOAD
+    // =============================================
     function processUpload() {
         const Swal = getSwal();
         const fileInput = document.getElementById('spmFile');
-        if (!fileInput.files.length) {
-            Swal.fire('Error', 'Please select a file to upload', 'error');
+        
+        if (!fileInput || !fileInput.files.length) {
+            if (Swal) {
+                Swal.fire('Error', 'Please select a file to upload', 'error');
+            } else {
+                showToast('Please select a file to upload', 'error');
+            }
             return;
         }
         
         const formData = new FormData(document.getElementById('uploadForm'));
         
-        Swal.fire({
-            title: 'Processing SPM Certificate',
-            html: '<div class="text-center"><div class="spinner-border text-maroon mb-3" role="status"></div><p>Extracting grades using OCR...</p></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false
-        });
+        if (Swal) {
+            Swal.fire({
+                title: 'Processing SPM Certificate',
+                html: '<div class="text-center"><div class="spinner-border text-maroon mb-3" role="status"></div><p>Extracting grades using OCR...</p></div>',
+                allowOutsideClick: false,
+                showConfirmButton: false
+            });
+        } else {
+            showToast('Processing SPM Certificate...', 'info');
+        }
         
         fetch("{{ route('upload.spm') }}", {
             method: 'POST',
@@ -932,24 +914,35 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            Swal.close();
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (Swal) Swal.close();
             
             if (data.success) {
                 ocrData = data;
                 displayOCRResults(data);
             } else {
-                Swal.fire('Error', data.message || 'Failed to process SPM certificate', 'error');
+                if (Swal) {
+                    Swal.fire('Error', data.message || 'Failed to process SPM certificate', 'error');
+                } else {
+                    showToast(data.message || 'Failed to process SPM certificate', 'error');
+                }
             }
         })
-        .catch(error => {
-            Swal.close();
-            Swal.fire('Error', 'Failed to process SPM certificate. Please try again.', 'error');
+        .catch(function(error) {
+            if (Swal) Swal.close();
+            if (Swal) {
+                Swal.fire('Error', 'Failed to process SPM certificate. Please try again.', 'error');
+            } else {
+                showToast('Failed to process SPM certificate', 'error');
+            }
             console.error('Error:', error);
         });
     }
     
+    // =============================================
+    // DISPLAY OCR RESULTS
+    // =============================================
     function displayOCRResults(data) {
         const isManual = data.manualEntry === true;
 
@@ -959,7 +952,7 @@
                     <i class="fas fa-info-circle me-3 fa-2x"></i>
                     <div>
                         <h6 class="mb-1">${isManual ? 'Academic Results Summary' : 'OCR Results Summary'}</h6>
-                        <p class="mb-0">${isManual ? `Added <strong>${Object.keys(data.grades).length}</strong> subjects` : `Detected <strong>${Object.keys(data.grades).length}</strong> subjects`} | 
+                        <p class="mb-0">${isManual ? 'Added <strong>' + Object.keys(data.grades).length + '</strong> subjects' : 'Detected <strong>' + Object.keys(data.grades).length + '</strong> subjects'} | 
                         Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span></p>
                     </div>
                 </div>
@@ -991,7 +984,7 @@
         const subjects = Object.keys(data.grades);
         subjects.sort();
         
-        subjects.forEach(subject => {
+        subjects.forEach(function(subject) {
             const grade = data.grades[subject];
             const gradeClass = getGradeClass(grade);
             const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
@@ -1051,7 +1044,8 @@
             </div>
         `;
         
-        document.getElementById('ocrResultsContainer').innerHTML = html;
+        var container = document.getElementById('ocrResultsContainer');
+        if (container) container.innerHTML = html;
 
         if (!isManual && data.confidence !== undefined) {
             const confidence = data.confidence;
@@ -1066,28 +1060,37 @@
                 confidenceText = 'Medium confidence – please double-check grades';
             }
 
-            document.getElementById('ocrConfidenceBar').innerHTML = `
-                <label class="form-label fw-bold">OCR Confidence Level</label>
-                <div class="progress" style="height: 22px;">
-                    <div class="progress-bar ${confidenceColor}" role="progressbar" style="width: ${confidence}%" aria-valuenow="${confidence}" aria-valuemin="0" aria-valuemax="100">
-                        ${confidence}%
+            var confidenceBar = document.getElementById('ocrConfidenceBar');
+            if (confidenceBar) {
+                confidenceBar.innerHTML = `
+                    <label class="form-label fw-bold">OCR Confidence Level</label>
+                    <div class="progress" style="height: 22px;">
+                        <div class="progress-bar ${confidenceColor}" role="progressbar" style="width: ${confidence}%" aria-valuenow="${confidence}" aria-valuemin="0" aria-valuemax="100">
+                            ${confidence}%
+                        </div>
                     </div>
-                </div>
-                <small class="text-muted mt-1 d-block">${confidenceText}</small>
-            `;
+                    <small class="text-muted mt-1 d-block">${confidenceText}</small>
+                `;
+            }
         }
 
+        var step2Title = document.getElementById('step2Title');
+        var step2Desc = document.getElementById('step2Desc');
+        
         if (isManual) {
-            document.getElementById('step2Title').innerText = 'Enter Your SPM Results';
-            document.getElementById('step2Desc').innerText = 'Please add your subjects and grades manually';
+            if (step2Title) step2Title.innerText = 'Enter Your SPM Results';
+            if (step2Desc) step2Desc.innerText = 'Please add your subjects and grades manually';
         } else {
-            document.getElementById('step2Title').innerText = 'Review & Edit Extracted Results';
-            document.getElementById('step2Desc').innerText = 'Please edit the extracted grades if needed';
+            if (step2Title) step2Title.innerText = 'Review & Edit Extracted Results';
+            if (step2Desc) step2Desc.innerText = 'Please edit the extracted grades if needed';
         }
         
         goToStep(2);
     }
     
+    // =============================================
+    // GET GRADE CLASS
+    // =============================================
     function getGradeClass(grade) {
         if (grade === 'A+') return 'grade-a-plus';
         if (grade === 'A') return 'grade-a';
@@ -1100,28 +1103,49 @@
         return 'grade-other';
     }
     
+    // =============================================
+    // UPDATE GRADE
+    // =============================================
     function updateGrade(subject, newGrade) {
         if (!ocrData) return;
         ocrData.grades[subject] = newGrade;
         
         const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
-        const badge = document.getElementById(`grade-${safeSubjectId}`);
+        const badge = document.getElementById('grade-' + safeSubjectId);
         if (badge) {
             badge.textContent = newGrade;
-            badge.className = `grade-badge ${getGradeClass(newGrade)}`;
+            badge.className = 'grade-badge ' + getGradeClass(newGrade);
         }
         
         let totalAs = 0;
-        Object.values(ocrData.grades).forEach(grade => {
+        Object.values(ocrData.grades).forEach(function(grade) {
             if (grade.startsWith('A')) totalAs++;
         });
         
-        document.getElementById('totalAsBadge').textContent = totalAs;
+        var badgeEl = document.getElementById('totalAsBadge');
+        if (badgeEl) badgeEl.textContent = totalAs;
         ocrData.totalAs = totalAs;
     }
     
+    // =============================================
+    // SHOW ADD SUBJECT MODAL (FIXED)
+    // =============================================
     function showAddSubjectModal() {
-        const Swal = getSwal();
+        var Swal = getSwal();
+        
+        // If SweetAlert2 is not available, use native prompt
+        if (!Swal) {
+            var subject = prompt('Enter subject name:');
+            if (subject && subject.trim()) {
+                var grade = prompt('Enter grade (A+, A, A-, B+, B, B-, C+, C, C-, D, E, G):');
+                if (grade && grade.trim()) {
+                    addSubject(subject.trim().toUpperCase(), grade.trim().toUpperCase());
+                }
+            }
+            return;
+        }
+        
+        // Use SweetAlert2
         Swal.fire({
             title: 'Add Missing Subject',
             html: `
@@ -1173,13 +1197,13 @@
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: '<i class="fas fa-plus me-2"></i> Add Subject',
+            confirmButtonText: 'Add Subject',
             cancelButtonText: 'Cancel',
             confirmButtonColor: '#7A0019',
             cancelButtonColor: '#6b7280',
-            preConfirm: () => {
-                let subject = document.getElementById('newSubjectName').value;
-                const grade = document.getElementById('newSubjectGrade').value;
+            preConfirm: function() {
+                var subject = document.getElementById('newSubjectName').value;
+                var grade = document.getElementById('newSubjectGrade').value;
                 
                 if (subject === 'OTHER') {
                     subject = document.getElementById('customSubjectName').value.trim().toUpperCase();
@@ -1190,17 +1214,25 @@
                     return false;
                 }
                 
+                if (!grade) {
+                    Swal.showValidationMessage('Please select a grade');
+                    return false;
+                }
+                
                 return { subject: subject, grade: grade };
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
+        }).then(function(result) {
+            if (result.isConfirmed && result.value) {
                 addSubject(result.value.subject, result.value.grade);
             }
         });
     }
 
+    // =============================================
+    // TOGGLE CUSTOM SUBJECT
+    // =============================================
     function toggleCustomSubject(value) {
-        const customInput = document.getElementById('customSubjectName');
+        var customInput = document.getElementById('customSubjectName');
         if (!customInput) return;
         if (value === 'OTHER') {
             customInput.classList.remove('d-none');
@@ -1210,21 +1242,33 @@
         }
     }
 
+    // =============================================
+    // ADD SUBJECT
+    // =============================================
     function addSubject(subject, grade) {
-        const Swal = getSwal();
+        var Swal = getSwal();
+        
         if (!ocrData) return;
         
         if (ocrData.grades[subject]) {
-            Swal.fire('Warning', `Subject "${subject}" already exists!`, 'warning');
+            if (Swal) {
+                Swal.fire('Warning', 'Subject "' + subject + '" already exists!', 'warning');
+            } else {
+                showToast('Subject "' + subject + '" already exists!', 'warning');
+            }
             return;
         }
         
-        Swal.fire({
-            title: 'Adding Subject',
-            html: '<div class="spinner-border text-maroon"></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false
-        });
+        if (Swal) {
+            Swal.fire({
+                title: 'Adding Subject',
+                html: '<div class="spinner-border text-maroon"></div>',
+                allowOutsideClick: false,
+                showConfirmButton: false
+            });
+        } else {
+            showToast('Adding subject...', 'info');
+        }
         
         fetch("{{ route('add.ocr.subject') }}", {
             method: 'POST',
@@ -1234,29 +1278,45 @@
             },
             body: JSON.stringify({ subject: subject, grade: grade })
         })
-        .then(response => response.json())
-        .then(data => {
-            Swal.close();
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (Swal) Swal.close();
+            
             if (data.success) {
                 ocrData.grades[subject] = grade;
                 ocrData.totalAs = data.totalAs;
                 addSubjectToTable(subject, grade, data.totalAs);
-                Swal.fire({ icon: 'success', title: 'Subject Added!', timer: 1500, showConfirmButton: false });
+                if (Swal) {
+                    Swal.fire({ icon: 'success', title: 'Subject Added!', timer: 1500, showConfirmButton: false });
+                } else {
+                    showToast('Subject added successfully!', 'success');
+                }
             } else {
-                Swal.fire('Error', data.message, 'error');
+                if (Swal) {
+                    Swal.fire('Error', data.message, 'error');
+                } else {
+                    showToast(data.message || 'Failed to add subject', 'error');
+                }
             }
         })
-        .catch(error => {
-            Swal.close();
+        .catch(function(error) {
+            if (Swal) Swal.close();
             console.error(error);
-            Swal.fire('Error', 'Failed to add subject', 'error');
+            if (Swal) {
+                Swal.fire('Error', 'Failed to add subject', 'error');
+            } else {
+                showToast('Failed to add subject', 'error');
+            }
         });
     }
     
+    // =============================================
+    // ADD SUBJECT TO TABLE
+    // =============================================
     function addSubjectToTable(subject, grade, totalAs) {
         const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
         const gradeClass = getGradeClass(grade);
-        const newRow = `
+        var newRow = `
             <tr id="subject-row-${safeSubjectId}">
                 <td class="fw-bold">${subject} <span class="badge bg-info ms-2">Added</span></td>
                 <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
@@ -1283,75 +1343,103 @@
                 </td>
             </tr>
         `;
-        const tbody = document.getElementById('gradesTableBody');
+        var tbody = document.getElementById('gradesTableBody');
         if (tbody) tbody.innerHTML += newRow;
-        document.getElementById('totalAsBadge').textContent = totalAs;
+        
+        var badgeEl = document.getElementById('totalAsBadge');
+        if (badgeEl) badgeEl.textContent = totalAs;
     }
     
+    // =============================================
+    // REMOVE SUBJECT
+    // =============================================
     function removeSubject(subject) {
-        const Swal = getSwal();
-        Swal.fire({
-            title: 'Remove Subject?', 
-            text: `Remove "${subject}"?`, 
-            icon: 'warning',
-            showCancelButton: true, 
-            confirmButtonText: 'Yes, Remove', 
-            confirmButtonColor: '#d33'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch("{{ route('remove.ocr.subject') }}", {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
-                    },
-                    body: JSON.stringify({ subject: subject })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (ocrData && ocrData.grades[subject]) delete ocrData.grades[subject];
-                        ocrData.totalAs = data.totalAs;
-                        const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
-                        const row = document.getElementById(`subject-row-${safeSubjectId}`);
-                        if (row) row.remove();
-                        document.getElementById('totalAsBadge').textContent = data.totalAs;
+        var Swal = getSwal();
+        
+        function doRemove() {
+            fetch("{{ route('remove.ocr.subject') }}", {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                },
+                body: JSON.stringify({ subject: subject })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    if (ocrData && ocrData.grades[subject]) delete ocrData.grades[subject];
+                    ocrData.totalAs = data.totalAs;
+                    const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+                    var row = document.getElementById('subject-row-' + safeSubjectId);
+                    if (row) row.remove();
+                    
+                    var badgeEl = document.getElementById('totalAsBadge');
+                    if (badgeEl) badgeEl.textContent = data.totalAs;
+                    
+                    if (Swal) {
                         Swal.fire({ icon: 'success', title: 'Removed!', timer: 2000, showConfirmButton: false });
-                    } else { 
-                        Swal.fire('Error', data.message, 'error'); 
+                    } else {
+                        showToast('Subject removed!', 'success');
                     }
-                })
-                .catch(error => { 
-                    Swal.fire('Error', 'Failed to remove subject', 'error'); 
-                });
+                } else { 
+                    if (Swal) {
+                        Swal.fire('Error', data.message, 'error');
+                    } else {
+                        showToast(data.message || 'Failed to remove subject', 'error');
+                    }
+                }
+            })
+            .catch(function(error) { 
+                if (Swal) {
+                    Swal.fire('Error', 'Failed to remove subject', 'error');
+                } else {
+                    showToast('Failed to remove subject', 'error');
+                }
+            });
+        }
+        
+        if (Swal) {
+            Swal.fire({
+                title: 'Remove Subject?', 
+                text: 'Remove "' + subject + '"?', 
+                icon: 'warning',
+                showCancelButton: true, 
+                confirmButtonText: 'Yes, Remove', 
+                confirmButtonColor: '#d33'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    doRemove();
+                }
+            });
+        } else {
+            if (confirm('Remove "' + subject + '"?')) {
+                doRemove();
             }
-        });
+        }
     }
     
+    // =============================================
+    // VERIFY AND CONTINUE
+    // =============================================
     function verifyAndContinue() {
-        const Swal = getSwal();
-        Swal.fire({
-            title: 'Verify Results', 
-            text: 'Are you sure all grades are correct?', 
-            icon: 'question',
-            showCancelButton: true, 
-            confirmButtonText: 'Yes, Continue', 
-            confirmButtonColor: '#3085d6'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch("{{ route('verify.ocr.results') }}", {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
-                    },
-                    body: JSON.stringify({ confirm: true })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        displayVerifiedGrades(data.totalAs);
-                        goToStep(3);
+        var Swal = getSwal();
+        
+        function doVerify() {
+            fetch("{{ route('verify.ocr.results') }}", {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                },
+                body: JSON.stringify({ confirm: true })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    displayVerifiedGrades(data.totalAs);
+                    goToStep(3);
+                    if (Swal) {
                         Swal.fire({ 
                             icon: 'success', 
                             title: 'Verified!', 
@@ -1359,15 +1447,44 @@
                             timer: 1500, 
                             showConfirmButton: false 
                         });
-                    } else { 
-                        Swal.fire('Error', data.message, 'error'); 
+                    } else {
+                        showToast('Verified successfully!', 'success');
                     }
-                })
-                .catch(error => { 
-                    Swal.fire('Error', 'Verification failed', 'error'); 
-                });
+                } else { 
+                    if (Swal) {
+                        Swal.fire('Error', data.message, 'error');
+                    } else {
+                        showToast(data.message || 'Verification failed', 'error');
+                    }
+                }
+            })
+            .catch(function(error) { 
+                if (Swal) {
+                    Swal.fire('Error', 'Verification failed', 'error');
+                } else {
+                    showToast('Verification failed', 'error');
+                }
+            });
+        }
+        
+        if (Swal) {
+            Swal.fire({
+                title: 'Verify Results', 
+                text: 'Are you sure all grades are correct?', 
+                icon: 'question',
+                showCancelButton: true, 
+                confirmButtonText: 'Yes, Continue', 
+                confirmButtonColor: '#3085d6'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    doVerify();
+                }
+            });
+        } else {
+            if (confirm('Are you sure all grades are correct?')) {
+                doVerify();
             }
-        });
+        }
 
         // Update grades
         fetch("{{ route('update.ocr.results') }}", {
@@ -1380,117 +1497,181 @@
         });
     }
     
+    // =============================================
+    // DISPLAY VERIFIED GRADES
+    // =============================================
     function displayVerifiedGrades(totalAs) {
-        document.getElementById('totalAsInput').value = totalAs;
-        document.getElementById('extractedGrades').innerHTML = `
-            <div class="verified-grades">
-                <div class="alert alert-success">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-check-circle me-3 fa-2x"></i>
-                        <div>
-                            <h6 class="mb-1">✓ Verified SPM Results</h6>
-                            <p class="mb-0">Total A's: <span class="badge bg-success">${totalAs}</span></p>
+        var inputEl = document.getElementById('totalAsInput');
+        if (inputEl) inputEl.value = totalAs;
+        
+        var gradesEl = document.getElementById('extractedGrades');
+        if (gradesEl) {
+            gradesEl.innerHTML = `
+                <div class="verified-grades">
+                    <div class="alert alert-success">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle me-3 fa-2x"></i>
+                            <div>
+                                <h6 class="mb-1">✓ Verified SPM Results</h6>
+                                <p class="mb-0">Total A's: <span class="badge bg-success">${totalAs}</span></p>
+                            </div>
                         </div>
                     </div>
+                    <p class="text-muted mb-0"><small>Your grades have been verified and will be used for scholarship matching.</small></p>
                 </div>
-                <p class="text-muted mb-0"><small>Your grades have been verified and will be used for scholarship matching.</small></p>
-            </div>
-        `;
+            `;
+        }
     }
     
+    // =============================================
+    // GO TO STEP
+    // =============================================
     function goToStep(step) {
-        document.getElementById('step1').classList.add('d-none');
-        document.getElementById('step2').classList.add('d-none');
-        document.getElementById('step3').classList.add('d-none');
-        document.getElementById(`step${step}`).classList.remove('d-none');
+        var step1 = document.getElementById('step1');
+        var step2 = document.getElementById('step2');
+        var step3 = document.getElementById('step3');
+        var progressBar = document.getElementById('progressBar');
         
-        const progress = step === 1 ? 33 : step === 2 ? 66 : 100;
-        document.getElementById('progressBar').style.width = `${progress}%`;
+        if (step1) step1.classList.add('d-none');
+        if (step2) step2.classList.add('d-none');
+        if (step3) step3.classList.add('d-none');
         
-        const stepTexts = ['step1Text', 'step2Text', 'step3Text'];
-        stepTexts.forEach((id, idx) => {
-            const el = document.getElementById(id);
-            if (idx + 1 === step) {
-                el.classList.add('active');
-            } else {
-                el.classList.remove('active');
+        var targetStep = document.getElementById('step' + step);
+        if (targetStep) targetStep.classList.remove('d-none');
+        
+        var progress = step === 1 ? 33 : step === 2 ? 66 : 100;
+        if (progressBar) progressBar.style.width = progress + '%';
+        
+        var stepTexts = ['step1Text', 'step2Text', 'step3Text'];
+        stepTexts.forEach(function(id, idx) {
+            var el = document.getElementById(id);
+            if (el) {
+                if (idx + 1 === step) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
             }
         });
         currentStep = step;
     }
     
+    // =============================================
+    // GO BACK TO UPLOAD
+    // =============================================
     function goBackToUpload() {
-        const Swal = getSwal();
-        Swal.fire({
-            title: 'Upload Again?', 
-            text: 'This will clear all extracted data.', 
-            icon: 'warning',
-            showCancelButton: true, 
-            confirmButtonText: 'Yes, Upload Again'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch("{{ route('verify.ocr.results') }}", {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
-                    },
-                    body: JSON.stringify({ confirm: false })
-                }).then(() => {
-                    document.getElementById('spmFile').value = '';
-                    document.getElementById('fileInfo').classList.add('d-none');
-                    goToStep(1);
-                });
+        var Swal = getSwal();
+        
+        function doReset() {
+            fetch("{{ route('verify.ocr.results') }}", {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                },
+                body: JSON.stringify({ confirm: false })
+            }).then(function() {
+                var fileInput = document.getElementById('spmFile');
+                var fileInfo = document.getElementById('fileInfo');
+                
+                if (fileInput) fileInput.value = '';
+                if (fileInfo) fileInfo.classList.add('d-none');
+                goToStep(1);
+            });
+        }
+        
+        if (Swal) {
+            Swal.fire({
+                title: 'Upload Again?', 
+                text: 'This will clear all extracted data.', 
+                icon: 'warning',
+                showCancelButton: true, 
+                confirmButtonText: 'Yes, Upload Again'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    doReset();
+                }
+            });
+        } else {
+            if (confirm('Upload again? This will clear all extracted data.')) {
+                doReset();
             }
-        });
+        }
     }
     
+    // =============================================
+    // GO BACK TO STEP 2
+    // =============================================
     function goBackToStep2() { 
         goToStep(2); 
     }
 
+    // =============================================
+    // SKIP OCR
+    // =============================================
     function skipOCR() {
-        const Swal = getSwal();
-        Swal.fire({
-            title: 'Manual Entry',
-            text: 'Proceed without OCR and enter SPM results manually?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch("{{ route('ocr.skip') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        ocrData = {
-                            grades: {},
-                            totalAs: 0,
-                            manualEntry: true
-                        };
-                        displayOCRResults(ocrData);
-                    }
-                });
+        var Swal = getSwal();
+        
+        function doSkip() {
+            fetch("{{ route('ocr.skip') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    ocrData = {
+                        grades: {},
+                        totalAs: 0,
+                        manualEntry: true
+                    };
+                    displayOCRResults(ocrData);
+                }
+            });
+        }
+        
+        if (Swal) {
+            Swal.fire({
+                title: 'Manual Entry',
+                text: 'Proceed without OCR and enter SPM results manually?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    doSkip();
+                }
+            });
+        } else {
+            if (confirm('Proceed without OCR and enter SPM results manually?')) {
+                doSkip();
+            }
+        }
+    }
+    
+    // =============================================
+    // PROFILE FORM SUBMIT
+    // =============================================
+    var profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            var income = document.querySelector('input[name="monthly_income"]');
+            var study = document.querySelector('select[name="study_path"]');
+            var Swal = getSwal();
+            
+            if (!income || !income.value || !study || !study.value) {
+                e.preventDefault();
+                if (Swal) {
+                    Swal.fire('Error', 'Please complete all required fields', 'error');
+                } else {
+                    showToast('Please complete all required fields', 'error');
+                }
             }
         });
     }
-    
-    document.getElementById('profileForm').addEventListener('submit', function(e) {
-        const income = document.querySelector('input[name="monthly_income"]').value;
-        const study = document.querySelector('select[name="study_path"]').value;
-        
-        if (!income || !study) {
-            e.preventDefault();
-            const Swal = getSwal();
-            Swal.fire('Error', 'Please complete all required fields', 'error');
-        }
-    });
 </script>
 @endpush
 @endsection

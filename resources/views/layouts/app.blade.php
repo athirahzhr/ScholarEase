@@ -41,6 +41,9 @@
             color: var(--gray-800);
         }
         
+        /* ============================================ */
+        /* NAVBAR STYLES                                */
+        /* ============================================ */
         .navbar-scholarease {
             background: rgba(255, 248, 238, 0.95);
             backdrop-filter: blur(20px);
@@ -100,6 +103,18 @@
             width: 80%;
         }
         
+        .nav-link.active {
+            color: var(--maroon) !important;
+            font-weight: 700;
+        }
+        
+        .nav-link.active::after {
+            width: 80%;
+        }
+        
+        /* ============================================ */
+        /* BUTTON STYLES                               */
+        /* ============================================ */
         .btn-nav {
             display: inline-flex;
             align-items: center;
@@ -125,6 +140,7 @@
             color: white !important;
             transform: translateY(-2px);
             border-color: transparent;
+            box-shadow: 0 4px 12px rgba(122, 0, 25, 0.2);
         }
         
         .btn-nav-register {
@@ -176,6 +192,54 @@
             transform: translateY(-2px);
         }
         
+        .btn-outline-secondary {
+            border: 2px solid var(--gray-600);
+            color: var(--gray-600);
+            background: transparent;
+            border-radius: 60px;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--gray-600);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(115deg, #ef4444, #dc2626);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+            background: linear-gradient(115deg, #dc2626, #b91c1c);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            min-height: 36px;
+        }
+        
+        .btn-lg {
+            padding: 0.75rem 2rem;
+            font-size: 1.05rem;
+            min-height: 52px;
+        }
+        
+        /* ============================================ */
+        /* CARD STYLES                                 */
+        /* ============================================ */
         .card {
             border: none;
             border-radius: 20px;
@@ -189,6 +253,9 @@
             box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
         }
         
+        /* ============================================ */
+        /* ALERT STYLES                                */
+        /* ============================================ */
         .alert {
             border-radius: 16px;
             border: none;
@@ -200,6 +267,27 @@
             border-left: 4px solid var(--gold);
         }
         
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        /* ============================================ */
+        /* FOOTER STYLES                               */
+        /* ============================================ */
         footer {
             background: var(--maroon-dark);
             color: white;
@@ -214,6 +302,7 @@
         
         footer a {
             transition: all 0.2s ease;
+            text-decoration: none;
         }
         
         footer a:hover {
@@ -221,10 +310,20 @@
             padding-left: 5px;
         }
         
+        /* ============================================ */
+        /* DROPDOWN STYLES                             */
+        /* ============================================ */
         .dropdown-menu {
             border-radius: 16px;
             border: 1px solid rgba(122, 0, 25, 0.1);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+        }
+        
+        .dropdown-item {
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            transition: all 0.2s ease;
         }
         
         .dropdown-item:hover {
@@ -234,6 +333,81 @@
         
         .dropdown-item.text-danger:hover {
             background: rgba(220, 38, 38, 0.1);
+        }
+        
+        /* ============================================ */
+        /* FORM STYLES                                 */
+        /* ============================================ */
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            padding: 0.6rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.2);
+            outline: none;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        /* ============================================ */
+        /* TABLE STYLES                                */
+        /* ============================================ */
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, var(--cream), var(--cream-dark));
+            color: var(--maroon);
+            font-weight: 700;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        /* ============================================ */
+        /* UTILITY CLASSES                             */
+        /* ============================================ */
+        .text-maroon {
+            color: var(--maroon);
+        }
+        
+        .bg-maroon {
+            background: var(--maroon);
+        }
+        
+        .bg-maroon-dark {
+            background: var(--maroon-dark);
+        }
+        
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 1rem; }
+        .gap-4 { gap: 1.5rem; }
+        
+        .flex-1 { flex: 1; }
+        
+        /* ============================================ */
+        /* RESPONSIVE                                  */
+        /* ============================================ */
+        @media (max-width: 992px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
         }
         
         @media (max-width: 768px) {
@@ -253,12 +427,60 @@
             
             .navbar-nav {
                 gap: 0;
+                padding: 0.5rem 0;
+            }
+            
+            .navbar-nav .nav-item {
+                width: 100%;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.6rem 1rem;
+                border-radius: 10px;
+            }
+            
+            .dropdown-menu {
+                border: none;
+                box-shadow: none;
+                background: transparent;
+                padding-left: 1rem;
+            }
+            
+            .dropdown-item {
+                padding: 0.5rem 1rem;
+            }
+            
+            footer {
+                text-align: center;
+            }
+            
+            footer .col-md-3, footer .col-md-6 {
+                margin-bottom: 1.5rem;
             }
         }
         
+        @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            
+            .btn-nav {
+                font-size: 0.85rem;
+                padding: 0.4rem 1rem;
+            }
+        }
+        
+        /* ============================================ */
+        /* NAVBAR TOGGLER                              */
+        /* ============================================ */
         .navbar-toggler {
             border: none;
             background: transparent;
+            padding: 0.5rem;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: none;
         }
         
         .navbar-toggler-icon {
@@ -271,23 +493,38 @@
             color: var(--maroon);
         }
         
-        .navbar-nav {
-            align-items: center;
-            gap: 0.5rem;
+        /* ============================================ */
+        /* ANIMATIONS                                  */
+        /* ============================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
         }
     </style>
     
     @stack('styles')
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- ============================================ -->
+    <!-- NAVIGATION                                   -->
+    <!-- ============================================ -->
     <nav class="navbar navbar-expand-lg navbar-scholarease">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="{{ route('dashboard') }}">
                 <i class="fas fa-graduation-cap me-2"></i> ScholarEase
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon">
                     <i class="fas fa-bars"></i>
                 </span>
@@ -297,37 +534,39 @@
                 <ul class="navbar-nav ms-auto">
                     @auth
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard') }}">
+                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
                                 <i class="fas fa-home me-1"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('scholarship.finder') }}">
+                            <a class="nav-link {{ request()->routeIs('scholarship.finder') ? 'active' : '' }}" href="{{ route('scholarship.finder') }}">
                                 <i class="fas fa-search me-1"></i> Find
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('bookmarks.index') }}">
+                            <a class="nav-link {{ request()->routeIs('bookmarks.*') ? 'active' : '' }}" href="{{ route('bookmarks.index') }}">
                                 <i class="fas fa-bookmark me-1"></i> Bookmarks
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('feedback.create') }}">
+                            <a class="nav-link {{ request()->routeIs('feedback.*') ? 'active' : '' }}" href="{{ route('feedback.create') }}">
                                 <i class="fas fa-star me-1"></i> Feedback
                             </a>
                         </li>
+                        
                         @if(auth()->user() && auth()->user()->isAdmin())
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                                <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
                                     <i class="fas fa-crown me-1"></i> Admin
                                 </a>
                             </li>
                         @endif
+                        
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li>
                                     <a class="dropdown-item" href="{{ route('profile.index') }}">
                                         <i class="fas fa-user me-2"></i> Profile
@@ -366,12 +605,16 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT                                -->
+    <!-- ============================================ -->
     <main>
         @yield('content')
     </main>
 
-    <!-- Footer -->
+    <!-- ============================================ -->
+    <!-- FOOTER                                      -->
+    <!-- ============================================ -->
     <footer>
         <div class="container">
             <div class="row">
@@ -384,10 +627,10 @@
                 <div class="col-md-3">
                     <h6>Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ route('dashboard') }}" class="text-light opacity-75 text-decoration-none">Dashboard</a></li>
-                        <li class="mb-2"><a href="{{ route('scholarship.finder') }}" class="text-light opacity-75 text-decoration-none">Find Scholarships</a></li>
-                        <li class="mb-2"><a href="{{ route('bookmarks.index') }}" class="text-light opacity-75 text-decoration-none">Bookmarks</a></li>
-                        <li class="mb-2"><a href="{{ route('feedback.create') }}" class="text-light opacity-75 text-decoration-none">Give Feedback</a></li>
+                        <li class="mb-2"><a href="{{ route('dashboard') }}" class="text-light opacity-75">Dashboard</a></li>
+                        <li class="mb-2"><a href="{{ route('scholarship.finder') }}" class="text-light opacity-75">Find Scholarships</a></li>
+                        <li class="mb-2"><a href="{{ route('bookmarks.index') }}" class="text-light opacity-75">Bookmarks</a></li>
+                        <li class="mb-2"><a href="{{ route('feedback.create') }}" class="text-light opacity-75">Give Feedback</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
@@ -410,35 +653,105 @@
     <!-- SCRIPTS - URUTAN PENTING!                    -->
     <!-- ============================================ -->
     
-    <!-- jQuery (required for Bootstrap) -->
+    <!-- 1. jQuery (required for Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    <!-- Bootstrap JS -->
+    <!-- 2. Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- SweetAlert2 - PASTIKAN INI ADA! -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <!-- 3. SweetAlert2 - Multiple CDN fallback -->
+    <script>
+        // Force load SweetAlert2 with multiple CDN fallbacks
+        (function loadSweetAlert() {
+            if (typeof Swal !== 'undefined' && Swal) {
+                console.log('✅ SweetAlert2 already loaded');
+                return;
+            }
+            
+            console.log('⏳ Loading SweetAlert2...');
+            
+            var cdnUrls = [
+                'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js',
+                'https://unpkg.com/sweetalert2@11/dist/sweetalert2.all.min.js'
+            ];
+            
+            var loaded = false;
+            var attempts = 0;
+            
+            function tryLoad(index) {
+                if (loaded || index >= cdnUrls.length) {
+                    if (!loaded) {
+                        console.warn('⚠️ All SweetAlert2 CDN failed, using native fallback');
+                        window.Swal = null;
+                    }
+                    return;
+                }
+                
+                var script = document.createElement('script');
+                script.src = cdnUrls[index];
+                script.async = false;
+                
+                script.onload = function() {
+                    if (typeof Swal !== 'undefined' && Swal) {
+                        loaded = true;
+                        console.log('✅ SweetAlert2 loaded from:', cdnUrls[index]);
+                    } else {
+                        // Try next CDN
+                        tryLoad(index + 1);
+                    }
+                };
+                
+                script.onerror = function() {
+                    console.warn('❌ Failed to load from:', cdnUrls[index]);
+                    tryLoad(index + 1);
+                };
+                
+                document.head.appendChild(script);
+            }
+            
+            // Start loading from first CDN
+            tryLoad(0);
+            
+            // Final fallback: after 5 seconds, if still not loaded
+            setTimeout(function() {
+                if (typeof Swal === 'undefined' || !Swal) {
+                    console.warn('⚠️ SweetAlert2 timeout, using native fallback');
+                    window.Swal = null;
+                }
+            }, 5000);
+        })();
+    </script>
     
-    <!-- AOS Animation -->
+    <!-- 4. AOS Animation -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
-    <!-- Custom Scripts from child views (finder.blade.php etc) -->
+    <!-- 5. Custom Scripts from child views -->
     @stack('scripts')
     
-    <!-- Default initialization -->
+    <!-- 6. Default initialization -->
     <script>
-        AOS.init({ duration: 800, once: true });
+        // Initialize AOS
+        if (typeof AOS !== 'undefined') {
+            AOS.init({ duration: 800, once: true });
+        }
         
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+        // CSRF Token for AJAX requests
+        if (typeof $ !== 'undefined') {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        }
         
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
+        // Initialize tooltips
+        if (typeof bootstrap !== 'undefined') {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
     </script>
 </body>
 </html>
