@@ -44,7 +44,7 @@ class ProfileController extends Controller
         $validated = $request->validate([
 
         // Academic
-        'total_as' => 'required|integer|min:0|max:12',
+        'total_as' => 'nullable',
 
         // Financial
         'monthly_income' => 'required|numeric|min:0',
@@ -80,17 +80,42 @@ class ProfileController extends Controller
 
     $existingProfile = Auth::user()->profile;
 
-    $verifiedOCR = session('verified_ocr_data');
+        // Priority 1:
+        // User edit grades manually
+        if ($request->filled('spm_results')) {
 
-    if ($verifiedOCR && isset($verifiedOCR['grades'])) {
+            $spmResults = $request->spm_results;
 
-        $spmResults = $verifiedOCR['grades'];
+        // Priority 2:
+        // Fresh OCR
+        } elseif (session()->has('verified_ocr_data')) {
 
-    } else {
+            $spmResults =
+                session('verified_ocr_data')['grades'];
 
-        $spmResults = $existingProfile?->spm_results;
+        // Priority 3:
+        // Existing database
+        } else {
 
-    }
+            $spmResults =
+                $existingProfile?->spm_results;
+        }
+
+        // ================= AUTO COUNT TOTAL A =================
+
+        $totalAs = 0;
+
+        if (!empty($spmResults)) {
+
+            foreach ($spmResults as $grade) {
+
+                if (in_array($grade, ['A+', 'A', 'A-'])) {
+                    $totalAs++;
+                }
+
+            }
+
+        }
     UserProfile::updateOrCreate(
 
         ['user_id' => Auth::id()],
@@ -98,7 +123,7 @@ class ProfileController extends Controller
         [
 
             // Academic
-            'total_as' => $validated['total_as'],
+            'total_as' => $totalAs,
             'spm_results' => $spmResults,
 
             // Financial

@@ -401,13 +401,11 @@
                                         </label>
                                         <input
                                             type="number"
+                                            id="total_as"
                                             name="total_as"
                                             class="form-control"
-                                            min="0"
-                                            max="12"
-                                            required
-                                            value="{{ old('total_as', $profile->total_as ?? '') }}"
-                                            placeholder="e.g., 8"
+                                            value="{{ old('total_as', $profile->total_as ?? 0) }}"
+                                            readonly
                                         >
                                         <span class="form-hint">Number of A's in SPM (0-12)</span>
                                     </div>
@@ -438,7 +436,40 @@
 
                                                     <tr>
                                                         <td>{{ $subject }}</td>
-                                                        <td>{{ $grade }}</td>
+                                                        <td>
+
+                                                    <select
+                                                        name="spm_results[{{ $subject }}]"
+                                                        class="form-select spm-grade"
+                                                    >
+
+                                                    @foreach([
+                                                    'A+',
+                                                    'A',
+                                                    'A-',
+                                                    'B+',
+                                                    'B',
+                                                    'C+',
+                                                    'C',
+                                                    'D',
+                                                    'E',
+                                                    'G'
+                                                    ] as $g)
+
+                                                    <option
+                                                    value="{{ $g }}"
+                                                    {{ $grade == $g ? 'selected' : '' }}
+                                                    >
+
+                                                    {{ $g }}
+
+                                                    </option>
+
+                                                    @endforeach
+
+                                                    </select>
+
+                                                    </td>
                                                     </tr>
 
                                                 @endforeach
@@ -478,7 +509,7 @@
                                         </label>
                                         <select name="study_path" class="form-select" required>
                                             <option value="">Select Study Path</option>
-                                            @php $studyPaths = ['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate']; @endphp
+                                            @php $studyPaths = ['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET']; @endphp
                                             @foreach ($studyPaths as $level)
                                                 <option value="{{ $level }}" {{ old('study_path', $profile->study_level ?? '') == $level ? 'selected' : '' }}>
                                                     {{ $level }}
@@ -632,8 +663,55 @@
 
 @push('scripts')
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <script>
-    AOS.init({ duration: 800, once: true });
+
+AOS.init({
+    duration: 800,
+    once: true
+});
+
+// =========================
+// AUTO UPDATE TOTAL A
+// =========================
+
+function updateTotalAs() {
+
+    let total = 0;
+
+    document.querySelectorAll('.spm-grade').forEach(function(select) {
+
+        if (['A+', 'A', 'A-'].includes(select.value)) {
+
+            total++;
+
+        }
+
+    });
+
+    const input = document.getElementById('total_as');
+
+    if (input) {
+
+        input.value = total;
+
+    }
+
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.spm-grade').forEach(function(select) {
+
+        select.addEventListener('change', updateTotalAs);
+
+    });
+
+    updateTotalAs();
+
+});
+
 </script>
+
 @endpush
 @endsection
