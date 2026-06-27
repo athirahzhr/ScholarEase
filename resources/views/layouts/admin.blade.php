@@ -9,12 +9,16 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ============================================ -->
+    <!-- BOOTSTRAP 5 CSS - FIXED CDN                  -->
+    <!-- ============================================ -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <!-- AOS Animation -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -312,28 +316,6 @@
             margin-right: 8px;
         }
 
-        .top-navbar .breadcrumb {
-            margin: 0;
-            padding: 0;
-            background: transparent;
-            font-size: 0.8rem;
-        }
-
-        .top-navbar .breadcrumb-item a {
-            color: var(--gray-500);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .top-navbar .breadcrumb-item a:hover {
-            color: var(--maroon);
-        }
-
-        .top-navbar .breadcrumb-item.active {
-            color: var(--gray-700);
-            font-weight: 600;
-        }
-
         /* User Dropdown */
         .user-dropdown-toggle {
             display: flex;
@@ -593,22 +575,6 @@
         }
 
         /* ========================================
-                   SCROLLBAR STYLING FOR SIDEBAR
-                   ======================================== */
-        .sidebar::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-        }
-
-        /* ========================================
                    DARK OVERLAY FOR MOBILE
                    ======================================== */
         .sidebar-overlay {
@@ -674,14 +640,6 @@
 
         .gap-3 {
             gap: 0.75rem;
-        }
-
-        /* ========================================
-                   RESPONSIVE TABLE WRAPPER
-                   ======================================== */
-        .table-responsive-custom {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         /* ========================================
@@ -940,10 +898,16 @@
     </div>
 
     <!-- ============================================
-    SCRIPTS
+    SCRIPTS - FIXED CDN
     ============================================ -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Bootstrap JS - FIXED: Using cdnjs instead of jsdelivr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
@@ -960,11 +924,13 @@
         // ============================================
         // CSRF TOKEN FOR AJAX
         // ============================================
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+        if (typeof $ !== 'undefined') {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        }
 
         // ============================================
         // SIDEBAR TOGGLE
@@ -1005,8 +971,10 @@
             const alerts = document.querySelectorAll('.alert-custom');
             alerts.forEach(function(alert) {
                 setTimeout(function() {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
+                    if (typeof bootstrap !== 'undefined') {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
                 }, 5000);
             });
         });
@@ -1025,12 +993,16 @@
         });
 
         // ============================================
-        // TOOLTIP INITIALIZATION (if needed)
+        // TOOLTIP INITIALIZATION
         // ============================================
-        // const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        // tooltipTriggerList.map(function (tooltipTriggerEl) {
-        //     return new bootstrap.Tooltip(tooltipTriggerEl);
-        // });
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof bootstrap !== 'undefined') {
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        });
     </script>
     
     @stack('scripts')
