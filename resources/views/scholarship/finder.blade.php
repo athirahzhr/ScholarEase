@@ -1,757 +1,1496 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>ScholarEase - @yield('title', 'SPM Scholarship Finder')</title>
+@extends('layouts.app')
+
+@section('title', 'Find Scholarship')
+
+@section('content')
+<style>
+    :root {
+        --maroon: #7A0019;
+        --maroon-dark: #4e0010;
+        --maroon-light: #9e1e32;
+        --gold: #F4C542;
+        --gold-light: #ffda77;
+        --cream: #FFF8EE;
+        --cream-dark: #f5ebe0;
+        --gray-800: #1f2937;
+        --gray-600: #4b5563;
+    }
+
+    .finder-container {
+        background: linear-gradient(135deg, var(--cream) 0%, var(--cream-dark) 100%);
+        min-height: calc(100vh - 200px);
+        padding: 2rem 0;
+    }
+
+    .step-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    .step-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    .step-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gold);
+    }
     
-    <!-- FontAwesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    .step-number {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--maroon), var(--maroon-dark));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(122, 0, 25, 0.3);
+    }
     
-    <!-- AOS Animation -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    .step-header h4 {
+        color: var(--maroon);
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
     
-    <style>
-        :root {
-            --maroon: #7A0019;
-            --maroon-dark: #4e0010;
-            --maroon-light: #9e1e32;
-            --gold: #F4C542;
-            --gold-light: #ffda77;
-            --cream: #FFF8EE;
-            --cream-dark: #f5ebe0;
-            --gray-800: #1f2937;
-            --gray-600: #4b5563;
-            --white: #ffffff;
+    .step-header p {
+        color: var(--gray-600);
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+    
+    .progress-custom {
+        background: #e5e7eb;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+    }
+    
+    .progress-bar-custom {
+        background: linear-gradient(90deg, var(--maroon), var(--gold));
+        width: 33%;
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    
+    .step-indicator {
+        color: var(--gray-600);
+        font-size: 0.85rem;
+        padding: 0.25rem 0;
+    }
+    
+    .step-indicator.active {
+        color: var(--maroon);
+        font-weight: 700;
+    }
+    
+    .upload-area {
+        border: 2px dashed var(--maroon);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+        border-color: var(--gold);
+        transform: scale(1.02);
+    }
+    
+    .upload-area.dragover {
+        background: #e9d5ff;
+        border-color: var(--gold);
+        transform: scale(1.02);
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--maroon);
+        margin-bottom: 1rem;
+    }
+    
+    .grade-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        min-width: 50px;
+        text-align: center;
+    }
+    
+    .grade-a-plus { background: linear-gradient(135deg, var(--maroon), var(--maroon-dark)); color: white; }
+    .grade-a { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+    .grade-a-minus { background: linear-gradient(135deg, #34d399, #10b981); color: white; }
+    .grade-b-plus { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+    .grade-b { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; }
+    .grade-b-minus { background: linear-gradient(135deg, #93c5fd, #60a5fa); color: white; }
+    .grade-c-plus { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+    .grade-c { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+    .grade-other { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
+    
+    .btn {
+        border-radius: 40px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 0.625rem 1.5rem;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 44px;
+        min-width: 120px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
+        border: none;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(122, 0, 25, 0.3);
+        background: linear-gradient(115deg, var(--maroon-dark), var(--maroon));
+        color: white;
+    }
+    
+    .btn-outline-primary {
+        border: 2px solid var(--maroon);
+        color: var(--maroon);
+        background: transparent;
+    }
+    
+    .btn-outline-primary:hover {
+        background: var(--maroon);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid var(--gray-600);
+        color: var(--gray-600);
+        background: transparent;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: var(--gray-600);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-sm {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        min-height: 36px;
+        min-width: 80px;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        font-size: 1.05rem;
+        min-height: 52px;
+        min-width: 160px;
+    }
+    
+    .btn-block {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+    }
+    
+    .button-group-center {
+        justify-content: center;
+    }
+    
+    .button-group-between {
+        justify-content: space-between;
+    }
+    
+    .button-group-end {
+        justify-content: flex-end;
+    }
+    
+    .table th {
+        background: linear-gradient(135deg, var(--cream), var(--cream-dark));
+        color: var(--maroon);
+        font-weight: 700;
+        border-bottom: 2px solid var(--gold);
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .table-responsive {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .verified-grades {
+        border: 2px solid #10b981;
+        border-radius: 16px;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        padding: 0.6rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.2);
+        outline: none;
+    }
+    
+    .alert-info {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        border: none;
+        border-left: 4px solid #3b82f6;
+        border-radius: 12px;
+        color: #1e40af;
+    }
+    
+    .alert-warning {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: none;
+        border-left: 4px solid #f59e0b;
+        border-radius: 12px;
+        color: #92400e;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        border: none;
+        border-left: 4px solid #10b981;
+        border-radius: 12px;
+        color: #065f46;
+    }
+    
+    .alert {
+        border-radius: 12px;
+    }
+    
+    .text-maroon {
+        color: var(--maroon);
+    }
+    
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 1rem; }
+    .gap-4 { gap: 1.5rem; }
+    
+    .flex-1 { flex: 1; }
+    
+    .mt-3 { margin-top: 1rem; }
+    .mt-4 { margin-top: 1.5rem; }
+    .mt-5 { margin-top: 2rem; }
+    .mb-3 { margin-bottom: 1rem; }
+    .mb-4 { margin-bottom: 1.5rem; }
+    .mb-5 { margin-bottom: 2rem; }
+    
+    .d-flex { display: flex; }
+    .flex-column { flex-direction: column; }
+    .align-items-center { align-items: center; }
+    .justify-content-between { justify-content: space-between; }
+    .justify-content-center { justify-content: center; }
+    .justify-content-end { justify-content: flex-end; }
+    
+    .text-center { text-align: center; }
+    .text-end { text-align: right; }
+    
+    .w-100 { width: 100%; }
+    
+    .d-none { display: none !important; }
+    .d-grid { display: grid; }
+    
+    /* Custom Toast Notification (fallback) */
+    .toast-fallback {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 9999;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        max-width: 400px;
+        transform: translateX(120%);
+        transition: transform 0.4s ease;
+    }
+    
+    .toast-fallback.show {
+        transform: translateX(0);
+    }
+    
+    .toast-fallback.success { background: linear-gradient(135deg, #10b981, #059669); }
+    .toast-fallback.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .toast-fallback.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .toast-fallback.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    
+    @media (max-width: 768px) {
+        .step-card {
+            padding: 1.25rem;
         }
         
-        * {
-            font-family: 'Inter', sans-serif;
+        .upload-area {
+            padding: 1.5rem;
         }
         
-        body {
-            background: var(--cream);
-            color: var(--gray-800);
+        .table {
+            font-size: 0.8rem;
         }
         
-        /* ============================================ */
-        /* NAVBAR STYLES                                */
-        /* ============================================ */
-        .navbar-scholarease {
-            background: rgba(255, 248, 238, 0.95);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 1rem 0;
-            border-bottom: 1px solid rgba(122, 0, 25, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        .table td, .table th {
+            padding: 0.5rem;
         }
         
-        .navbar-brand {
-            font-weight: 800;
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, var(--maroon) 0%, var(--gold) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-        }
-        
-        .navbar-brand i {
-            background: linear-gradient(135deg, var(--maroon), var(--gold));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 1.8rem;
-        }
-        
-        .nav-link {
-            color: var(--gray-600) !important;
-            font-weight: 500;
+        .btn {
             padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .nav-link:hover {
-            color: var(--maroon) !important;
-            background: rgba(122, 0, 25, 0.05);
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--gold);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-        
-        .nav-link:hover::after {
-            width: 80%;
-        }
-        
-        .nav-link.active {
-            color: var(--maroon) !important;
-            font-weight: 700;
-        }
-        
-        .nav-link.active::after {
-            width: 80%;
-        }
-        
-        /* ============================================ */
-        /* BUTTON STYLES                               */
-        /* ============================================ */
-        .btn-nav {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0.5rem 1.5rem;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn-nav-login {
-            background: rgba(122, 0, 25, 0.08);
-            color: var(--maroon) !important;
-            border: 1px solid rgba(122, 0, 25, 0.2);
-        }
-        
-        .btn-nav-login:hover {
-            background: var(--maroon);
-            color: white !important;
-            transform: translateY(-2px);
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(122, 0, 25, 0.2);
-        }
-        
-        .btn-nav-register {
-            background: linear-gradient(115deg, #ffb347, #ff8c00);
-            color: #2c1a00 !important;
-            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
-        }
-        
-        .btn-nav-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.4);
-            background: linear-gradient(115deg, #ffa726, #ff9800);
-            color: #1f1400 !important;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 60px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(122, 0, 25, 0.3);
-            background: linear-gradient(115deg, var(--maroon-dark), var(--maroon));
-            color: white;
-        }
-        
-        .btn-outline-primary {
-            border: 2px solid var(--maroon);
-            color: var(--maroon);
-            border-radius: 60px;
-            font-weight: 600;
-            padding: 0.5rem 1.5rem;
-            transition: all 0.3s ease;
-            background: transparent;
-        }
-        
-        .btn-outline-primary:hover {
-            background: var(--maroon);
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .btn-outline-secondary {
-            border: 2px solid var(--gray-600);
-            color: var(--gray-600);
-            background: transparent;
-            border-radius: 60px;
-            font-weight: 600;
-            padding: 0.5rem 1.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-outline-secondary:hover {
-            background: var(--gray-600);
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(115deg, #ef4444, #dc2626);
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 60px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-            background: linear-gradient(115deg, #dc2626, #b91c1c);
-            color: white;
-        }
-        
-        .btn-sm {
-            padding: 0.4rem 1rem;
             font-size: 0.85rem;
-            min-height: 36px;
+            min-height: 40px;
+            min-width: 100px;
         }
         
         .btn-lg {
-            padding: 0.75rem 2rem;
-            font-size: 1.05rem;
-            min-height: 52px;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.95rem;
+            min-height: 46px;
+            min-width: 140px;
         }
         
-        /* ============================================ */
-        /* CARD STYLES                                 */
-        /* ============================================ */
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            background: white;
+        .btn-sm {
+            padding: 0.3rem 0.75rem;
+            font-size: 0.8rem;
+            min-height: 32px;
+            min-width: 60px;
         }
         
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
+        .step-number {
+            width: 38px;
+            height: 38px;
+            font-size: 1rem;
         }
         
-        /* ============================================ */
-        /* ALERT STYLES                                */
-        /* ============================================ */
-        .alert {
-            border-radius: 16px;
-            border: none;
+        .step-header h4 {
+            font-size: 1rem;
         }
         
-        .alert-info {
-            background: linear-gradient(135deg, var(--cream), var(--cream-dark));
-            color: var(--maroon);
-            border-left: 4px solid var(--gold);
+        .step-header p {
+            font-size: 0.8rem;
         }
         
-        .alert-success {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            color: #065f46;
-            border-left: 4px solid #10b981;
+        .step-indicator {
+            font-size: 0.7rem;
         }
         
-        .alert-danger {
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
+        .step-indicator i {
+            display: none;
         }
         
-        .alert-warning {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            color: #92400e;
-            border-left: 4px solid #f59e0b;
+        .button-group {
+            flex-direction: column;
+            width: 100%;
         }
         
-        /* ============================================ */
-        /* FOOTER STYLES                               */
-        /* ============================================ */
-        footer {
-            background: var(--maroon-dark);
-            color: white;
-            padding: 3rem 0 2rem;
-            margin-top: 3rem;
+        .button-group .btn {
+            width: 100%;
+            min-width: unset;
         }
         
-        footer h5, footer h6 {
-            color: var(--gold);
-            font-weight: 700;
+        .button-group-between {
+            flex-direction: column-reverse;
         }
         
-        footer a {
-            transition: all 0.2s ease;
-            text-decoration: none;
+        .row .col-md-4, .row .col-md-6, .row .col-md-8 {
+            margin-bottom: 0.5rem;
         }
-        
-        footer a:hover {
-            color: var(--gold) !important;
-            padding-left: 5px;
-        }
-        
-        /* ============================================ */
-        /* DROPDOWN STYLES                             */
-        /* ============================================ */
-        .dropdown-menu {
-            border-radius: 16px;
-            border: 1px solid rgba(122, 0, 25, 0.1);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 0.5rem;
-        }
-        
-        .dropdown-item {
-            border-radius: 10px;
-            padding: 0.6rem 1rem;
-            transition: all 0.2s ease;
-        }
-        
-        .dropdown-item:hover {
-            background: rgba(122, 0, 25, 0.05);
-            color: var(--maroon);
-        }
-        
-        .dropdown-item.text-danger:hover {
-            background: rgba(220, 38, 38, 0.1);
-        }
-        
-        /* ============================================ */
-        /* FORM STYLES                                 */
-        /* ============================================ */
-        .form-control, .form-select {
-            border-radius: 12px;
-            border: 2px solid #e5e7eb;
-            padding: 0.6rem 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.2);
-            outline: none;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-        
-        /* ============================================ */
-        /* TABLE STYLES                                */
-        /* ============================================ */
-        .table {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .table th {
-            background: linear-gradient(135deg, var(--cream), var(--cream-dark));
-            color: var(--maroon);
-            font-weight: 700;
-            border-bottom: 2px solid var(--gold);
-        }
-        
-        .table td {
-            vertical-align: middle;
-        }
-        
-        .table-responsive {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        /* ============================================ */
-        /* UTILITY CLASSES                             */
-        /* ============================================ */
-        .text-maroon {
-            color: var(--maroon);
-        }
-        
-        .bg-maroon {
-            background: var(--maroon);
-        }
-        
-        .bg-maroon-dark {
-            background: var(--maroon-dark);
-        }
-        
-        .gap-2 { gap: 0.5rem; }
-        .gap-3 { gap: 1rem; }
-        .gap-4 { gap: 1.5rem; }
-        
-        .flex-1 { flex: 1; }
-        
-        /* ============================================ */
-        /* RESPONSIVE                                  */
-        /* ============================================ */
-        @media (max-width: 992px) {
-            .navbar-brand {
-                font-size: 1.5rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 1.4rem;
-            }
-            
-            .nav-link::after {
-                display: none;
-            }
-            
-            .btn-nav {
-                width: 100%;
-                justify-content: center;
-                margin: 0.25rem 0;
-            }
-            
-            .navbar-nav {
-                gap: 0;
-                padding: 0.5rem 0;
-            }
-            
-            .navbar-nav .nav-item {
-                width: 100%;
-            }
-            
-            .navbar-nav .nav-link {
-                padding: 0.6rem 1rem;
-                border-radius: 10px;
-            }
-            
-            .dropdown-menu {
-                border: none;
-                box-shadow: none;
-                background: transparent;
-                padding-left: 1rem;
-            }
-            
-            .dropdown-item {
-                padding: 0.5rem 1rem;
-            }
-            
-            footer {
-                text-align: center;
-            }
-            
-            footer .col-md-3, footer .col-md-6 {
-                margin-bottom: 1.5rem;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .navbar-brand {
-                font-size: 1.2rem;
-            }
-            
-            .btn-nav {
-                font-size: 0.85rem;
-                padding: 0.4rem 1rem;
-            }
-        }
-        
-        /* ============================================ */
-        /* NAVBAR TOGGLER                              */
-        /* ============================================ */
-        .navbar-toggler {
-            border: none;
-            background: transparent;
-            padding: 0.5rem;
-        }
-        
-        .navbar-toggler:focus {
-            box-shadow: none;
-        }
-        
-        .navbar-toggler-icon {
-            background-image: none;
-            position: relative;
-        }
-        
-        .navbar-toggler-icon i {
-            font-size: 1.5rem;
-            color: var(--maroon);
-        }
-        
-        /* ============================================ */
-        /* ANIMATIONS                                  */
-        /* ============================================ */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-    </style>
+    }
     
-    @stack('styles')
-</head>
-<body>
-    <!-- ============================================ -->
-    <!-- NAVIGATION                                   -->
-    <!-- ============================================ -->
-    <nav class="navbar navbar-expand-lg navbar-scholarease">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">
-                <i class="fas fa-graduation-cap me-2"></i> ScholarEase
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon">
-                    <i class="fas fa-bars"></i>
-                </span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    @auth
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                                <i class="fas fa-home me-1"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('scholarship.finder') ? 'active' : '' }}" href="{{ route('scholarship.finder') }}">
-                                <i class="fas fa-search me-1"></i> Find
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('bookmarks.*') ? 'active' : '' }}" href="{{ route('bookmarks.index') }}">
-                                <i class="fas fa-bookmark me-1"></i> Bookmarks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('feedback.*') ? 'active' : '' }}" href="{{ route('feedback.create') }}">
-                                <i class="fas fa-star me-1"></i> Feedback
-                            </a>
-                        </li>
-                        
-                        @if(auth()->user() && auth()->user()->isAdmin())
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
-                                    <i class="fas fa-crown me-1"></i> Admin
-                                </a>
-                            </li>
-                        @endif
-                        
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('profile.index') }}">
-                                        <i class="fas fa-user me-2"></i> Profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('feedback.create') }}">
-                                        <i class="fas fa-star me-2" style="color: #F4C542;"></i> Give Feedback
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                    </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="btn-nav btn-nav-login" href="{{ route('login') }}">
-                                <i class="fas fa-sign-in-alt"></i> Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn-nav btn-nav-register" href="{{ route('register') }}">
-                                <i class="fas fa-user-plus"></i> Register
-                            </a>
-                        </li>
-                    @endauth
-                </ul>
+    @media (max-width: 576px) {
+        .step-card {
+            padding: 1rem;
+        }
+        
+        .step-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .step-number {
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-area {
+            padding: 1rem;
+        }
+        
+        .upload-icon {
+            font-size: 2rem;
+        }
+        
+        .grade-badge {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            min-width: 40px;
+        }
+    }
+</style>
+
+<div class="finder-container">
+    <div class="container py-4">
+        <div class="step-container">
+            <!-- Progress Bar -->
+            <div class="mb-5" data-aos="fade-down">
+                <div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
+                    <span class="step-indicator active" id="step1Text">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Step 1: Academic Information
+                    </span>
+                    <span class="step-indicator" id="step2Text">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Step 2: Results Verification
+                    </span>
+                    <span class="step-indicator" id="step3Text">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        Step 3: Eligibility Profile
+                    </span>
+                </div>
+                <div class="progress-custom">
+                    <div class="progress-bar-custom" id="progressBar" style="width: 33%;"></div>
+                </div>
+            </div>
+
+            <!-- Step 1: Upload SPM -->
+            <div class="step-card" id="step1" data-aos="fade-up">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h4 class="mb-1">Academic Results Submission</h4>
+                        <p class="text-muted mb-0">Upload your SPM result slip or enter your results manually.</p>
+                    </div>
+                </div>
+                
+                <form id="uploadForm">
+                    @csrf
+                    <div class="upload-area" id="dropArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h5 class="text-maroon">Drag & Drop or Click to Upload</h5>
+                        <p class="text-muted">Supported formats: JPG, PNG, JPEG (Max: 5MB)</p>
+                        <input type="file" class="form-control d-none" id="spmFile" name="spm_file" accept="image/*,.pdf" required>
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('spmFile').click()">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                    </div>
+                    
+                    <div id="fileInfo" class="mt-3 d-none">
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-file-alt me-3 fa-2x"></i>
+                            <div class="flex-1">
+                                <strong id="fileName"></strong>
+                                <div class="progress mt-2" style="height: 6px;">
+                                    <div class="progress-bar bg-success" id="fileProgress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group button-group-center mt-4">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="processUpload()" id="processBtn">
+                            <i class="fas fa-cogs"></i> Process SPM Results
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="skipOCR()">
+                            <i class="fas fa-pen"></i> I don't have SPM result
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 2: Review & Edit OCR Results -->
+            <div class="step-card d-none" id="step2" data-aos="fade-up">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h4 class="mb-1" id="step2Title">Review & Edit Extracted Results</h4>
+                        <p class="text-muted mb-0" id="step2Desc">Please edit the extracted grades if needed</p>
+                    </div>
+                </div>
+                
+                <div id="ocrResultsContainer">
+                    <!-- Results will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Step 3: Additional Information -->
+            <div class="step-card d-none" id="step3" data-aos="fade-up">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h4 class="mb-1">Eligibility Profile</h4>
+                        <p class="text-muted mb-0">Complete your profile for personalized scholarship recommendations.</p>
+                    </div>
+                </div>
+                
+                <form id="profileForm" action="{{ route('save.profile') }}" method="POST">
+                    @csrf
+                    
+                    <!-- Extracted Grades Display -->
+                    <div class="mb-4">
+                        <h6 class="mb-3 fw-bold text-maroon">Verified SPM Results</h6>
+                        <div id="extractedGrades">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-maroon" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading verified grades...</p>
+                            </div>
+                        </div>
+                        <input type="hidden" name="total_as" id="totalAsInput">
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-money-bill me-2 text-maroon"></i>
+                                Monthly Household Income (RM)
+                            </label>
+                            <input type="number" name="monthly_income"
+                                class="form-control" min="0" placeholder="e.g. 4500" required>
+                            <small class="text-muted">
+                                B40 ≤ RM4,850 &nbsp;|&nbsp; M40 RM4,851–RM10,960 &nbsp;|&nbsp; T20 > RM10,960
+                            </small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-road me-2 text-maroon"></i>Intended Study Path
+                            </label>
+                            <select name="study_path" class="form-select" required>
+                                <option value="">-- Select Study Path --</option>
+                                <option value="Foundation">Foundation</option>
+                                <option value="Matriculation">Matriculation</option>
+                                <option value="Diploma">Diploma</option>
+                                <option value="Degree">Degree</option>
+                                <option value="TVET">TVET</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-book me-2 text-maroon"></i>Field of Study
+                            </label>
+                            <select name="field_of_study" class="form-select" required>
+                                <option value="">-- Select Field --</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Business">Business</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Education">Education</option>
+                                <option value="Data Science">Data Science</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="Economics">Economics</option>
+                                <option value="Law">Law</option>
+                                <option value="Science">Science</option>
+                                <option value="Architecture">Architecture</option>
+                                <option value="Social Science">Social Science</option>
+                                <option value="Communication">Communication</option>
+                                <option value="Hospitality">Hospitality</option>
+                                <option value="Art & Design">Art & Design</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-star-of-life me-2 text-maroon"></i>Bumiputera Status
+                            </label>
+                            <select name="bumiputera" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-birthday-cake me-2 text-maroon"></i>Age
+                            </label>
+                            <select name="age" class="form-select" required>
+                                <option value="">-- Select Age --</option>
+                                @for ($i = 15; $i <= 30; $i++)
+                                    <option value="{{ $i }}">{{ $i }} Years Old</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-map-marker-alt me-2 text-maroon"></i>State of Origin
+                            </label>
+                            <select name="state" class="form-select" required>
+                                <option value="">-- Select State --</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Pulau Pinang">Pulau Pinang</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                <option value="Putrajaya">Putrajaya</option>
+                                <option value="Labuan">Labuan</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-passport me-2 text-maroon"></i>Citizenship
+                            </label>
+                            <select name="citizenship" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="Malaysia">Malaysia</option>
+                                <option value="International">International</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-trophy me-2 text-maroon"></i>Leadership Experience
+                            </label>
+                            <select name="has_leadership" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group button-group-between mt-4 pt-3">
+                        <button type="button" class="btn btn-outline-primary" onclick="goBackToStep2()">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Get Recommendations <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-    </nav>
+    </div>
+</div>
 
-    <!-- ============================================ -->
-    <!-- MAIN CONTENT                                -->
-    <!-- ============================================ -->
-    <main>
-        @yield('content')
-    </main>
+@push('scripts')
+<!-- Load SweetAlert2 with fallback -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" onerror="handleSwalError()"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-    <!-- ============================================ -->
-    <!-- FOOTER                                      -->
-    <!-- ============================================ -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5><i class="fas fa-graduation-cap me-2"></i> ScholarEase</h5>
-                    <p class="mt-3" style="opacity: 0.8;">
-                        Your intelligent SPM scholarship finder. Making education accessible for all Malaysian students.
-                    </p>
-                </div>
-                <div class="col-md-3">
-                    <h6>Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ route('dashboard') }}" class="text-light opacity-75">Dashboard</a></li>
-                        <li class="mb-2"><a href="{{ route('scholarship.finder') }}" class="text-light opacity-75">Find Scholarships</a></li>
-                        <li class="mb-2"><a href="{{ route('bookmarks.index') }}" class="text-light opacity-75">Bookmarks</a></li>
-                        <li class="mb-2"><a href="{{ route('feedback.create') }}" class="text-light opacity-75">Give Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h6>Contact</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> support@scholarease.com</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +603-1234 5678</li>
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Kuala Lumpur, Malaysia</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
-            <div class="text-center" style="opacity: 0.6;">
-                &copy; {{ date('Y') }} ScholarEase. All rights reserved. | Making Education Accessible
-            </div>
-        </div>
-    </footer>
-
-    <!-- ============================================ -->
-    <!-- SCRIPTS - URUTAN PENTING!                    -->
-    <!-- ============================================ -->
+<script>
+    // Handle SweetAlert2 load failure - use native fallback
+    function handleSwalError() {
+        console.warn('SweetAlert2 failed to load, using native fallback');
+        window.Swal = null;
+    }
     
-    <!-- 1. jQuery (required for Bootstrap) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- 2. Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- 3. SweetAlert2 - Multiple CDN fallback -->
-    <script>
-        // Force load SweetAlert2 with multiple CDN fallbacks
-        (function loadSweetAlert() {
-            if (typeof Swal !== 'undefined' && Swal) {
-                console.log('✅ SweetAlert2 already loaded');
-                return;
-            }
-            
-            console.log('⏳ Loading SweetAlert2...');
-            
-            var cdnUrls = [
-                'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js',
-                'https://unpkg.com/sweetalert2@11/dist/sweetalert2.all.min.js'
-            ];
-            
-            var loaded = false;
-            var attempts = 0;
-            
-            function tryLoad(index) {
-                if (loaded || index >= cdnUrls.length) {
-                    if (!loaded) {
-                        console.warn('⚠️ All SweetAlert2 CDN failed, using native fallback');
-                        window.Swal = null;
-                    }
-                    return;
-                }
+    // Wait for Swal to load, fallback to native
+    function getSwal() {
+        if (typeof Swal !== 'undefined' && Swal) {
+            return Swal;
+        }
+        // Native fallback
+        return {
+            fire: function(options) {
+                const icon = options.icon || 'info';
+                const title = options.title || '';
+                const text = options.text || '';
+                const html = options.html || '';
+                const confirmText = options.confirmButtonText || 'OK';
+                const cancelText = options.cancelButtonText || 'Cancel';
+                const showCancel = options.showCancelButton || false;
+                const timer = options.timer || 0;
                 
-                var script = document.createElement('script');
-                script.src = cdnUrls[index];
-                script.async = false;
-                
-                script.onload = function() {
-                    if (typeof Swal !== 'undefined' && Swal) {
-                        loaded = true;
-                        console.log('✅ SweetAlert2 loaded from:', cdnUrls[index]);
+                return new Promise((resolve) => {
+                    // Create custom modal
+                    const modal = document.createElement('div');
+                    modal.style.cssText = `
+                        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                        background: rgba(0,0,0,0.5); display: flex; align-items: center;
+                        justify-content: center; z-index: 99999; padding: 20px;
+                    `;
+                    
+                    const colors = {
+                        success: '#10b981',
+                        error: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                        question: '#6b7280'
+                    };
+                    
+                    const iconMap = {
+                        success: '✅',
+                        error: '❌',
+                        warning: '⚠️',
+                        info: 'ℹ️',
+                        question: '❓'
+                    };
+                    
+                    const content = document.createElement('div');
+                    content.style.cssText = `
+                        background: white; border-radius: 16px; padding: 24px;
+                        max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                        animation: modalFadeIn 0.3s ease;
+                    `;
+                    
+                    if (options.html) {
+                        content.innerHTML = options.html;
                     } else {
-                        // Try next CDN
-                        tryLoad(index + 1);
+                        content.innerHTML = `
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 12px;">${iconMap[icon] || 'ℹ️'}</div>
+                                <h3 style="margin: 0 0 8px; color: #1f2937;">${title}</h3>
+                                <p style="margin: 0 0 20px; color: #4b5563;">${text}</p>
+                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                    ${showCancel ? `<button id="swal-cancel" style="padding: 10px 24px; border: 2px solid #6b7280; background: transparent; border-radius: 40px; font-weight: 600; cursor: pointer;">${cancelText}</button>` : ''}
+                                    <button id="swal-confirm" style="padding: 10px 24px; border: none; background: ${colors[icon] || '#7A0019'}; color: white; border-radius: 40px; font-weight: 600; cursor: pointer;">${confirmText}</button>
+                                </div>
+                            </div>
+                        `;
                     }
-                };
-                
-                script.onerror = function() {
-                    console.warn('❌ Failed to load from:', cdnUrls[index]);
-                    tryLoad(index + 1);
-                };
-                
-                document.head.appendChild(script);
+                    
+                    modal.appendChild(content);
+                    document.body.appendChild(modal);
+                    
+                    // Add animation
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes modalFadeIn {
+                            from { opacity: 0; transform: scale(0.9); }
+                            to { opacity: 1; transform: scale(1); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Handle timer
+                    if (timer > 0) {
+                        setTimeout(() => {
+                            if (modal.parentNode) modal.remove();
+                            resolve({ isConfirmed: false, isDismissed: true });
+                        }, timer);
+                    }
+                    
+                    const confirmBtn = content.querySelector('#swal-confirm');
+                    const cancelBtn = content.querySelector('#swal-cancel');
+                    
+                    confirmBtn.onclick = () => {
+                        modal.remove();
+                        resolve({ isConfirmed: true });
+                    };
+                    
+                    if (cancelBtn) {
+                        cancelBtn.onclick = () => {
+                            modal.remove();
+                            resolve({ isConfirmed: false, isDismissed: true });
+                        };
+                    }
+                    
+                    // Close on backdrop click
+                    modal.onclick = (e) => {
+                        if (e.target === modal && !showCancel) {
+                            modal.remove();
+                            resolve({ isConfirmed: false, isDismissed: true });
+                        }
+                    };
+                });
+            },
+            close: function() {
+                const modals = document.querySelectorAll('[style*="position: fixed"][style*="z-index: 99999"]');
+                modals.forEach(m => m.remove());
             }
+        };
+    }
+    
+    AOS.init({ duration: 800, once: true });
+
+    let currentStep = 1;
+    let ocrData = null;
+    
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('spmFile');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+        dropArea.classList.add('dragover');
+    }
+    
+    function unhighlight() {
+        dropArea.classList.remove('dragover');
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        handleFiles(files);
+    }
+    
+    fileInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+    
+    function handleFiles(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').classList.remove('d-none');
             
-            // Start loading from first CDN
-            tryLoad(0);
-            
-            // Final fallback: after 5 seconds, if still not loaded
-            setTimeout(function() {
-                if (typeof Swal === 'undefined' || !Swal) {
-                    console.warn('⚠️ SweetAlert2 timeout, using native fallback');
-                    window.Swal = null;
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                document.getElementById('fileProgress').style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
                 }
-            }, 5000);
-        })();
-    </script>
+            }, 100);
+        }
+    }
     
-    <!-- 4. AOS Animation -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <!-- 5. Custom Scripts from child views -->
-    @stack('scripts')
-    
-    <!-- 6. Default initialization -->
-    <script>
-        // Initialize AOS
-        if (typeof AOS !== 'undefined') {
-            AOS.init({ duration: 800, once: true });
+    function processUpload() {
+        const Swal = getSwal();
+        const fileInput = document.getElementById('spmFile');
+        if (!fileInput.files.length) {
+            Swal.fire('Error', 'Please select a file to upload', 'error');
+            return;
         }
         
-        // CSRF Token for AJAX requests
-        if (typeof $ !== 'undefined') {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+        const formData = new FormData(document.getElementById('uploadForm'));
+        
+        Swal.fire({
+            title: 'Processing SPM Certificate',
+            html: '<div class="text-center"><div class="spinner-border text-maroon mb-3" role="status"></div><p>Extracting grades using OCR...</p></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+        
+        fetch("{{ route('upload.spm') }}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            
+            if (data.success) {
+                ocrData = data;
+                displayOCRResults(data);
+            } else {
+                Swal.fire('Error', data.message || 'Failed to process SPM certificate', 'error');
+            }
+        })
+        .catch(error => {
+            Swal.close();
+            Swal.fire('Error', 'Failed to process SPM certificate. Please try again.', 'error');
+            console.error('Error:', error);
+        });
+    }
+    
+    function displayOCRResults(data) {
+        const isManual = data.manualEntry === true;
+
+        let html = `
+            <div class="alert alert-info mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle me-3 fa-2x"></i>
+                    <div>
+                        <h6 class="mb-1">${isManual ? 'Academic Results Summary' : 'OCR Results Summary'}</h6>
+                        <p class="mb-0">${isManual ? `Added <strong>${Object.keys(data.grades).length}</strong> subjects` : `Detected <strong>${Object.keys(data.grades).length}</strong> subjects`} | 
+                        Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ocrConfidenceBar" class="mb-4"></div>
+            
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h6 class="mb-0 fw-bold text-maroon">${isManual ? 'Enter Your Subjects & Grades' : 'Edit Detected Grades'}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="showAddSubjectModal()">
+                        <i class="fas fa-plus"></i> ${isManual ? 'Add Subject' : 'Add Missing Subject'}
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover" id="gradesTable">
+                        <thead>
+                            <tr>
+                                <th width="40%">${isManual ? 'Subject' : 'Subject (Detected by OCR)'}</th>
+                                <th width="20%">${isManual ? 'Grade' : 'Extracted Grade'}</th>
+                                <th width="30%">Edit Grade</th>
+                                <th width="10%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradesTableBody">
+        `;
+        
+        const subjects = Object.keys(data.grades);
+        subjects.sort();
+        
+        subjects.forEach(subject => {
+            const grade = data.grades[subject];
+            const gradeClass = getGradeClass(grade);
+            const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+            
+            html += `
+                <tr id="subject-row-${safeSubjectId}">
+                    <td class="fw-bold">${subject}</td>
+                    <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
+                    <td>
+                        <select class="form-select form-select-sm grade-select" data-subject="${subject}" onchange="updateGrade('${subject}', this.value)" id="select-${safeSubjectId}" style="max-width: 140px;">
+                            <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
+                            <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
+                            <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
+                            <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
+                            <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
+                            <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
+                            <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
+                            <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
+                            <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
+                            <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
+                            <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
+                            <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')" title="Remove this subject">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row mt-3 align-items-center">
+                    <div class="col-md-8">
+                        <div class="alert alert-warning mb-0">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>${isManual ? 'Manual Entry Note:' : 'OCR Accuracy Note:'}</h6>
+                            <p class="mb-0 small">${isManual ? 'Please enter all your SPM subjects and grades manually before continuing.' : 'OCR may not detect all subjects or may misread grades. Please verify each subject and grade.'}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="button-group button-group-end mt-3 mt-md-0">
+                            <button type="button" class="btn btn-primary" onclick="verifyAndContinue()">
+                                <i class="fas fa-check-circle"></i> Continue
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="goBackToUpload()">
+                                <i class="fas fa-redo"></i> ${isManual ? 'Back' : 'Upload Again'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('ocrResultsContainer').innerHTML = html;
+
+        if (!isManual && data.confidence !== undefined) {
+            const confidence = data.confidence;
+            let confidenceColor = 'bg-danger';
+            let confidenceText = 'Low confidence – manual verification recommended';
+
+            if (confidence >= 80) {
+                confidenceColor = 'bg-success';
+                confidenceText = 'High confidence – OCR result is reliable';
+            } else if (confidence >= 60) {
+                confidenceColor = 'bg-warning';
+                confidenceText = 'Medium confidence – please double-check grades';
+            }
+
+            document.getElementById('ocrConfidenceBar').innerHTML = `
+                <label class="form-label fw-bold">OCR Confidence Level</label>
+                <div class="progress" style="height: 22px;">
+                    <div class="progress-bar ${confidenceColor}" role="progressbar" style="width: ${confidence}%" aria-valuenow="${confidence}" aria-valuemin="0" aria-valuemax="100">
+                        ${confidence}%
+                    </div>
+                </div>
+                <small class="text-muted mt-1 d-block">${confidenceText}</small>
+            `;
+        }
+
+        if (isManual) {
+            document.getElementById('step2Title').innerText = 'Enter Your SPM Results';
+            document.getElementById('step2Desc').innerText = 'Please add your subjects and grades manually';
+        } else {
+            document.getElementById('step2Title').innerText = 'Review & Edit Extracted Results';
+            document.getElementById('step2Desc').innerText = 'Please edit the extracted grades if needed';
         }
         
-        // Initialize tooltips
-        if (typeof bootstrap !== 'undefined') {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+        goToStep(2);
+    }
+    
+    function getGradeClass(grade) {
+        if (grade === 'A+') return 'grade-a-plus';
+        if (grade === 'A') return 'grade-a';
+        if (grade === 'A-') return 'grade-a-minus';
+        if (grade === 'B+') return 'grade-b-plus';
+        if (grade === 'B') return 'grade-b';
+        if (grade === 'B-') return 'grade-b-minus';
+        if (grade === 'C+') return 'grade-c-plus';
+        if (grade === 'C') return 'grade-c';
+        return 'grade-other';
+    }
+    
+    function updateGrade(subject, newGrade) {
+        if (!ocrData) return;
+        ocrData.grades[subject] = newGrade;
+        
+        const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+        const badge = document.getElementById(`grade-${safeSubjectId}`);
+        if (badge) {
+            badge.textContent = newGrade;
+            badge.className = `grade-badge ${getGradeClass(newGrade)}`;
         }
-    </script>
-</body>
-</html>
+        
+        let totalAs = 0;
+        Object.values(ocrData.grades).forEach(grade => {
+            if (grade.startsWith('A')) totalAs++;
+        });
+        
+        document.getElementById('totalAsBadge').textContent = totalAs;
+        ocrData.totalAs = totalAs;
+    }
+    
+    function showAddSubjectModal() {
+        const Swal = getSwal();
+        Swal.fire({
+            title: 'Add Missing Subject',
+            html: `
+                <div class="text-start">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Subject Name</label>
+                        <select id="newSubjectName" class="form-select" onchange="toggleCustomSubject(this.value)">
+                            <option value="">-- Select Subject --</option>
+                            <option value="BAHASA MELAYU">BAHASA MELAYU</option>
+                            <option value="BAHASA INGGERIS">BAHASA INGGERIS</option>
+                            <option value="MATHEMATICS">MATHEMATICS</option>
+                            <option value="ADDITIONAL MATHEMATICS">ADDITIONAL MATHEMATICS</option>
+                            <option value="SCIENCE">SCIENCE</option>
+                            <option value="PHYSICS">PHYSICS</option>
+                            <option value="CHEMISTRY">CHEMISTRY</option>
+                            <option value="BIOLOGY">BIOLOGY</option>
+                            <option value="SEJARAH">SEJARAH</option>
+                            <option value="PENDIDIKAN ISLAM">PENDIDIKAN ISLAM</option>
+                            <option value="PENDIDIKAN MORAL">PENDIDIKAN MORAL</option>
+                            <option value="PRINSIP PERAKAUNAN">PRINSIP PERAKAUNAN</option>
+                            <option value="EKONOMI">EKONOMI</option>
+                            <option value="PERNIAGAAN">PERNIAGAAN</option>
+                            <option value="SAINS KOMPUTER">SAINS KOMPUTER</option>
+                            <option value="BAHASA ARAB">BAHASA ARAB</option>
+                            <option value="KESUSASTERAAN MELAYU">KESUSASTERAAN MELAYU</option>
+                            <option value="GEOGRAFI">GEOGRAFI</option>
+                            <option value="OTHER">OTHER</option>
+                        </select>
+                        <input type="text" id="customSubjectName" class="form-control mt-2 d-none" placeholder="Enter custom subject name">
+                        <small class="text-muted">Select a subject or choose OTHER to enter custom</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Grade</label>
+                        <select id="newSubjectGrade" class="form-select">
+                            <option value="A+">A+</option>
+                            <option value="A">A</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B">B</option>
+                            <option value="B-">B-</option>
+                            <option value="C+">C+</option>
+                            <option value="C">C</option>
+                            <option value="C-">C-</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                            <option value="G">G</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-plus me-2"></i> Add Subject',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#7A0019',
+            cancelButtonColor: '#6b7280',
+            preConfirm: () => {
+                let subject = document.getElementById('newSubjectName').value;
+                const grade = document.getElementById('newSubjectGrade').value;
+                
+                if (subject === 'OTHER') {
+                    subject = document.getElementById('customSubjectName').value.trim().toUpperCase();
+                }
+                
+                if (!subject) {
+                    Swal.showValidationMessage('Please select or enter a subject name');
+                    return false;
+                }
+                
+                return { subject: subject, grade: grade };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                addSubject(result.value.subject, result.value.grade);
+            }
+        });
+    }
+
+    function toggleCustomSubject(value) {
+        const customInput = document.getElementById('customSubjectName');
+        if (!customInput) return;
+        if (value === 'OTHER') {
+            customInput.classList.remove('d-none');
+        } else {
+            customInput.classList.add('d-none');
+            customInput.value = '';
+        }
+    }
+
+    function addSubject(subject, grade) {
+        const Swal = getSwal();
+        if (!ocrData) return;
+        
+        if (ocrData.grades[subject]) {
+            Swal.fire('Warning', `Subject "${subject}" already exists!`, 'warning');
+            return;
+        }
+        
+        Swal.fire({
+            title: 'Adding Subject',
+            html: '<div class="spinner-border text-maroon"></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+        
+        fetch("{{ route('add.ocr.subject') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ subject: subject, grade: grade })
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.success) {
+                ocrData.grades[subject] = grade;
+                ocrData.totalAs = data.totalAs;
+                addSubjectToTable(subject, grade, data.totalAs);
+                Swal.fire({ icon: 'success', title: 'Subject Added!', timer: 1500, showConfirmButton: false });
+            } else {
+                Swal.fire('Error', data.message, 'error');
+            }
+        })
+        .catch(error => {
+            Swal.close();
+            console.error(error);
+            Swal.fire('Error', 'Failed to add subject', 'error');
+        });
+    }
+    
+    function addSubjectToTable(subject, grade, totalAs) {
+        const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+        const gradeClass = getGradeClass(grade);
+        const newRow = `
+            <tr id="subject-row-${safeSubjectId}">
+                <td class="fw-bold">${subject} <span class="badge bg-info ms-2">Added</span></td>
+                <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
+                <td>
+                    <select class="form-select form-select-sm" onchange="updateGrade('${subject}', this.value)" style="max-width: 140px;">
+                        <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
+                        <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
+                        <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
+                        <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
+                        <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
+                        <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
+                        <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
+                        <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
+                        <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
+                        <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
+                        <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
+                        <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
+                    </select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        const tbody = document.getElementById('gradesTableBody');
+        if (tbody) tbody.innerHTML += newRow;
+        document.getElementById('totalAsBadge').textContent = totalAs;
+    }
+    
+    function removeSubject(subject) {
+        const Swal = getSwal();
+        Swal.fire({
+            title: 'Remove Subject?', 
+            text: `Remove "${subject}"?`, 
+            icon: 'warning',
+            showCancelButton: true, 
+            confirmButtonText: 'Yes, Remove', 
+            confirmButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ route('remove.ocr.subject') }}", {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                    },
+                    body: JSON.stringify({ subject: subject })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (ocrData && ocrData.grades[subject]) delete ocrData.grades[subject];
+                        ocrData.totalAs = data.totalAs;
+                        const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+                        const row = document.getElementById(`subject-row-${safeSubjectId}`);
+                        if (row) row.remove();
+                        document.getElementById('totalAsBadge').textContent = data.totalAs;
+                        Swal.fire({ icon: 'success', title: 'Removed!', timer: 2000, showConfirmButton: false });
+                    } else { 
+                        Swal.fire('Error', data.message, 'error'); 
+                    }
+                })
+                .catch(error => { 
+                    Swal.fire('Error', 'Failed to remove subject', 'error'); 
+                });
+            }
+        });
+    }
+    
+    function verifyAndContinue() {
+        const Swal = getSwal();
+        Swal.fire({
+            title: 'Verify Results', 
+            text: 'Are you sure all grades are correct?', 
+            icon: 'question',
+            showCancelButton: true, 
+            confirmButtonText: 'Yes, Continue', 
+            confirmButtonColor: '#3085d6'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ route('verify.ocr.results') }}", {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                    },
+                    body: JSON.stringify({ confirm: true })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayVerifiedGrades(data.totalAs);
+                        goToStep(3);
+                        Swal.fire({ 
+                            icon: 'success', 
+                            title: 'Verified!', 
+                            text: data.message, 
+                            timer: 1500, 
+                            showConfirmButton: false 
+                        });
+                    } else { 
+                        Swal.fire('Error', data.message, 'error'); 
+                    }
+                })
+                .catch(error => { 
+                    Swal.fire('Error', 'Verification failed', 'error'); 
+                });
+            }
+        });
+
+        // Update grades
+        fetch("{{ route('update.ocr.results') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ grades: ocrData.grades })
+        });
+    }
+    
+    function displayVerifiedGrades(totalAs) {
+        document.getElementById('totalAsInput').value = totalAs;
+        document.getElementById('extractedGrades').innerHTML = `
+            <div class="verified-grades">
+                <div class="alert alert-success">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-3 fa-2x"></i>
+                        <div>
+                            <h6 class="mb-1">✓ Verified SPM Results</h6>
+                            <p class="mb-0">Total A's: <span class="badge bg-success">${totalAs}</span></p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mb-0"><small>Your grades have been verified and will be used for scholarship matching.</small></p>
+            </div>
+        `;
+    }
+    
+    function goToStep(step) {
+        document.getElementById('step1').classList.add('d-none');
+        document.getElementById('step2').classList.add('d-none');
+        document.getElementById('step3').classList.add('d-none');
+        document.getElementById(`step${step}`).classList.remove('d-none');
+        
+        const progress = step === 1 ? 33 : step === 2 ? 66 : 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+        
+        const stepTexts = ['step1Text', 'step2Text', 'step3Text'];
+        stepTexts.forEach((id, idx) => {
+            const el = document.getElementById(id);
+            if (idx + 1 === step) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
+        currentStep = step;
+    }
+    
+    function goBackToUpload() {
+        const Swal = getSwal();
+        Swal.fire({
+            title: 'Upload Again?', 
+            text: 'This will clear all extracted data.', 
+            icon: 'warning',
+            showCancelButton: true, 
+            confirmButtonText: 'Yes, Upload Again'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ route('verify.ocr.results') }}", {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                    },
+                    body: JSON.stringify({ confirm: false })
+                }).then(() => {
+                    document.getElementById('spmFile').value = '';
+                    document.getElementById('fileInfo').classList.add('d-none');
+                    goToStep(1);
+                });
+            }
+        });
+    }
+    
+    function goBackToStep2() { 
+        goToStep(2); 
+    }
+
+    function skipOCR() {
+        const Swal = getSwal();
+        Swal.fire({
+            title: 'Manual Entry',
+            text: 'Proceed without OCR and enter SPM results manually?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ route('ocr.skip') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        ocrData = {
+                            grades: {},
+                            totalAs: 0,
+                            manualEntry: true
+                        };
+                        displayOCRResults(ocrData);
+                    }
+                });
+            }
+        });
+    }
+    
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        const income = document.querySelector('input[name="monthly_income"]').value;
+        const study = document.querySelector('select[name="study_path"]').value;
+        
+        if (!income || !study) {
+            e.preventDefault();
+            const Swal = getSwal();
+            Swal.fire('Error', 'Please complete all required fields', 'error');
+        }
+    });
+</script>
+@endpush
+@endsection
