@@ -5,70 +5,75 @@ namespace App\Services;
 /**
  * Rule-Based Scholarship Matcher
  * ================================
- * FYP — Pure Rule-Based Recommendation System
+ * FYP — Pure Rule-Based Recommendation System (ScholarEase)
  *
  * DESIGN PHILOSOPHY:
- * ─────────────────────────────────────────────────────
+ * ─────────────────────────────────────────────────────────
  * Every criterion is evaluated as a binary pass/fail rule.
- * No scoring weights are applied — no percentage, no points.
- * This reflects the actual policy language used by Malaysian
- * scholarship providers and requires no external justification
- * for weight values.
+ * No scoring weights, no percentage, no points.
+ * Directly reflects the policy language used by Malaysian
+ * scholarship providers. No external weight justification needed.
  *
- * A scholarship either matches the student or it does not.
- * The only exception is income keutamaan (preference) — where
- * the student is still shown but flagged as "Less Priority"
- * if they are outside the preferred income group.
+ * ─────────────────────────────────────────────────────────
+ * HARD FILTERS (pass/fail — any fail = excluded immediately):
  *
- * ─────────────────────────────────────────────────────
- * HARD FILTERS (all pass/fail — any fail = excluded):
+ *   1. Citizenship       Must match if required. Empty = open to all.
+ *   2. Bumiputera        Must be Bumiputera if bumiputera_required = true.
+ *   3. Study level       Must be in allowed list (Foundation / Matriculation /
+ *                        Diploma / Degree / TVET only — no postgraduate).
+ *   4. Field of study    Must be in allowed list. Empty = open to all.
+ *   5. Age               Must be within min/max range. Not set = no restriction.
+ *   6. SPM result        Must meet or exceed min_spm_as. Strict — no tolerance.
+ *   7. Income RM ceiling monthly_income ≤ max_monthly_income if set.
+ *   8. Income category   If 1 category ticked → syarat wajib hard filter.
+ *   9. State             Must be in allowed states. Empty = open to all.
  *
- *   1. Citizenship        — must match if required
- *   2. Bumiputera         — must be Bumiputera if required
- *   3. Study level        — must be in allowed list
- *   4. Field of study     — must be in allowed list
- *   5. Age                — must be within min/max range
- *   6. SPM result         — shortfall must not exceed 2As
- *   7. Income RM ceiling  — monthly_income ≤ max_monthly_income
- *   8. Income category    — if 1 category ticked (syarat wajib)
+ * ─────────────────────────────────────────────────────────
+ * KEUTAMAAN FLAG (not a filter — affects ordering only):
  *
- * KEUTAMAAN FLAG (not a filter — informational only):
+ *   Income categories — auto-resolved from checkbox count:
+ *   0 ticked  → no restriction  → Priority Match (no penalty)
+ *   1 ticked  → hard filter     → handled in Step 1
+ *   2+ ticked → preference      → Priority Match if in list
+ *                                  General Match if outside list
  *
- *   Income preference     — if 2+ categories ticked
- *   Student in preferred group  → priority = 'keutamaan'
- *   Student outside group       → priority = 'less_priority'
- *
+ * ─────────────────────────────────────────────────────────
  * SORTING:
- *   1. Keutamaan matches first
- *   2. Less priority matches second
- *   3. Within each group → soonest deadline first
+ *   1st → Priority Match  (soonest deadline first)
+ *   2nd → General Match   (soonest deadline first)
  *
- * ─────────────────────────────────────────────────────
- * INCOME CATEGORY AUTO-RESOLUTION (from checkbox count):
+ * ─────────────────────────────────────────────────────────
+ * NOT INCLUDED IN MATCHING (shown in scholarship detail only):
+ *   Leadership, sports achievement, rural priority
+ *   — excluded because scholarship providers typically express
+ *     these as preferences, not mandatory requirements.
  *
- *   0 ticked  → no restriction   → pass, priority = 'keutamaan'
- *   1 ticked  → hard requirement → must match or excluded
- *   2+ ticked → preference       → pass, flag keutamaan or less_priority
+ * ─────────────────────────────────────────────────────────
+ * ALLOWED STUDY LEVELS:
+ *   Foundation, Matriculation, Diploma, Degree, TVET
+ *   for SPM-based scholarship recommendations.
  *
+ * ─────────────────────────────────────────────────────────
  * INCOME THRESHOLDS (Rafizi Ramli, Ministry of Economy, 2023):
  *   B40 → ≤ RM4,850/month
  *   M40 → RM4,851 – RM10,960/month
  *   T20 → > RM10,960/month
- * ─────────────────────────────────────────────────────
+ * ─────────────────────────────────────────────────────────
  */
 class ScholarshipRuleMatcher
 {
     /**
-     * SPM near-hard filter tolerance.
-     * Shortfall > 2As → excluded (too far from requirement).
-     * Shortfall 0, 1, 2 → eligible (close enough to be relevant).
-     *
-     * Rationale (design decision):
-     *   A student 1–2As short may still be competitive if all other
-     *   criteria are met. Beyond 2As the gap is too significant to
-     *   produce a meaningful recommendation.
+     * Allowed study levels.
+     * designed for SPM leavers applying for pre-degree and
+     * undergraduate programmes only.
      */
-    private const SPM_MAX_SHORTFALL = 2;
+    private const ALLOWED_STUDY_LEVELS = [
+        'Foundation',
+        'Matriculation',
+        'Diploma',
+        'Degree',
+        'TVET',
+    ];
 
     /**
      * Official Malaysian household income thresholds.
@@ -82,6 +87,11 @@ class ScholarshipRuleMatcher
     // =========================================================================
     // PUBLIC: Auto-derive income category from actual monthly income (RM)
     // Call on profile save. Store result in student->income_category.
+    //
+    // Example:
+    //   deriveIncomeCategory(3000)  → 'B40'
+    //   deriveIncomeCategory(7000)  → 'M40'
+    //   deriveIncomeCategory(15000) → 'T20'
     // =========================================================================
 
     public static function deriveIncomeCategory(int $monthlyIncome): string
@@ -103,9 +113,8 @@ class ScholarshipRuleMatcher
 
     public function getRecommendations($student, $scholarships): \Illuminate\Support\Collection
     {
-        $matched       = [];
-        $keutamaan     = [];
-        $lessPriority  = [];
+        $priorityMatch = [];
+        $generalMatch  = [];
 
         foreach ($scholarships as $scholarship) {
             $criteria = $scholarship->eligibilityCriteria;
@@ -124,11 +133,10 @@ class ScholarshipRuleMatcher
             $scholarship->match_level     = $result['match_level'];
             $scholarship->priority        = $result['priority'];
 
-            // Separate into keutamaan and less_priority groups
-            if ($result['priority'] === 'less_priority') {
-                $lessPriority[] = $scholarship;
+            if ($result['priority'] === 'general_match') {
+                $generalMatch[] = $scholarship;
             } else {
-                $keutamaan[] = $scholarship;
+                $priorityMatch[] = $scholarship;
             }
         }
 
@@ -139,11 +147,10 @@ class ScholarshipRuleMatcher
             return $da <=> $db;
         };
 
-        usort($keutamaan,    $sortByDeadline);
-        usort($lessPriority, $sortByDeadline);
+        usort($priorityMatch, $sortByDeadline);
+        usort($generalMatch,  $sortByDeadline);
 
-        // Keutamaan first, then less priority
-        return collect(array_merge($keutamaan, $lessPriority))->values();
+        return collect(array_merge($priorityMatch, $generalMatch))->values();
     }
 
     // =========================================================================
@@ -171,7 +178,9 @@ class ScholarshipRuleMatcher
         return [
             'eligible'    => true,
             'priority'    => $priority,
-            'match_level' => $priority === 'keutamaan' ? 'Eligible — Keutamaan' : 'Eligible — Less Priority',
+            'match_level' => $priority === 'priority_match'
+                ? 'Priority Match'
+                : 'General Match',
             'breakdown'   => $filters,
         ];
     }
@@ -191,9 +200,15 @@ class ScholarshipRuleMatcher
             'age'         => $this->checkAge($student, $criteria),
             'spm'         => $this->checkSpm($student, $criteria),
             'income'      => $this->checkIncome($student, $criteria),
+            'state'       => $this->checkState($student, $criteria),
         ];
     }
 
+    /**
+     * Filter 1 — Citizenship
+     * Must match scholarship's required citizenship.
+     * If no requirement set → open to all → pass.
+     */
     private function checkCitizenship($student, $criteria): array
     {
         if (!$criteria->citizenship_required) {
@@ -204,17 +219,25 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        $passed = strcasecmp($student->citizenship, $criteria->citizenship_required) === 0;
+        $passed = strcasecmp(
+            $student->citizenship,
+            $criteria->citizenship_required
+        ) === 0;
 
         return [
             'passed' => $passed,
             'label'  => 'Citizenship',
             'reason' => $passed
                 ? "Eligible ({$student->citizenship})"
-                : "Required {$criteria->citizenship_required}, student is {$student->citizenship}",
+                : "Required: {$criteria->citizenship_required} — Student: {$student->citizenship}",
         ];
     }
 
+    /**
+     * Filter 2 — Bumiputera
+     * Must be Bumiputera if bumiputera_required = true.
+     * If not required → open to all races → pass.
+     */
     private function checkBumiputera($student, $criteria): array
     {
         if (!$criteria->bumiputera_required) {
@@ -236,9 +259,20 @@ class ScholarshipRuleMatcher
         ];
     }
 
+    /**
+     * Filter 3 — Study Level
+     * Must be in scholarship's allowed study paths.
+     * If no restriction → pass.
+     *
+     * Allowed values: Foundation, Matriculation, Diploma, Degree, TVET.
+     * Postgraduate levels are not applicable for this system.
+     */
     private function checkStudyLevel($student, $criteria): array
     {
-        $allowed = $criteria->study_paths ?? [];
+        $allowed = array_intersect(
+            $criteria->study_paths ?? [],
+            self::ALLOWED_STUDY_LEVELS
+        );
 
         if (empty($allowed)) {
             return [
@@ -255,10 +289,16 @@ class ScholarshipRuleMatcher
             'label'  => 'Study level',
             'reason' => $passed
                 ? "Eligible ({$student->study_level})"
-                : "{$student->study_level} is not in allowed levels: " . implode(', ', $allowed),
+                : "{$student->study_level} is not in allowed levels: "
+                    . implode(', ', $allowed),
         ];
     }
 
+    /**
+     * Filter 4 — Field of Study
+     * Must be in scholarship's allowed fields.
+     * If no restriction → pass.
+     */
     private function checkField($student, $criteria): array
     {
         $allowed = $criteria->fields_of_study ?? [];
@@ -278,17 +318,22 @@ class ScholarshipRuleMatcher
             'label'  => 'Field of study',
             'reason' => $passed
                 ? "Eligible ({$student->field_of_study})"
-                : "{$student->field_of_study} is not in allowed fields",
+                : "{$student->field_of_study} is not in allowed fields: "
+                    . implode(', ', $allowed),
         ];
     }
 
+    /**
+     * Filter 5 — Age
+     * Must be within min/max range.
+     * If not set → no restriction → pass.
+     */
     private function checkAge($student, $criteria): array
     {
-        $minOk = $criteria->min_age === null || $student->age >= $criteria->min_age;
-        $maxOk = $criteria->max_age === null || $student->age <= $criteria->max_age;
-        $passed = $minOk && $maxOk;
+        $hasMin = $criteria->min_age !== null;
+        $hasMax = $criteria->max_age !== null;
 
-        if ($criteria->min_age === null && $criteria->max_age === null) {
+        if (!$hasMin && !$hasMax) {
             return [
                 'passed' => true,
                 'label'  => 'Age',
@@ -296,7 +341,10 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        $range = ($criteria->min_age ?? '?') . '–' . ($criteria->max_age ?? '?') . ' years';
+        $minOk  = !$hasMin || $student->age >= $criteria->min_age;
+        $maxOk  = !$hasMax || $student->age <= $criteria->max_age;
+        $passed = $minOk && $maxOk;
+        $range  = ($criteria->min_age ?? '?') . '–' . ($criteria->max_age ?? '?') . ' years';
 
         return [
             'passed' => $passed,
@@ -308,14 +356,10 @@ class ScholarshipRuleMatcher
     }
 
     /**
-     * SPM near-hard filter.
-     * Shortfall > SPM_MAX_SHORTFALL (2) → excluded.
-     * 0–2As short → eligible.
-     *
-     * Rationale (design decision, no external source required):
-     *   Students within 2As of the requirement are close enough to
-     *   be a relevant recommendation. Beyond that the academic gap
-     *   is too large to be meaningful.
+     * Filter 6 — SPM Result (strict hard filter)
+     * Student's total As must meet or exceed min_spm_as.
+     * No tolerance — SV feedback: "if requirement is 8A, student needs 8A."
+     * If no requirement → pass.
      */
     private function checkSpm($student, $criteria): array
     {
@@ -327,44 +371,36 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        $shortfall = $criteria->min_spm_as - $student->total_as;
-
-        if ($shortfall <= 0) {
-            return [
-                'passed' => true,
-                'label'  => 'SPM result',
-                'reason' => "Meets requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)",
-            ];
-        }
-
-        if ($shortfall <= self::SPM_MAX_SHORTFALL) {
-            return [
-                'passed' => true,
-                'label'  => 'SPM result',
-                'reason' => "{$shortfall}A short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required) — within tolerance",
-            ];
-        }
+        $passed = $student->total_as >= $criteria->min_spm_as;
 
         return [
-            'passed' => false,
+            'passed' => $passed,
             'label'  => 'SPM result',
-            'reason' => "{$shortfall}As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required) — exceeds tolerance of " . self::SPM_MAX_SHORTFALL,
+            'reason' => $passed
+                ? "Meets requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"
+                : "Does not meet requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)",
         ];
     }
 
     /**
-     * Income hard filter.
+     * Filter 7 & 8 — Income
      *
-     * Checks in this order:
+     * Checked in this order:
      *
-     * 1. max_monthly_income set → compare actual RM (syarat wajib)
-     * 2. 1 category ticked     → compare derived category (syarat wajib)
-     * 3. 2+ categories ticked  → pass here (handled as keutamaan flag)
-     * 4. Nothing set           → pass (no restriction)
+     * A. max_monthly_income set (RM ceiling — syarat wajib)
+     *    → compare student's actual monthly_income against ceiling
+     *
+     * B. income_categories count = 1 (single category — syarat wajib)
+     *    → student's derived income_category must match
+     *
+     * C. income_categories count = 2+ (preference — keutamaan)
+     *    → pass here, handled as keutamaan flag after filters
+     *
+     * D. Nothing set → no restriction → pass
      */
     private function checkIncome($student, $criteria): array
     {
-        // ── RM ceiling ────────────────────────────────────────────────────────
+        // A — RM ceiling
         if ($criteria->max_monthly_income !== null) {
             $passed = $student->monthly_income <= $criteria->max_monthly_income;
 
@@ -377,12 +413,11 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        // ── Category-based ────────────────────────────────────────────────────
-        $categories  = $criteria->income_categories ?? [];
-        $incomeType  = $this->resolveIncomeType($categories);
+        $categories = $criteria->income_categories ?? [];
+        $type       = $this->resolveIncomeType($categories);
 
-        // 1 ticked → hard requirement
-        if ($incomeType === 'requirement') {
+        // B — Single category requirement
+        if ($type === 'requirement') {
             $required        = array_map('strtoupper', $categories);
             $studentCategory = strtoupper($student->income_category ?? '');
             $passed          = in_array($studentCategory, $required, true);
@@ -391,50 +426,83 @@ class ScholarshipRuleMatcher
                 'passed' => $passed,
                 'label'  => 'Income category',
                 'reason' => $passed
-                    ? "Eligible ({$studentCategory} — required: " . implode(', ', $required) . ')'
-                    : "{$studentCategory} does not meet requirement: " . implode(', ', $required),
+                    ? "Eligible ({$studentCategory} — required: "
+                        . implode(', ', $required) . ')'
+                    : "{$studentCategory} does not meet requirement: "
+                        . implode(', ', $required),
             ];
         }
 
-        // 2+ ticked (preference) or 0 ticked (no restriction) → pass here
+        // C — Preference (2+ categories) or D — no restriction → pass
         return [
             'passed' => true,
             'label'  => 'Income category',
-            'reason' => $incomeType === 'preference'
-                ? 'Income preference — eligibility determined by keutamaan flag'
+            'reason' => $type === 'preference'
+                ? 'Income preference applies — see Priority Match / General Match'
                 : 'No income restriction',
         ];
     }
 
+    /**
+     * Filter 9 — State
+     * Student's state must be in scholarship's allowed states.
+     * If no restriction → open to all states → pass.
+     *
+     * Common use case: state-based scholarships
+     * e.g. Yayasan Sarawak, Yayasan Negeri Sembilan
+     */
+    private function checkState($student, $criteria): array
+    {
+        $allowed = $criteria->states ?? [];
+
+        if (empty($allowed)) {
+            return [
+                'passed' => true,
+                'label'  => 'State',
+                'reason' => 'No state restriction',
+            ];
+        }
+
+        $passed = in_array($student->state, $allowed, true);
+
+        return [
+            'passed' => $passed,
+            'label'  => 'State',
+            'reason' => $passed
+                ? "Eligible ({$student->state})"
+                : "{$student->state} is not in required states: "
+                    . implode(', ', $allowed),
+        ];
+    }
+
     // =========================================================================
-    // Keutamaan Flag (not a filter — informational sorting signal only)
+    // Keutamaan Flag
     // =========================================================================
 
     /**
-     * Resolve keutamaan priority for scholarships with 2+ income categories.
+     * Resolve priority label after all hard filters pass.
      *
-     * Called only AFTER all hard filters pass.
+     * Only applies when scholarship has 2+ income categories (preference).
+     * All other scholarships default to 'priority_match'.
      *
      * Returns:
-     *   'keutamaan'     → student is in preferred income group
-     *   'less_priority' → student is outside preferred group (but still eligible)
-     *   'keutamaan'     → default for all non-preference scholarships (no penalty)
+     *   'priority_match' → student in preferred group OR no preference
+     *   'general_match'  → student outside preferred group (still eligible)
      */
     private function resolveKeutamaan($student, $criteria): string
     {
         $categories = $criteria->income_categories ?? [];
-        $incomeType = $this->resolveIncomeType($categories);
 
-        if ($incomeType !== 'preference') {
-            return 'keutamaan'; // no preference = full priority
+        if ($this->resolveIncomeType($categories) !== 'preference') {
+            return 'priority_match';
         }
 
         $preferred       = array_map('strtoupper', $categories);
         $studentCategory = strtoupper($student->income_category ?? '');
 
         return in_array($studentCategory, $preferred, true)
-            ? 'keutamaan'
-            : 'less_priority';
+            ? 'priority_match'
+            : 'general_match';
     }
 
     // =========================================================================
@@ -444,9 +512,9 @@ class ScholarshipRuleMatcher
     /**
      * Auto-resolve income type from number of ticked categories.
      *
-     * 0 ticked  → null          (no restriction)
-     * 1 ticked  → 'requirement' (syarat wajib — hard filter)
-     * 2+ ticked → 'preference'  (keutamaan — flag only)
+     * 0 ticked  → null          no restriction
+     * 1 ticked  → 'requirement' hard filter (syarat wajib)
+     * 2+ ticked → 'preference'  keutamaan flag (not a filter)
      */
     private function resolveIncomeType(array $categories): ?string
     {

@@ -47,7 +47,7 @@
         background: linear-gradient(90deg, var(--gold), var(--maroon));
     }
 
-    .recommendation-card.less-priority::before {
+    .recommendation-card.general-match::before {
         background: linear-gradient(90deg, #f59e0b, #d97706);
     }
 
@@ -56,36 +56,30 @@
         box-shadow: 0 20px 25px -12px rgba(0,0,0,.15);
     }
 
-    .recommendation-icon { font-size: 48px; display: flex; align-items: flex-start; }
+    .recommendation-icon    { font-size: 48px; display: flex; align-items: flex-start; }
     .recommendation-content { flex: 1; }
+    .scholarship-title      { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; color: var(--maroon); }
+    .provider-name          { color: var(--gray-600); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .provider-name i        { color: var(--gold); }
 
-    .scholarship-title  { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; color: var(--maroon); }
-    .provider-name      { color: var(--gray-600); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .provider-name i    { color: var(--gold); }
-
-    .recommendation-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
-
-    .tag { padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-
-    .tag-keutamaan { background: linear-gradient(135deg,#d1fae5,#a7f3d0); color:#065f46; }
-    .tag-less      { background: linear-gradient(135deg,#fef3c7,#fde68a); color:#92400e; }
-    .tag-eligible  { background: linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; }
+    .recommendation-tags    { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .tag                    { padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .tag-priority           { background: linear-gradient(135deg,#d1fae5,#a7f3d0); color:#065f46; }
+    .tag-general            { background: linear-gradient(135deg,#fef3c7,#fde68a); color:#92400e; }
+    .tag-eligible           { background: linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; }
 
     .scholarship-description { color: var(--gray-600); line-height: 1.6; margin-bottom: 20px; }
 
-    .breakdown-list  { margin: 14px 0 18px; background: #f9fafb; padding: 14px 16px; border-radius: 16px; }
-    .breakdown-item  { font-size: 0.85rem; color: var(--gray-600); margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px; }
+    .breakdown-list         { margin: 14px 0 18px; background: #f9fafb; padding: 14px 16px; border-radius: 16px; }
+    .breakdown-item         { font-size: 0.85rem; color: var(--gray-600); margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px; }
     .breakdown-item:last-child { margin-bottom: 0; }
+    .breakdown-icon         { width: 18px; flex-shrink: 0; margin-top: 2px; font-size: 0.9rem; }
+    .breakdown-icon.pass    { color: #10b981; }
+    .breakdown-icon.fail    { color: #ef4444; }
+    .breakdown-label        { font-weight: 600; color: var(--gray-800); min-width: 130px; white-space: nowrap; }
+    .breakdown-detail       { color: var(--gray-600); }
 
-    .breakdown-icon        { width: 18px; flex-shrink: 0; margin-top: 2px; font-size: 0.9rem; }
-    .breakdown-icon.pass   { color: #10b981; }
-    .breakdown-icon.warn   { color: #f59e0b; }
-    .breakdown-icon.fail   { color: #ef4444; }
-
-    .breakdown-label  { font-weight: 600; color: var(--gray-800); min-width: 130px; white-space: nowrap; }
-    .breakdown-detail { color: var(--gray-600); }
-
-    .keutamaan-notice {
+    .general-notice {
         background: linear-gradient(135deg,#fef3c7,#fde68a);
         border-left: 4px solid #f59e0b;
         border-radius: 12px;
@@ -105,20 +99,9 @@
         margin: 2rem 0 1rem;
     }
 
-    .group-divider span {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--gray-600);
-        white-space: nowrap;
-    }
-
+    .group-divider span     { font-size: 0.85rem; font-weight: 600; color: var(--gray-600); white-space: nowrap; }
     .group-divider::before,
-    .group-divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: #e5e7eb;
-    }
+    .group-divider::after   { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
 
     .recommendation-footer  { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
     .deadline-text          { color: var(--gray-600); font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
@@ -169,7 +152,7 @@
             <i class="fas fa-graduation-cap me-2" style="color:var(--gold)"></i>
             Scholarship Recommendations
         </h2>
-        <p>Scholarships matched to your eligibility based on academic results, income, study path, and other criteria</p>
+        <p>Scholarships matched to your eligibility based on academic results, income, study path, state, and other criteria</p>
     </div>
 
     @if(session('success'))
@@ -190,31 +173,28 @@
         <div class="alert-success mb-4" data-aos="fade-down">
             <i class="fas fa-check-circle me-2"></i>
             All scholarships below meet your eligibility criteria.
-            Scholarships marked <strong>Keutamaan</strong> match your income group preference.
+            <strong>Priority Match</strong> scholarships align with your income group preference.
         </div>
     @endif
 
     @php
-        $keutamaanGroup    = $results->where('priority', 'keutamaan');
-        $lessPriorityGroup = $results->where('priority', 'less_priority');
+        $priorityGroup = $results->where('priority', 'priority_match');
+        $generalGroup  = $results->where('priority', 'general_match');
     @endphp
 
-    {{-- ── Keutamaan group ──────────────────────────────────────────── --}}
-    @if($keutamaanGroup->isNotEmpty())
+    {{-- ── Priority Match group ────────────────────────────────────────── --}}
+    @if($priorityGroup->isNotEmpty())
 
         <div class="group-divider" data-aos="fade-up">
             <span>
                 <i class="fas fa-star me-1" style="color:var(--gold)"></i>
-                Keutamaan match
+                Priority Match
             </span>
         </div>
 
         <div class="row">
-            @foreach($keutamaanGroup as $scholarship)
-                @php
-                    $breakdown = $scholarship->match_breakdown ?? [];
-                    $isLess    = false;
-                @endphp
+            @foreach($priorityGroup as $scholarship)
+                @php $breakdown = $scholarship->match_breakdown ?? []; @endphp
 
                 <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 50 }}">
                     <div class="recommendation-card">
@@ -231,8 +211,8 @@
                                 <span class="tag tag-eligible">
                                     <i class="fas fa-check-circle me-1"></i> Eligible
                                 </span>
-                                <span class="tag tag-keutamaan">
-                                    <i class="fas fa-star me-1"></i> Keutamaan
+                                <span class="tag tag-priority">
+                                    <i class="fas fa-star me-1"></i> Priority Match
                                 </span>
                             </div>
 
@@ -241,15 +221,12 @@
                             </p>
 
                             <div class="breakdown-list">
-                                @foreach($breakdown as $key => $item)
+                                @foreach($breakdown as $item)
                                     @php
                                         $passed    = $item['passed'] ?? false;
-                                        $label     = $item['label']  ?? $key;
+                                        $label     = $item['label']  ?? '';
                                         $reason    = $item['reason'] ?? '';
-                                        $isWarn    = $passed && str_contains($reason, 'within tolerance');
-                                        $iconClass = $passed
-                                            ? ($isWarn ? 'fa-exclamation-circle warn' : 'fa-check-circle pass')
-                                            : 'fa-times-circle fail';
+                                        $iconClass = $passed ? 'fa-check-circle pass' : 'fa-times-circle fail';
                                     @endphp
                                     <div class="breakdown-item">
                                         <i class="fas breakdown-icon {{ $iconClass }}"></i>
@@ -292,24 +269,22 @@
         </div>
     @endif
 
-    {{-- ── Less priority group ──────────────────────────────────────── --}}
-    @if($lessPriorityGroup->isNotEmpty())
+    {{-- ── General Match group ──────────────────────────────────────────── --}}
+    @if($generalGroup->isNotEmpty())
 
         <div class="group-divider" data-aos="fade-up">
             <span>
                 <i class="fas fa-info-circle me-1" style="color:#f59e0b"></i>
-                Less priority — outside preferred income group
+                General Match — outside preferred income group
             </span>
         </div>
 
         <div class="row">
-            @foreach($lessPriorityGroup as $scholarship)
-                @php
-                    $breakdown = $scholarship->match_breakdown ?? [];
-                @endphp
+            @foreach($generalGroup as $scholarship)
+                @php $breakdown = $scholarship->match_breakdown ?? []; @endphp
 
                 <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 50 }}">
-                    <div class="recommendation-card less-priority">
+                    <div class="recommendation-card general-match">
                         <div class="recommendation-icon">🎓</div>
                         <div class="recommendation-content">
 
@@ -323,15 +298,15 @@
                                 <span class="tag tag-eligible">
                                     <i class="fas fa-check-circle me-1"></i> Eligible
                                 </span>
-                                <span class="tag tag-less">
-                                    <i class="fas fa-info-circle me-1"></i> Less Priority
+                                <span class="tag tag-general">
+                                    <i class="fas fa-info-circle me-1"></i> General Match
                                 </span>
                             </div>
 
-                            <div class="keutamaan-notice">
+                            <div class="general-notice">
                                 <i class="fas fa-exclamation-circle"></i>
                                 You are eligible for this scholarship but are outside its preferred income group.
-                                You may still apply — keutamaan (priority) is given to other income categories.
+                                You may still apply — priority (keutamaan) is given to other income categories.
                             </div>
 
                             <p class="scholarship-description">
@@ -339,15 +314,12 @@
                             </p>
 
                             <div class="breakdown-list">
-                                @foreach($breakdown as $key => $item)
+                                @foreach($breakdown as $item)
                                     @php
                                         $passed    = $item['passed'] ?? false;
-                                        $label     = $item['label']  ?? $key;
+                                        $label     = $item['label']  ?? '';
                                         $reason    = $item['reason'] ?? '';
-                                        $isWarn    = $passed && str_contains($reason, 'within tolerance');
-                                        $iconClass = $passed
-                                            ? ($isWarn ? 'fa-exclamation-circle warn' : 'fa-check-circle pass')
-                                            : 'fa-times-circle fail';
+                                        $iconClass = $passed ? 'fa-check-circle pass' : 'fa-times-circle fail';
                                     @endphp
                                     <div class="breakdown-item">
                                         <i class="fas breakdown-icon {{ $iconClass }}"></i>
@@ -390,7 +362,7 @@
         </div>
     @endif
 
-    {{-- ── Empty state ──────────────────────────────────────────────── --}}
+    {{-- ── Empty state ──────────────────────────────────────────────────── --}}
     @if($results->isEmpty())
         <div class="col-12">
             <div class="alert-info text-center py-5" data-aos="fade-up">
