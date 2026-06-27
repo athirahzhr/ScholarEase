@@ -33,6 +33,7 @@
         box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
         padding: 2rem;
         margin-bottom: 2rem;
+        border: 1px solid rgba(122, 0, 25, 0.05);
     }
     
     .step-header {
@@ -63,6 +64,7 @@
         color: var(--maroon);
         font-weight: 700;
         margin-bottom: 0.25rem;
+        font-size: 1.2rem;
     }
     
     .step-header p {
@@ -71,6 +73,7 @@
         font-size: 0.9rem;
     }
     
+    /* Progress Bar */
     .progress-custom {
         background: #e5e7eb;
         border-radius: 10px;
@@ -90,6 +93,13 @@
         color: var(--gray-600);
         font-size: 0.85rem;
         padding: 0.25rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .step-indicator i {
+        font-size: 1rem;
     }
     
     .step-indicator.active {
@@ -97,10 +107,15 @@
         font-weight: 700;
     }
     
+    .step-indicator.active i {
+        color: var(--gold);
+    }
+    
+    /* Upload Area */
     .upload-area {
         border: 2px dashed var(--maroon);
         border-radius: 20px;
-        padding: 3rem;
+        padding: 3rem 2rem;
         text-align: center;
         background: linear-gradient(135deg, #faf5ff, #f3e8ff);
         cursor: pointer;
@@ -120,19 +135,21 @@
     }
     
     .upload-icon {
-        font-size: 3rem;
+        font-size: 3.5rem;
         color: var(--maroon);
         margin-bottom: 1rem;
+        display: block;
     }
     
+    /* Grade Badges */
     .grade-badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
-        margin: 0.25rem;
-        font-weight: 600;
-        font-size: 0.875rem;
-        min-width: 50px;
+        margin: 0.15rem;
+        font-weight: 700;
+        font-size: 0.8rem;
+        min-width: 45px;
         text-align: center;
     }
     
@@ -146,6 +163,7 @@
     .grade-c { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
     .grade-other { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
     
+    /* Buttons - STANDARDIZED */
     .btn {
         border-radius: 40px;
         font-weight: 600;
@@ -157,7 +175,6 @@
         justify-content: center;
         gap: 0.5rem;
         min-height: 44px;
-        min-width: 120px;
     }
     
     .btn-primary {
@@ -198,24 +215,47 @@
     }
     
     .btn-sm {
-        padding: 0.4rem 1rem;
-        font-size: 0.85rem;
-        min-height: 36px;
-        min-width: 80px;
+        padding: 0.3rem 1rem;
+        font-size: 0.8rem;
+        min-height: 34px;
+        min-width: 60px;
     }
     
     .btn-lg {
         padding: 0.75rem 2rem;
         font-size: 1.05rem;
         min-height: 52px;
-        min-width: 160px;
+    }
+    
+    .btn-success {
+        background: linear-gradient(115deg, #10b981, #059669);
+        border: none;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        color: white;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(115deg, #ef4444, #dc2626);
+        border: none;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        color: white;
     }
     
     .btn-block {
         width: 100%;
-        min-width: unset;
     }
     
+    /* Button Groups */
     .button-group {
         display: flex;
         flex-wrap: wrap;
@@ -235,22 +275,37 @@
         justify-content: flex-end;
     }
     
+    /* Tables */
+    .table {
+        margin-bottom: 0;
+    }
+    
     .table th {
         background: linear-gradient(135deg, var(--cream), var(--cream-dark));
         color: var(--maroon);
         font-weight: 700;
         border-bottom: 2px solid var(--gold);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
     
     .table td {
         vertical-align: middle;
+        padding: 0.75rem;
     }
     
     .table-responsive {
         border-radius: 12px;
         overflow: hidden;
+        border: 1px solid #e5e7eb;
     }
     
+    .table-hover tbody tr:hover {
+        background: rgba(122, 0, 25, 0.03);
+    }
+    
+    /* Verified Grades */
     .verified-grades {
         border: 2px solid #10b981;
         border-radius: 16px;
@@ -258,6 +313,7 @@
         background: linear-gradient(135deg, #f0fdf4, #dcfce7);
     }
     
+    /* Form Controls */
     .form-control, .form-select {
         border-radius: 12px;
         border: 2px solid #e5e7eb;
@@ -271,36 +327,48 @@
         outline: none;
     }
     
+    .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--gray-800);
+    }
+    
+    /* Alerts */
+    .alert {
+        border-radius: 12px;
+        border: none;
+    }
+    
     .alert-info {
         background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-        border: none;
         border-left: 4px solid #3b82f6;
-        border-radius: 12px;
         color: #1e40af;
     }
     
     .alert-warning {
         background: linear-gradient(135deg, #fef3c7, #fde68a);
-        border: none;
         border-left: 4px solid #f59e0b;
-        border-radius: 12px;
         color: #92400e;
     }
     
     .alert-success {
         background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-        border: none;
         border-left: 4px solid #10b981;
-        border-radius: 12px;
         color: #065f46;
     }
     
-    .alert {
-        border-radius: 12px;
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        border-left: 4px solid #ef4444;
+        color: #991b1b;
     }
     
     .text-maroon {
         color: var(--maroon);
+    }
+    
+    .bg-maroon-soft {
+        background: rgba(122, 0, 25, 0.05);
     }
     
     .gap-2 { gap: 0.5rem; }
@@ -329,15 +397,19 @@
     .w-100 { width: 100%; }
     
     .d-none { display: none !important; }
-    .d-grid { display: grid; }
     
+    /* Responsive */
     @media (max-width: 768px) {
         .step-card {
             padding: 1.25rem;
         }
         
         .upload-area {
-            padding: 1.5rem;
+            padding: 1.5rem 1rem;
+        }
+        
+        .upload-icon {
+            font-size: 2.5rem;
         }
         
         .table {
@@ -352,21 +424,18 @@
             padding: 0.5rem 1rem;
             font-size: 0.85rem;
             min-height: 40px;
-            min-width: 100px;
         }
         
         .btn-lg {
             padding: 0.6rem 1.25rem;
             font-size: 0.95rem;
             min-height: 46px;
-            min-width: 140px;
         }
         
         .btn-sm {
-            padding: 0.3rem 0.75rem;
-            font-size: 0.8rem;
-            min-height: 32px;
-            min-width: 60px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            min-height: 30px;
         }
         
         .step-number {
@@ -398,7 +467,6 @@
         
         .button-group .btn {
             width: 100%;
-            min-width: unset;
         }
         
         .button-group-between {
@@ -434,9 +502,17 @@
         }
         
         .grade-badge {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             padding: 0.15rem 0.5rem;
-            min-width: 40px;
+            min-width: 35px;
+        }
+        
+        .table-responsive {
+            font-size: 0.7rem;
+        }
+        
+        .table td, .table th {
+            padding: 0.4rem 0.3rem;
         }
     }
 </style>
@@ -478,9 +554,7 @@
                 <form id="uploadForm">
                     @csrf
                     <div class="upload-area" id="dropArea">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
                         <h5 class="text-maroon">Drag & Drop or Click to Upload</h5>
                         <p class="text-muted">Supported formats: JPG, PNG, JPEG (Max: 5MB)</p>
                         <input type="file" class="form-control d-none" id="spmFile" name="spm_file" accept="image/*,.pdf" required>
@@ -506,7 +580,7 @@
                             <i class="fas fa-cogs"></i> Process SPM Results
                         </button>
                         <button type="button" class="btn btn-outline-secondary" onclick="skipOCR()">
-                            <i class="fas fa-pen"></i> I don't have SPM result
+                            <i class="fas fa-pen"></i> Enter Manually
                         </button>
                     </div>
                 </form>
@@ -704,47 +778,56 @@
         
         console.log('⏳ Loading SweetAlert2...');
         
-        // Try multiple CDN sources
-        const cdnUrls = [
-            'https://cdn.jsdelivr.net/npm/sweetalert2@11',
+        var cdnUrls = [
+            'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js',
             'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js',
             'https://unpkg.com/sweetalert2@11/dist/sweetalert2.all.min.js'
         ];
         
-        let loaded = false;
+        var loaded = false;
         
-        cdnUrls.forEach(function(url, index) {
-            if (loaded) return;
+        function tryLoad(index) {
+            if (loaded || index >= cdnUrls.length) {
+                if (!loaded) {
+                    console.warn('⚠️ All SweetAlert2 CDN failed, using native fallback');
+                    window.Swal = null;
+                }
+                return;
+            }
             
             var script = document.createElement('script');
-            script.src = url;
+            script.src = cdnUrls[index];
             script.async = false;
             
             script.onload = function() {
                 if (typeof Swal !== 'undefined' && Swal) {
                     loaded = true;
-                    console.log('✅ SweetAlert2 loaded from:', url);
+                    console.log('✅ SweetAlert2 loaded from:', cdnUrls[index]);
+                } else {
+                    tryLoad(index + 1);
                 }
             };
             
             script.onerror = function() {
-                console.warn('❌ Failed to load from:', url);
+                console.warn('❌ Failed to load from:', cdnUrls[index]);
+                tryLoad(index + 1);
             };
             
             document.head.appendChild(script);
-        });
+        }
         
-        // Fallback: After 3 seconds, if still not loaded, use native
+        tryLoad(0);
+        
         setTimeout(function() {
             if (typeof Swal === 'undefined' || !Swal) {
-                console.warn('⚠️ SweetAlert2 not loaded, using native fallback');
+                console.warn('⚠️ SweetAlert2 timeout, using native fallback');
                 window.Swal = null;
             }
-        }, 3000);
+        }, 5000);
     })();
     
     // =============================================
-    // GET SWAL INSTANCE (with fallback)
+    // GET SWAL INSTANCE
     // =============================================
     function getSwal() {
         if (typeof Swal !== 'undefined' && Swal) {
@@ -754,7 +837,7 @@
     }
     
     // =============================================
-    // SHOW TOAST/NOTIFICATION (fallback)
+    // SHOW TOAST FALLBACK
     // =============================================
     function showToast(message, type) {
         type = type || 'info';
@@ -843,8 +926,8 @@
     }
     
     function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
+        var dt = e.dataTransfer;
+        var files = dt.files;
         if (fileInput) {
             fileInput.files = files;
             handleFiles(files);
@@ -859,7 +942,7 @@
     
     function handleFiles(files) {
         if (files.length > 0) {
-            const file = files[0];
+            var file = files[0];
             var fileNameEl = document.getElementById('fileName');
             var fileInfoEl = document.getElementById('fileInfo');
             var fileProgressEl = document.getElementById('fileProgress');
@@ -867,8 +950,8 @@
             if (fileNameEl) fileNameEl.textContent = file.name;
             if (fileInfoEl) fileInfoEl.classList.remove('d-none');
             
-            let progress = 0;
-            const interval = setInterval(function() {
+            var progress = 0;
+            var interval = setInterval(function() {
                 progress += 10;
                 if (fileProgressEl) fileProgressEl.style.width = progress + '%';
                 if (progress >= 100) {
@@ -882,8 +965,8 @@
     // PROCESS UPLOAD
     // =============================================
     function processUpload() {
-        const Swal = getSwal();
-        const fileInput = document.getElementById('spmFile');
+        var Swal = getSwal();
+        var fileInput = document.getElementById('spmFile');
         
         if (!fileInput || !fileInput.files.length) {
             if (Swal) {
@@ -894,7 +977,7 @@
             return;
         }
         
-        const formData = new FormData(document.getElementById('uploadForm'));
+        var formData = new FormData(document.getElementById('uploadForm'));
         
         if (Swal) {
             Swal.fire({
@@ -944,17 +1027,16 @@
     // DISPLAY OCR RESULTS
     // =============================================
     function displayOCRResults(data) {
-        const isManual = data.manualEntry === true;
-
-        let html = `
-            <div class="alert alert-info mb-4">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-info-circle me-3 fa-2x"></i>
-                    <div>
-                        <h6 class="mb-1">${isManual ? 'Academic Results Summary' : 'OCR Results Summary'}</h6>
-                        <p class="mb-0">${isManual ? 'Added <strong>' + Object.keys(data.grades).length + '</strong> subjects' : 'Detected <strong>' + Object.keys(data.grades).length + '</strong> subjects'} | 
-                        Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span></p>
-                    </div>
+        var isManual = data.manualEntry === true;
+        var subjectCount = Object.keys(data.grades).length;
+        
+        var html = `
+            <div class="alert alert-info mb-4 d-flex align-items-center">
+                <i class="fas fa-info-circle me-3 fa-2x"></i>
+                <div>
+                    <h6 class="mb-1">${isManual ? 'Academic Results Summary' : 'OCR Results Summary'}</h6>
+                    <p class="mb-0">${isManual ? 'Added <strong>' + subjectCount + '</strong> subjects' : 'Detected <strong>' + subjectCount + '</strong> subjects'} | 
+                    Total A's: <span class="badge bg-success" id="totalAsBadge">${data.totalAs}</span></p>
                 </div>
             </div>
 
@@ -964,7 +1046,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <h6 class="mb-0 fw-bold text-maroon">${isManual ? 'Enter Your Subjects & Grades' : 'Edit Detected Grades'}</h6>
                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="showAddSubjectModal()">
-                        <i class="fas fa-plus"></i> ${isManual ? 'Add Subject' : 'Add Missing Subject'}
+                        <i class="fas fa-plus"></i> ${isManual ? 'Add Subject' : 'Add Subject'}
                     </button>
                 </div>
                 
@@ -972,8 +1054,8 @@
                     <table class="table table-hover" id="gradesTable">
                         <thead>
                             <tr>
-                                <th width="40%">${isManual ? 'Subject' : 'Subject (Detected by OCR)'}</th>
-                                <th width="20%">${isManual ? 'Grade' : 'Extracted Grade'}</th>
+                                <th width="40%">${isManual ? 'Subject' : 'Subject'}</th>
+                                <th width="20%">${isManual ? 'Grade' : 'Grade'}</th>
                                 <th width="30%">Edit Grade</th>
                                 <th width="10%">Actions</th>
                             </tr>
@@ -981,62 +1063,73 @@
                         <tbody id="gradesTableBody">
         `;
         
-        const subjects = Object.keys(data.grades);
+        var subjects = Object.keys(data.grades);
         subjects.sort();
         
-        subjects.forEach(function(subject) {
-            const grade = data.grades[subject];
-            const gradeClass = getGradeClass(grade);
-            const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
-            
+        if (subjects.length === 0) {
             html += `
-                <tr id="subject-row-${safeSubjectId}">
-                    <td class="fw-bold">${subject}</td>
-                    <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
-                    <td>
-                        <select class="form-select form-select-sm grade-select" data-subject="${subject}" onchange="updateGrade('${subject}', this.value)" id="select-${safeSubjectId}" style="max-width: 140px;">
-                            <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
-                            <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
-                            <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
-                            <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
-                            <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
-                            <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
-                            <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
-                            <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
-                            <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
-                            <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
-                            <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
-                            <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')" title="Remove this subject">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        <i class="fas fa-plus-circle fa-2x d-block mb-2" style="color: #d1d5db;"></i>
+                        No subjects added yet. Click "Add Subject" to add your SPM results.
                     </td>
                 </tr>
             `;
-        });
+        } else {
+            subjects.forEach(function(subject) {
+                var grade = data.grades[subject];
+                var gradeClass = getGradeClass(grade);
+                var safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+                
+                html += `
+                    <tr id="subject-row-${safeSubjectId}">
+                        <td class="fw-bold">${subject}</td>
+                        <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
+                        <td>
+                            <select class="form-select form-select-sm grade-select" data-subject="${subject}" onchange="updateGrade('${subject}', this.value)" id="select-${safeSubjectId}" style="max-width: 140px;">
+                                <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
+                                <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
+                                <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
+                                <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
+                                <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
+                                <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
+                                <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
+                                <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
+                                <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
+                                <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
+                                <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
+                                <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')" title="Remove this subject">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
         
         html += `
                         </tbody>
                     </table>
                 </div>
                 
-                <div class="row mt-3 align-items-center">
-                    <div class="col-md-8">
+                <div class="row mt-4 align-items-center">
+                    <div class="col-md-7">
                         <div class="alert alert-warning mb-0">
-                            <h6><i class="fas fa-exclamation-triangle me-2"></i>${isManual ? 'Manual Entry Note:' : 'OCR Accuracy Note:'}</h6>
-                            <p class="mb-0 small">${isManual ? 'Please enter all your SPM subjects and grades manually before continuing.' : 'OCR may not detect all subjects or may misread grades. Please verify each subject and grade.'}</p>
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Note:</strong> ${isManual ? 'Please enter all your SPM subjects and grades manually before continuing.' : 'Please verify each subject and grade before continuing.'}
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <div class="button-group button-group-end mt-3 mt-md-0">
                             <button type="button" class="btn btn-primary" onclick="verifyAndContinue()">
                                 <i class="fas fa-check-circle"></i> Continue
                             </button>
                             <button type="button" class="btn btn-outline-secondary" onclick="goBackToUpload()">
-                                <i class="fas fa-redo"></i> ${isManual ? 'Back' : 'Upload Again'}
+                                <i class="fas fa-arrow-left"></i> Back
                             </button>
                         </div>
                     </div>
@@ -1048,9 +1141,9 @@
         if (container) container.innerHTML = html;
 
         if (!isManual && data.confidence !== undefined) {
-            const confidence = data.confidence;
-            let confidenceColor = 'bg-danger';
-            let confidenceText = 'Low confidence – manual verification recommended';
+            var confidence = data.confidence;
+            var confidenceColor = 'bg-danger';
+            var confidenceText = 'Low confidence – manual verification recommended';
 
             if (confidence >= 80) {
                 confidenceColor = 'bg-success';
@@ -1063,13 +1156,15 @@
             var confidenceBar = document.getElementById('ocrConfidenceBar');
             if (confidenceBar) {
                 confidenceBar.innerHTML = `
-                    <label class="form-label fw-bold">OCR Confidence Level</label>
-                    <div class="progress" style="height: 22px;">
-                        <div class="progress-bar ${confidenceColor}" role="progressbar" style="width: ${confidence}%" aria-valuenow="${confidence}" aria-valuemin="0" aria-valuemax="100">
-                            ${confidence}%
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">OCR Confidence Level</label>
+                        <div class="progress" style="height: 24px;">
+                            <div class="progress-bar ${confidenceColor}" role="progressbar" style="width: ${confidence}%; font-weight: 600; font-size: 0.8rem;">
+                                ${confidence}%
+                            </div>
                         </div>
+                        <small class="text-muted mt-1 d-block">${confidenceText}</small>
                     </div>
-                    <small class="text-muted mt-1 d-block">${confidenceText}</small>
                 `;
             }
         }
@@ -1110,14 +1205,14 @@
         if (!ocrData) return;
         ocrData.grades[subject] = newGrade;
         
-        const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
-        const badge = document.getElementById('grade-' + safeSubjectId);
+        var safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+        var badge = document.getElementById('grade-' + safeSubjectId);
         if (badge) {
             badge.textContent = newGrade;
             badge.className = 'grade-badge ' + getGradeClass(newGrade);
         }
         
-        let totalAs = 0;
+        var totalAs = 0;
         Object.values(ocrData.grades).forEach(function(grade) {
             if (grade.startsWith('A')) totalAs++;
         });
@@ -1128,12 +1223,11 @@
     }
     
     // =============================================
-    // SHOW ADD SUBJECT MODAL (FIXED)
+    // SHOW ADD SUBJECT MODAL
     // =============================================
     function showAddSubjectModal() {
         var Swal = getSwal();
         
-        // If SweetAlert2 is not available, use native prompt
         if (!Swal) {
             var subject = prompt('Enter subject name:');
             if (subject && subject.trim()) {
@@ -1145,9 +1239,8 @@
             return;
         }
         
-        // Use SweetAlert2
         Swal.fire({
-            title: 'Add Missing Subject',
+            title: 'Add Subject',
             html: `
                 <div class="text-start">
                     <div class="mb-3">
@@ -1197,8 +1290,8 @@
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: 'Add Subject',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: '<i class="fas fa-plus me-2"></i> Add Subject',
+            cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
             confirmButtonColor: '#7A0019',
             cancelButtonColor: '#6b7280',
             preConfirm: function() {
@@ -1262,7 +1355,7 @@
         if (Swal) {
             Swal.fire({
                 title: 'Adding Subject',
-                html: '<div class="spinner-border text-maroon"></div>',
+                html: '<div class="text-center"><div class="spinner-border text-maroon mb-3" role="status"></div><p>Adding subject...</p></div>',
                 allowOutsideClick: false,
                 showConfirmButton: false
             });
@@ -1314,37 +1407,47 @@
     // ADD SUBJECT TO TABLE
     // =============================================
     function addSubjectToTable(subject, grade, totalAs) {
-        const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
-        const gradeClass = getGradeClass(grade);
-        var newRow = `
-            <tr id="subject-row-${safeSubjectId}">
-                <td class="fw-bold">${subject} <span class="badge bg-info ms-2">Added</span></td>
-                <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
-                <td>
-                    <select class="form-select form-select-sm" onchange="updateGrade('${subject}', this.value)" style="max-width: 140px;">
-                        <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
-                        <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
-                        <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
-                        <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
-                        <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
-                        <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
-                        <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
-                        <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
-                        <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
-                        <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
-                        <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
-                        <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
+        var safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+        var gradeClass = getGradeClass(grade);
+        
+        // Check if empty state exists and remove it
         var tbody = document.getElementById('gradesTableBody');
-        if (tbody) tbody.innerHTML += newRow;
+        if (tbody) {
+            var emptyRow = tbody.querySelector('tr td[colspan="4"]');
+            if (emptyRow) {
+                tbody.innerHTML = '';
+            }
+        }
+        
+        var newRow = document.createElement('tr');
+        newRow.id = 'subject-row-' + safeSubjectId;
+        newRow.innerHTML = `
+            <td class="fw-bold">${subject} <span class="badge bg-success ms-2">Added</span></td>
+            <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
+            <td>
+                <select class="form-select form-select-sm" onchange="updateGrade('${subject}', this.value)" style="max-width: 140px;">
+                    <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
+                    <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
+                    <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
+                    <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
+                    <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
+                    <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
+                    <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
+                    <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
+                    <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
+                    <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
+                    <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
+                    <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
+                </select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        
+        if (tbody) tbody.appendChild(newRow);
         
         var badgeEl = document.getElementById('totalAsBadge');
         if (badgeEl) badgeEl.textContent = totalAs;
@@ -1370,12 +1473,25 @@
                 if (data.success) {
                     if (ocrData && ocrData.grades[subject]) delete ocrData.grades[subject];
                     ocrData.totalAs = data.totalAs;
-                    const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
+                    var safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
                     var row = document.getElementById('subject-row-' + safeSubjectId);
                     if (row) row.remove();
                     
                     var badgeEl = document.getElementById('totalAsBadge');
                     if (badgeEl) badgeEl.textContent = data.totalAs;
+                    
+                    // If no subjects left, show empty state
+                    var tbody = document.getElementById('gradesTableBody');
+                    if (tbody && tbody.children.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="fas fa-plus-circle fa-2x d-block mb-2" style="color: #d1d5db;"></i>
+                                    No subjects added yet. Click "Add Subject" to add your SPM results.
+                                </td>
+                            </tr>
+                        `;
+                    }
                     
                     if (Swal) {
                         Swal.fire({ icon: 'success', title: 'Removed!', timer: 2000, showConfirmButton: false });
@@ -1424,6 +1540,16 @@
     // =============================================
     function verifyAndContinue() {
         var Swal = getSwal();
+        
+        // Check if there are any subjects
+        if (!ocrData || Object.keys(ocrData.grades).length === 0) {
+            if (Swal) {
+                Swal.fire('Error', 'Please add at least one subject before continuing.', 'error');
+            } else {
+                showToast('Please add at least one subject before continuing.', 'error');
+            }
+            return;
+        }
         
         function doVerify() {
             fetch("{{ route('verify.ocr.results') }}", {
@@ -1508,16 +1634,14 @@
         if (gradesEl) {
             gradesEl.innerHTML = `
                 <div class="verified-grades">
-                    <div class="alert alert-success">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-check-circle me-3 fa-2x"></i>
-                            <div>
-                                <h6 class="mb-1">✓ Verified SPM Results</h6>
-                                <p class="mb-0">Total A's: <span class="badge bg-success">${totalAs}</span></p>
-                            </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-3 fa-2x" style="color: #10b981;"></i>
+                        <div>
+                            <h6 class="mb-1">✓ Verified SPM Results</h6>
+                            <p class="mb-0">Total A's: <span class="badge bg-success">${totalAs}</span></p>
                         </div>
                     </div>
-                    <p class="text-muted mb-0"><small>Your grades have been verified and will be used for scholarship matching.</small></p>
+                    <p class="text-muted mt-2 mb-0"><small>Your grades have been verified and will be used for scholarship matching.</small></p>
                 </div>
             `;
         }
@@ -1582,18 +1706,18 @@
         
         if (Swal) {
             Swal.fire({
-                title: 'Upload Again?', 
+                title: 'Go Back?', 
                 text: 'This will clear all extracted data.', 
                 icon: 'warning',
                 showCancelButton: true, 
-                confirmButtonText: 'Yes, Upload Again'
+                confirmButtonText: 'Yes, Go Back'
             }).then(function(result) {
                 if (result.isConfirmed) {
                     doReset();
                 }
             });
         } else {
-            if (confirm('Upload again? This will clear all extracted data.')) {
+            if (confirm('Go back? This will clear all extracted data.')) {
                 doReset();
             }
         }
@@ -1639,7 +1763,7 @@
                 text: 'Proceed without OCR and enter SPM results manually?',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Yes'
+                confirmButtonText: 'Yes, Proceed'
             }).then(function(result) {
                 if (result.isConfirmed) {
                     doSkip();
