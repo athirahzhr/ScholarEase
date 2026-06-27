@@ -5,78 +5,74 @@ namespace App\Services;
 /**
  * Rule-Based Scholarship Matcher
  * ================================
- * FYP — Explainable Rule-Based Recommendation System
+ * FYP — Pure Rule-Based Recommendation System
  *
- * HOW IT WORKS:
+ * DESIGN PHILOSOPHY:
  * ─────────────────────────────────────────────────────
- * STEP 1 — Hard Filters (Pass/Fail)
- *   Citizenship, Bumiputera, Study Level, Field of Study, Age, State, Leadership
- *   SPM (near-hard filter, shortfall > 2 = excluded),
- *   Income (ceiling OR single-category requirement)
- *   → Student must pass ALL. Any failure = excluded immediately.
+ * Every criterion is evaluated as a binary pass/fail rule.
+ * No scoring weights are applied — no percentage, no points.
+ * This reflects the actual policy language used by Malaysian
+ * scholarship providers and requires no external justification
+ * for weight values.
  *
- * STEP 2 — Scored Criteria (Range-based, partial credit)
- *   SPM Result (50 pts) + Income (50 pts) = 100 pts base
- *   → SPM: partial credit for shortfall 0, 1, or 2.
- *   → Income: scored ONLY when 2+ categories ticked (keutamaan).
- *
- * STEP 3 — Bonus Points (on top, capped at 100 final)
- *   Leadership (+5) and Bumiputera Priority (+5)
+ * A scholarship either matches the student or it does not.
+ * The only exception is income keutamaan (preference) — where
+ * the student is still shown but flagged as "Less Priority"
+ * if they are outside the preferred income group.
  *
  * ─────────────────────────────────────────────────────
- * INCOME TYPE — auto-resolved from income_categories count:
+ * HARD FILTERS (all pass/fail — any fail = excluded):
  *
- *   0 ticked  → null        No restriction. Full marks.
- *               "Terbuka kepada semua"
+ *   1. Citizenship        — must match if required
+ *   2. Bumiputera         — must be Bumiputera if required
+ *   3. Study level        — must be in allowed list
+ *   4. Field of study     — must be in allowed list
+ *   5. Age                — must be within min/max range
+ *   6. SPM result         — shortfall must not exceed 2As
+ *   7. Income RM ceiling  — monthly_income ≤ max_monthly_income
+ *   8. Income category    — if 1 category ticked (syarat wajib)
  *
- *   1 ticked  → requirement Hard filter. Only that category eligible.
- *               "B40 sahaja" — M40/T20 students excluded ❌
+ * KEUTAMAAN FLAG (not a filter — informational only):
  *
- *   2+ ticked → preference  Scored criteria (keutamaan).
- *               "Keutamaan B40 dan M40" — T20 gets 25/50 ✅
+ *   Income preference     — if 2+ categories ticked
+ *   Student in preferred group  → priority = 'keutamaan'
+ *   Student outside group       → priority = 'less_priority'
  *
- * No separate income_type column needed in database.
- * System auto-derives type from count of ticked categories.
+ * SORTING:
+ *   1. Keutamaan matches first
+ *   2. Less priority matches second
+ *   3. Within each group → soonest deadline first
  *
  * ─────────────────────────────────────────────────────
- * STUDENT INCOME DATA:
- *   User inputs monthly_income (actual RM e.g. RM4,500).
- *   System auto-derives income_category (B40/M40/T20) on profile save.
+ * INCOME CATEGORY AUTO-RESOLUTION (from checkbox count):
  *
- *   monthly_income  → used for max_monthly_income ceiling check
- *   income_category → used for category requirement/preference check
+ *   0 ticked  → no restriction   → pass, priority = 'keutamaan'
+ *   1 ticked  → hard requirement → must match or excluded
+ *   2+ ticked → preference       → pass, flag keutamaan or less_priority
  *
- * INCOME THRESHOLDS (Rafizi Ramli, Ministry of Economy Malaysia, 2023):
+ * INCOME THRESHOLDS (Rafizi Ramli, Ministry of Economy, 2023):
  *   B40 → ≤ RM4,850/month
  *   M40 → RM4,851 – RM10,960/month
  *   T20 → > RM10,960/month
- *
- * RECOMMENDATION THRESHOLD: Score >= 50
  * ─────────────────────────────────────────────────────
  */
 class ScholarshipRuleMatcher
 {
-    // ── Scoring weights (must total 100) ─────────────────────────────────────
-    private const W_SPM    = 50;
-    private const W_INCOME = 50;
-
-    // ── Bonus (on top, final score capped at 100) ─────────────────────────────
-    private const W_BONUS = 5;
-
-    // ── Minimum score to appear in recommendations ────────────────────────────
-    private const MIN_SCORE = 50;
-
-    // ── SPM near-hard filter tolerance ───────────────────────────────────────
-    // Shortfall > this value = excluded (too far from requirement)
+    /**
+     * SPM near-hard filter tolerance.
+     * Shortfall > 2As → excluded (too far from requirement).
+     * Shortfall 0, 1, 2 → eligible (close enough to be relevant).
+     *
+     * Rationale (design decision):
+     *   A student 1–2As short may still be competitive if all other
+     *   criteria are met. Beyond 2As the gap is too significant to
+     *   produce a meaningful recommendation.
+     */
     private const SPM_MAX_SHORTFALL = 2;
 
     /**
      * Official Malaysian household income thresholds.
      * Source: Ministry of Economy Malaysia (Rafizi Ramli, 2023)
-     *
-     * B40 → ≤ RM4,850/month
-     * M40 → RM4,851 – RM10,960/month
-     * T20 → > RM10,960/month
      */
     private const INCOME_THRESHOLDS = [
         'B40' => 4850,
@@ -85,12 +81,7 @@ class ScholarshipRuleMatcher
 
     // =========================================================================
     // PUBLIC: Auto-derive income category from actual monthly income (RM)
-    // Call this when saving student profile, store result in income_category.
-    //
-    // Example:
-    //   deriveIncomeCategory(3000)  → 'B40'
-    //   deriveIncomeCategory(7000)  → 'M40'
-    //   deriveIncomeCategory(15000) → 'T20'
+    // Call on profile save. Store result in student->income_category.
     // =========================================================================
 
     public static function deriveIncomeCategory(int $monthlyIncome): string
@@ -112,7 +103,9 @@ class ScholarshipRuleMatcher
 
     public function getRecommendations($student, $scholarships): \Illuminate\Support\Collection
     {
-        $results = [];
+        $matched       = [];
+        $keutamaan     = [];
+        $lessPriority  = [];
 
         foreach ($scholarships as $scholarship) {
             $criteria = $scholarship->eligibilityCriteria;
@@ -123,17 +116,34 @@ class ScholarshipRuleMatcher
 
             $result = $this->matchScholarship($student, $criteria);
 
-            if ($result['eligible'] && $result['score'] >= self::MIN_SCORE) {
-                $scholarship->match_score     = $result['score'];
-                $scholarship->match_breakdown = $result['breakdown'];
-                $scholarship->match_level     = $result['match_level'];
-                $results[] = $scholarship;
+            if (!$result['eligible']) {
+                continue;
+            }
+
+            $scholarship->match_breakdown = $result['breakdown'];
+            $scholarship->match_level     = $result['match_level'];
+            $scholarship->priority        = $result['priority'];
+
+            // Separate into keutamaan and less_priority groups
+            if ($result['priority'] === 'less_priority') {
+                $lessPriority[] = $scholarship;
+            } else {
+                $keutamaan[] = $scholarship;
             }
         }
 
-        return collect($results)
-            ->sortByDesc('match_score')
-            ->values();
+        // Sort each group by soonest deadline first
+        $sortByDeadline = function ($a, $b) {
+            $da = $a->deadline ? strtotime($a->deadline) : PHP_INT_MAX;
+            $db = $b->deadline ? strtotime($b->deadline) : PHP_INT_MAX;
+            return $da <=> $db;
+        };
+
+        usort($keutamaan,    $sortByDeadline);
+        usort($lessPriority, $sortByDeadline);
+
+        // Keutamaan first, then less priority
+        return collect(array_merge($keutamaan, $lessPriority))->values();
     }
 
     // =========================================================================
@@ -142,67 +152,33 @@ class ScholarshipRuleMatcher
 
     public function matchScholarship($student, $criteria): array
     {
-        // ── STEP 1: Hard Filters ─────────────────────────────────────────────
-        $hardFilters = $this->runHardFilters($student, $criteria);
-        $failedAny   = in_array(false, $hardFilters, true);
+        // ── Hard Filters ──────────────────────────────────────────────────────
+        $filters   = $this->runHardFilters($student, $criteria);
+        $failedAny = in_array(false, array_column($filters, 'passed'), true);
 
         if ($failedAny) {
             return [
                 'eligible'    => false,
-                'score'       => 0,
-                'breakdown'   => $hardFilters,
+                'priority'    => null,
                 'match_level' => 'Not Eligible',
+                'breakdown'   => $filters,
             ];
         }
 
-        // ── STEP 2: Scored Criteria ───────────────────────────────────────────
-        $score          = 0;
-        $maxScore       = 0;
-        $scoreBreakdown = [];
-
-        // SPM Result
-        [$earned, $max, $detail] = $this->scoreSpm($student, $criteria);
-        $score    += $earned;
-        $maxScore += $max;
-        $scoreBreakdown['spm'] = [
-            'earned' => $earned,
-            'max'    => $max,
-            'detail' => $detail,
-        ];
-
-        // Income (preference scoring — only when 2+ categories ticked)
-        [$earned, $max, $detail] = $this->scoreIncome($student, $criteria);
-        $score    += $earned;
-        $maxScore += $max;
-        $scoreBreakdown['income'] = [
-            'earned' => $earned,
-            'max'    => $max,
-            'detail' => $detail,
-        ];
-
-        // ── STEP 3: Bonus Points ──────────────────────────────────────────────
-        [$bonusEarned, $bonusDetail] = $this->scoreBonus($student, $criteria);
-        $score += $bonusEarned;
-        $scoreBreakdown['bonus'] = [
-            'earned' => $bonusEarned,
-            'detail' => $bonusDetail,
-        ];
-
-        // ── Final Score (capped at 100) ───────────────────────────────────────
-        $percentage = $maxScore > 0
-            ? (int) min(round(($score / $maxScore) * 100), 100)
-            : 0;
+        // ── Keutamaan Flag ────────────────────────────────────────────────────
+        $priority = $this->resolveKeutamaan($student, $criteria);
 
         return [
             'eligible'    => true,
-            'score'       => $percentage,
-            'breakdown'   => array_merge($hardFilters, $scoreBreakdown),
-            'match_level' => $this->getMatchLevel($percentage),
+            'priority'    => $priority,
+            'match_level' => $priority === 'keutamaan' ? 'Eligible — Keutamaan' : 'Eligible — Less Priority',
+            'breakdown'   => $filters,
         ];
     }
 
     // =========================================================================
-    // STEP 1 — Hard Filters (Pass/Fail, no scoring)
+    // Hard Filters
+    // Each returns ['passed' => bool, 'label' => string, 'reason' => string]
     // =========================================================================
 
     private function runHardFilters($student, $criteria): array
@@ -210,252 +186,255 @@ class ScholarshipRuleMatcher
         return [
             'citizenship' => $this->checkCitizenship($student, $criteria),
             'bumiputera'  => $this->checkBumiputera($student, $criteria),
-            'state'       => $this->checkState($student, $criteria),
             'study_level' => $this->checkStudyLevel($student, $criteria),
             'field'       => $this->checkField($student, $criteria),
             'age'         => $this->checkAge($student, $criteria),
             'spm'         => $this->checkSpm($student, $criteria),
             'income'      => $this->checkIncome($student, $criteria),
-            'leadership'  => $this->checkLeadership($student, $criteria),
         ];
     }
 
-    private function checkCitizenship($student, $criteria): bool
+    private function checkCitizenship($student, $criteria): array
     {
         if (!$criteria->citizenship_required) {
-            return true;
+            return [
+                'passed' => true,
+                'label'  => 'Citizenship',
+                'reason' => 'No citizenship requirement',
+            ];
         }
 
-        return strcasecmp($student->citizenship, $criteria->citizenship_required) === 0;
+        $passed = strcasecmp($student->citizenship, $criteria->citizenship_required) === 0;
+
+        return [
+            'passed' => $passed,
+            'label'  => 'Citizenship',
+            'reason' => $passed
+                ? "Eligible ({$student->citizenship})"
+                : "Required {$criteria->citizenship_required}, student is {$student->citizenship}",
+        ];
     }
 
-    private function checkState($student, $criteria): bool
-    {
-        if (!$criteria->state_requirement) {
-            return true;
-        }
-
-        return strcasecmp(
-            trim($student->state),
-            trim($criteria->state_requirement)
-        ) === 0;
-    }
-
-    private function checkBumiputera($student, $criteria): bool
+    private function checkBumiputera($student, $criteria): array
     {
         if (!$criteria->bumiputera_required) {
-            return true;
+            return [
+                'passed' => true,
+                'label'  => 'Bumiputera',
+                'reason' => 'No Bumiputera requirement',
+            ];
         }
 
-        return (bool) $student->bumiputera;
+        $passed = (bool) $student->bumiputera;
+
+        return [
+            'passed' => $passed,
+            'label'  => 'Bumiputera',
+            'reason' => $passed
+                ? 'Bumiputera status confirmed'
+                : 'This scholarship requires Bumiputera status',
+        ];
     }
 
-    private function checkLeadership($student, $criteria): bool
-    {
-        if (!$criteria->leadership_required) {
-            return true;
-        }
-
-        return (bool) $student->has_leadership;
-    }
-
-    private function checkStudyLevel($student, $criteria): bool
+    private function checkStudyLevel($student, $criteria): array
     {
         $allowed = $criteria->study_paths ?? [];
 
-        return empty($allowed) || in_array($student->study_level, $allowed, true);
+        if (empty($allowed)) {
+            return [
+                'passed' => true,
+                'label'  => 'Study level',
+                'reason' => 'No study level restriction',
+            ];
+        }
+
+        $passed = in_array($student->study_level, $allowed, true);
+
+        return [
+            'passed' => $passed,
+            'label'  => 'Study level',
+            'reason' => $passed
+                ? "Eligible ({$student->study_level})"
+                : "{$student->study_level} is not in allowed levels: " . implode(', ', $allowed),
+        ];
     }
 
-    private function checkField($student, $criteria): bool
+    private function checkField($student, $criteria): array
     {
         $allowed = $criteria->fields_of_study ?? [];
 
-        return empty($allowed) || in_array($student->field_of_study, $allowed, true);
+        if (empty($allowed)) {
+            return [
+                'passed' => true,
+                'label'  => 'Field of study',
+                'reason' => 'No field restriction',
+            ];
+        }
+
+        $passed = in_array($student->field_of_study, $allowed, true);
+
+        return [
+            'passed' => $passed,
+            'label'  => 'Field of study',
+            'reason' => $passed
+                ? "Eligible ({$student->field_of_study})"
+                : "{$student->field_of_study} is not in allowed fields",
+        ];
     }
 
-    private function checkAge($student, $criteria): bool
+    private function checkAge($student, $criteria): array
     {
-        if ($criteria->min_age !== null && $student->age < $criteria->min_age) {
-            return false;
+        $minOk = $criteria->min_age === null || $student->age >= $criteria->min_age;
+        $maxOk = $criteria->max_age === null || $student->age <= $criteria->max_age;
+        $passed = $minOk && $maxOk;
+
+        if ($criteria->min_age === null && $criteria->max_age === null) {
+            return [
+                'passed' => true,
+                'label'  => 'Age',
+                'reason' => 'No age requirement',
+            ];
         }
 
-        if ($criteria->max_age !== null && $student->age > $criteria->max_age) {
-            return false;
-        }
+        $range = ($criteria->min_age ?? '?') . '–' . ($criteria->max_age ?? '?') . ' years';
 
-        return true;
+        return [
+            'passed' => $passed,
+            'label'  => 'Age',
+            'reason' => $passed
+                ? "Within range ({$student->age} years, range {$range})"
+                : "Age {$student->age} is outside required range {$range}",
+        ];
     }
 
     /**
-     * SPM Hard Filter (near-hard filter with tolerance of 2).
+     * SPM near-hard filter.
+     * Shortfall > SPM_MAX_SHORTFALL (2) → excluded.
+     * 0–2As short → eligible.
      *
-     * Shortfall > SPM_MAX_SHORTFALL (2) → excluded entirely.
-     * Students within tolerance proceed to Step 2 for partial scoring.
+     * Rationale (design decision, no external source required):
+     *   Students within 2As of the requirement are close enough to
+     *   be a relevant recommendation. Beyond that the academic gap
+     *   is too large to be meaningful.
      */
-    private function checkSpm($student, $criteria): bool
+    private function checkSpm($student, $criteria): array
     {
         if ($criteria->min_spm_as === null) {
-            return true;
-        }
-
-        $shortfall = $criteria->min_spm_as - $student->total_as;
-
-        return $shortfall <= self::SPM_MAX_SHORTFALL;
-    }
-
-    /**
-     * Income Hard Filter.
-     *
-     * Two separate checks, evaluated in this order:
-     *
-     * 1. max_monthly_income (RM ceiling)
-     *    If set → compare student's actual monthly_income against it.
-     *    "Pendapatan tidak melebihi RM5,000"
-     *    RM8,000 vs RM5,000 → FAIL ❌
-     *
-     * 2. income_categories (category-based)
-     *    Behaviour auto-resolved from count:
-     *
-     *    0 ticked → null        No restriction → pass ✅
-     *    1 ticked → requirement Student category MUST match → hard filter
-     *                           "B40 sahaja" — T20 → FAIL ❌
-     *    2+ ticked → preference Not a hard filter → pass here ✅
-     *                           Handled in Step 2 scoreIncome() as scored criteria.
-     */
-    private function checkIncome($student, $criteria): bool
-    {
-        // ── Check 1: RM ceiling ───────────────────────────────────────────────
-        if ($criteria->max_monthly_income !== null) {
-            return $student->monthly_income <= $criteria->max_monthly_income;
-        }
-
-        // ── Check 2: Category-based ───────────────────────────────────────────
-        $incomeType = $this->resolveIncomeType($criteria);
-
-        if ($incomeType === 'requirement') {
-            $required        = array_map('strtoupper', $criteria->income_categories);
-            $studentCategory = strtoupper($student->income_category ?? '');
-
-            return in_array($studentCategory, $required, true);
-        }
-
-        // null or preference → pass here
-        return true;
-    }
-
-    // =========================================================================
-    // STEP 2 — Scored Criteria (range-based, partial credit)
-    // Each returns: [points_earned, max_points, detail_string]
-    // =========================================================================
-
-    /**
-     * SPM Result — 50 pts
-     *
-     * Only students within SPM_MAX_SHORTFALL (2) reach here.
-     * checkSpm() already excluded students with shortfall > 2.
-     *
-     * Scoring Tiers:
-     *   Meets or exceeds requirement  → 50/50 (100%)
-     *   1 A short                     → 35/50  (70%)
-     *   2 As short                    → 23/50  (45%)
-     */
-    private function scoreSpm($student, $criteria): array
-    {
-        $max = self::W_SPM;
-
-        if ($criteria->min_spm_as === null) {
-            return [$max, $max, 'No SPM requirement — full marks awarded'];
+            return [
+                'passed' => true,
+                'label'  => 'SPM result',
+                'reason' => 'No SPM requirement',
+            ];
         }
 
         $shortfall = $criteria->min_spm_as - $student->total_as;
 
         if ($shortfall <= 0) {
             return [
-                $max,
-                $max,
-                "Meets requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)",
+                'passed' => true,
+                'label'  => 'SPM result',
+                'reason' => "Meets requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)",
             ];
         }
 
-        $tiers = [
-            1 => [0.70, "1A short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"],
-            2 => [0.45, "2As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"],
-        ];
-
-        [$multiplier, $label] = $tiers[$shortfall]
-            ?? [0.15, "{$shortfall}As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required)"];
-
-        return [(int) round($max * $multiplier), $max, $label];
-    }
-
-    /**
-     * Income — 50 pts (preference scoring only)
-     *
-     * Only runs when 2+ categories are ticked (keutamaan).
-     * Ceiling and single-category requirement are handled in Step 1.
-     *
-     * Uses student's AUTO-DERIVED income_category from monthly_income.
-     *
-     * Scoring:
-     *   Student category in preferred list  → 50/50 (keutamaan — perfect fit)
-     *   Student category NOT in list        → 25/50 (less preferred, not excluded)
-     *   0 or 1 category ticked             → 50/50 (not a preference)
-     */
-    private function scoreIncome($student, $criteria): array
-    {
-        $max        = self::W_INCOME;
-        $incomeType = $this->resolveIncomeType($criteria);
-
-        // Only score when preference (2+ categories ticked)
-        if ($incomeType !== 'preference') {
-            return [$max, $max, 'No income preference — full marks awarded'];
-        }
-
-        $preferred       = array_map('strtoupper', $criteria->income_categories);
-        $studentCategory = strtoupper($student->income_category ?? '');
-
-        if (in_array($studentCategory, $preferred, true)) {
+        if ($shortfall <= self::SPM_MAX_SHORTFALL) {
             return [
-                $max,
-                $max,
-                "Preferred category match ({$studentCategory} — keutamaan diberikan)",
+                'passed' => true,
+                'label'  => 'SPM result',
+                'reason' => "{$shortfall}A short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required) — within tolerance",
             ];
         }
 
         return [
-            (int) round($max * 0.50),
-            $max,
-            "Outside preferred categories (student: {$studentCategory}, preferred: "
-                . implode('/', $preferred) . ')',
+            'passed' => false,
+            'label'  => 'SPM result',
+            'reason' => "{$shortfall}As short of requirement ({$student->total_as}A / {$criteria->min_spm_as}A required) — exceeds tolerance of " . self::SPM_MAX_SHORTFALL,
+        ];
+    }
+
+    /**
+     * Income hard filter.
+     *
+     * Checks in this order:
+     *
+     * 1. max_monthly_income set → compare actual RM (syarat wajib)
+     * 2. 1 category ticked     → compare derived category (syarat wajib)
+     * 3. 2+ categories ticked  → pass here (handled as keutamaan flag)
+     * 4. Nothing set           → pass (no restriction)
+     */
+    private function checkIncome($student, $criteria): array
+    {
+        // ── RM ceiling ────────────────────────────────────────────────────────
+        if ($criteria->max_monthly_income !== null) {
+            $passed = $student->monthly_income <= $criteria->max_monthly_income;
+
+            return [
+                'passed' => $passed,
+                'label'  => 'Monthly income',
+                'reason' => $passed
+                    ? "Within limit (RM{$student->monthly_income} ≤ RM{$criteria->max_monthly_income})"
+                    : "Exceeds limit (RM{$student->monthly_income} > RM{$criteria->max_monthly_income})",
+            ];
+        }
+
+        // ── Category-based ────────────────────────────────────────────────────
+        $categories  = $criteria->income_categories ?? [];
+        $incomeType  = $this->resolveIncomeType($categories);
+
+        // 1 ticked → hard requirement
+        if ($incomeType === 'requirement') {
+            $required        = array_map('strtoupper', $categories);
+            $studentCategory = strtoupper($student->income_category ?? '');
+            $passed          = in_array($studentCategory, $required, true);
+
+            return [
+                'passed' => $passed,
+                'label'  => 'Income category',
+                'reason' => $passed
+                    ? "Eligible ({$studentCategory} — required: " . implode(', ', $required) . ')'
+                    : "{$studentCategory} does not meet requirement: " . implode(', ', $required),
+            ];
+        }
+
+        // 2+ ticked (preference) or 0 ticked (no restriction) → pass here
+        return [
+            'passed' => true,
+            'label'  => 'Income category',
+            'reason' => $incomeType === 'preference'
+                ? 'Income preference — eligibility determined by keutamaan flag'
+                : 'No income restriction',
         ];
     }
 
     // =========================================================================
-    // STEP 3 — Bonus Points
+    // Keutamaan Flag (not a filter — informational sorting signal only)
     // =========================================================================
 
     /**
-     * Bonus — up to +5 pts each (final score capped at 100)
+     * Resolve keutamaan priority for scholarships with 2+ income categories.
      *
-     * Bonuses reward preferred but non-mandatory traits.
-     * They break ties between equally-scored candidates.
+     * Called only AFTER all hard filters pass.
+     *
+     * Returns:
+     *   'keutamaan'     → student is in preferred income group
+     *   'less_priority' → student is outside preferred group (but still eligible)
+     *   'keutamaan'     → default for all non-preference scholarships (no penalty)
      */
-    private function scoreBonus($student, $criteria): array
+    private function resolveKeutamaan($student, $criteria): string
     {
-        $earned  = 0;
-        $details = [];
+        $categories = $criteria->income_categories ?? [];
+        $incomeType = $this->resolveIncomeType($categories);
 
-        if ($criteria->leadership_priority && $student->has_leadership) {
-            $earned    += self::W_BONUS;
-            $details[] = 'Leadership bonus (+' . self::W_BONUS . ' pts)';
+        if ($incomeType !== 'preference') {
+            return 'keutamaan'; // no preference = full priority
         }
 
-        if ($criteria->bumiputera_priority && $student->bumiputera) {
-            $earned    += self::W_BONUS;
-            $details[] = 'Bumiputera priority bonus (+' . self::W_BONUS . ' pts)';
-        }
+        $preferred       = array_map('strtoupper', $categories);
+        $studentCategory = strtoupper($student->income_category ?? '');
 
-        return [$earned, $details];
+        return in_array($studentCategory, $preferred, true)
+            ? 'keutamaan'
+            : 'less_priority';
     }
 
     // =========================================================================
@@ -466,33 +445,15 @@ class ScholarshipRuleMatcher
      * Auto-resolve income type from number of ticked categories.
      *
      * 0 ticked  → null          (no restriction)
-     * 1 ticked  → 'requirement' (hard filter — syarat wajib)
-     * 2+ ticked → 'preference'  (scored — keutamaan)
-     *
-     * No separate database column needed.
-     * The count of income_categories determines the behaviour.
+     * 1 ticked  → 'requirement' (syarat wajib — hard filter)
+     * 2+ ticked → 'preference'  (keutamaan — flag only)
      */
-    private function resolveIncomeType($criteria): ?string
+    private function resolveIncomeType(array $categories): ?string
     {
-        $categories = $criteria->income_categories ?? [];
+        $count = count($categories);
 
-        if (empty($categories)) {
-            return null;
-        }
-
-        if (count($categories) === 1) {
-            return 'requirement';
-        }
-
+        if ($count === 0) return null;
+        if ($count === 1) return 'requirement';
         return 'preference';
-    }
-
-    private function getMatchLevel(int $score): string
-    {
-        return match (true) {
-            $score >= 80 => 'High Match',
-            $score >= 60 => 'Medium Match',
-            default      => 'Low Match',
-        };
     }
 }
