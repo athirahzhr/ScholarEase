@@ -9,8 +9,10 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ============================================ -->
+    <!-- BOOTSTRAP 5 CSS - Fixed CDN                  -->
+    <!-- ============================================ -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -39,6 +41,7 @@
         body {
             background: var(--cream);
             color: var(--gray-800);
+            min-height: 100vh;
         }
         
         /* ============================================ */
@@ -60,16 +63,16 @@
             font-size: 1.8rem;
             background: linear-gradient(135deg, var(--maroon) 0%, var(--gold) 100%);
             -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             background-clip: text;
-            color: transparent;
             letter-spacing: -0.5px;
         }
         
         .navbar-brand i {
             background: linear-gradient(135deg, var(--maroon), var(--gold));
             -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             background-clip: text;
-            color: transparent;
             font-size: 1.8rem;
         }
         
@@ -510,6 +513,13 @@
         .fade-in-up {
             animation: fadeInUp 0.6s ease forwards;
         }
+        
+        /* ============================================ */
+        /* MAIN CONTENT MIN HEIGHT                     */
+        /* ============================================ */
+        main {
+            min-height: calc(100vh - 300px);
+        }
     </style>
     
     @stack('styles')
@@ -654,10 +664,10 @@
     <!-- ============================================ -->
     
     <!-- 1. jQuery (required for Bootstrap) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     
-    <!-- 2. Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 2. Bootstrap JS - Fixed CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     
     <!-- 3. SweetAlert2 - Multiple CDN fallback -->
     <script>
@@ -671,13 +681,12 @@
             console.log('⏳ Loading SweetAlert2...');
             
             var cdnUrls = [
-                'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js',
+                'https://cdn.jsdelivr.net/npm/sweetalert2@11',
                 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js',
                 'https://unpkg.com/sweetalert2@11/dist/sweetalert2.all.min.js'
             ];
             
             var loaded = false;
-            var attempts = 0;
             
             function tryLoad(index) {
                 if (loaded || index >= cdnUrls.length) {
@@ -697,7 +706,6 @@
                         loaded = true;
                         console.log('✅ SweetAlert2 loaded from:', cdnUrls[index]);
                     } else {
-                        // Try next CDN
                         tryLoad(index + 1);
                     }
                 };
@@ -752,6 +760,23 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         }
+        
+        // Close mobile menu on link click
+        document.addEventListener('DOMContentLoaded', function() {
+            var navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            var navbarCollapse = document.getElementById('navbarNav');
+            
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (navbarCollapse.classList.contains('show')) {
+                        var bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                        if (bsCollapse) {
+                            bsCollapse.hide();
+                        }
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
