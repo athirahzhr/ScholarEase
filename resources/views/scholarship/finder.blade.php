@@ -71,7 +71,6 @@
         font-size: 0.9rem;
     }
     
-    /* Progress Bar */
     .progress-custom {
         background: #e5e7eb;
         border-radius: 10px;
@@ -98,7 +97,6 @@
         font-weight: 700;
     }
     
-    /* Upload Area */
     .upload-area {
         border: 2px dashed var(--maroon);
         border-radius: 20px;
@@ -127,7 +125,6 @@
         margin-bottom: 1rem;
     }
     
-    /* Grade Badges */
     .grade-badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -149,7 +146,6 @@
     .grade-c { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
     .grade-other { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
     
-    /* Buttons - STANDARDIZED */
     .btn {
         border-radius: 40px;
         font-weight: 600;
@@ -220,7 +216,6 @@
         min-width: unset;
     }
     
-    /* Button Container */
     .button-group {
         display: flex;
         flex-wrap: wrap;
@@ -240,7 +235,6 @@
         justify-content: flex-end;
     }
     
-    /* Tables */
     .table th {
         background: linear-gradient(135deg, var(--cream), var(--cream-dark));
         color: var(--maroon);
@@ -257,7 +251,6 @@
         overflow: hidden;
     }
     
-    /* Verified Grades */
     .verified-grades {
         border: 2px solid #10b981;
         border-radius: 16px;
@@ -265,7 +258,6 @@
         background: linear-gradient(135deg, #f0fdf4, #dcfce7);
     }
     
-    /* Form Controls */
     .form-control, .form-select {
         border-radius: 12px;
         border: 2px solid #e5e7eb;
@@ -279,7 +271,6 @@
         outline: none;
     }
     
-    /* Alerts */
     .alert-info {
         background: linear-gradient(135deg, #dbeafe, #bfdbfe);
         border: none;
@@ -308,7 +299,6 @@
         border-radius: 12px;
     }
     
-    /* Utility Classes */
     .text-maroon {
         color: var(--maroon);
     }
@@ -341,7 +331,31 @@
     .d-none { display: none !important; }
     .d-grid { display: grid; }
     
-    /* Responsive */
+    /* Custom Toast Notification (fallback) */
+    .toast-fallback {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 9999;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        max-width: 400px;
+        transform: translateX(120%);
+        transition: transform 0.4s ease;
+    }
+    
+    .toast-fallback.show {
+        transform: translateX(0);
+    }
+    
+    .toast-fallback.success { background: linear-gradient(135deg, #10b981, #059669); }
+    .toast-fallback.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .toast-fallback.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .toast-fallback.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    
     @media (max-width: 768px) {
         .step-card {
             padding: 1.25rem;
@@ -517,7 +531,7 @@
                             <i class="fas fa-cogs"></i> Process SPM Results
                         </button>
                         <button type="button" class="btn btn-outline-secondary" onclick="skipOCR()">
-                            <i class="fas fa-pen"></i> I dont have SPM result
+                            <i class="fas fa-pen"></i> I don't have SPM result
                         </button>
                     </div>
                 </form>
@@ -566,20 +580,18 @@
                     </div>
                     
                     <div class="row g-3">
-                        <!-- income category -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-money-bill me-2 text-maroon"></i>
-                                    Monthly Household Income (RM)
-                                </label>
-                                <input type="number" name="monthly_income"
-                                    class="form-control" min="0" placeholder="e.g. 4500" required>
-                                <small class="text-muted">
-                                    B40 ≤ RM4,850 &nbsp;|&nbsp; M40 RM4,851–RM10,960 &nbsp;|&nbsp; T20 > RM10,960
-                                </small>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-money-bill me-2 text-maroon"></i>
+                                Monthly Household Income (RM)
+                            </label>
+                            <input type="number" name="monthly_income"
+                                class="form-control" min="0" placeholder="e.g. 4500" required>
+                            <small class="text-muted">
+                                B40 ≤ RM4,850 &nbsp;|&nbsp; M40 RM4,851–RM10,960 &nbsp;|&nbsp; T20 > RM10,960
+                            </small>
+                        </div>
 
-                        <!-- Study Path -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">
                                 <i class="fas fa-road me-2 text-maroon"></i>Intended Study Path
@@ -594,7 +606,6 @@
                             </select>
                         </div>
 
-                        <!-- Field of Study -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">
                                 <i class="fas fa-book me-2 text-maroon"></i>Field of Study
@@ -620,7 +631,6 @@
                             </select>
                         </div>
 
-                        <!-- Bumiputera Status -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">
                                 <i class="fas fa-star-of-life me-2 text-maroon"></i>Bumiputera Status
@@ -632,22 +642,18 @@
                             </select>
                         </div>
 
-                        <!-- Age -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">
                                 <i class="fas fa-birthday-cake me-2 text-maroon"></i>Age
                             </label>
-
                             <select name="age" class="form-select" required>
                                 <option value="">-- Select Age --</option>
-
                                 @for ($i = 15; $i <= 30; $i++)
                                     <option value="{{ $i }}">{{ $i }} Years Old</option>
                                 @endfor
                             </select>
                         </div>
 
-                        <!-- State -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">
                                 <i class="fas fa-map-marker-alt me-2 text-maroon"></i>State of Origin
@@ -673,7 +679,6 @@
                             </select>
                         </div>
 
-                        <!-- Citizenship -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">
                                 <i class="fas fa-passport me-2 text-maroon"></i>Citizenship
@@ -685,7 +690,6 @@
                             </select>
                         </div>
 
-                        <!-- Leadership Experience -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">
                                 <i class="fas fa-trophy me-2 text-maroon"></i>Leadership Experience
@@ -698,7 +702,6 @@
                         </div>
                     </div>
                     
-                    <!-- Navigation -->
                     <div class="button-group button-group-between mt-4 pt-3">
                         <button type="button" class="btn btn-outline-primary" onclick="goBackToStep2()">
                             <i class="fas fa-arrow-left"></i> Back
@@ -714,16 +717,139 @@
 </div>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Load SweetAlert2 with fallback -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" onerror="handleSwalError()"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <script>
+    // Handle SweetAlert2 load failure - use native fallback
+    function handleSwalError() {
+        console.warn('SweetAlert2 failed to load, using native fallback');
+        window.Swal = null;
+    }
+    
+    // Wait for Swal to load, fallback to native
+    function getSwal() {
+        if (typeof Swal !== 'undefined' && Swal) {
+            return Swal;
+        }
+        // Native fallback
+        return {
+            fire: function(options) {
+                const icon = options.icon || 'info';
+                const title = options.title || '';
+                const text = options.text || '';
+                const html = options.html || '';
+                const confirmText = options.confirmButtonText || 'OK';
+                const cancelText = options.cancelButtonText || 'Cancel';
+                const showCancel = options.showCancelButton || false;
+                const timer = options.timer || 0;
+                
+                return new Promise((resolve) => {
+                    // Create custom modal
+                    const modal = document.createElement('div');
+                    modal.style.cssText = `
+                        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                        background: rgba(0,0,0,0.5); display: flex; align-items: center;
+                        justify-content: center; z-index: 99999; padding: 20px;
+                    `;
+                    
+                    const colors = {
+                        success: '#10b981',
+                        error: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                        question: '#6b7280'
+                    };
+                    
+                    const iconMap = {
+                        success: '✅',
+                        error: '❌',
+                        warning: '⚠️',
+                        info: 'ℹ️',
+                        question: '❓'
+                    };
+                    
+                    const content = document.createElement('div');
+                    content.style.cssText = `
+                        background: white; border-radius: 16px; padding: 24px;
+                        max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                        animation: modalFadeIn 0.3s ease;
+                    `;
+                    
+                    if (options.html) {
+                        content.innerHTML = options.html;
+                    } else {
+                        content.innerHTML = `
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 12px;">${iconMap[icon] || 'ℹ️'}</div>
+                                <h3 style="margin: 0 0 8px; color: #1f2937;">${title}</h3>
+                                <p style="margin: 0 0 20px; color: #4b5563;">${text}</p>
+                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                    ${showCancel ? `<button id="swal-cancel" style="padding: 10px 24px; border: 2px solid #6b7280; background: transparent; border-radius: 40px; font-weight: 600; cursor: pointer;">${cancelText}</button>` : ''}
+                                    <button id="swal-confirm" style="padding: 10px 24px; border: none; background: ${colors[icon] || '#7A0019'}; color: white; border-radius: 40px; font-weight: 600; cursor: pointer;">${confirmText}</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    modal.appendChild(content);
+                    document.body.appendChild(modal);
+                    
+                    // Add animation
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes modalFadeIn {
+                            from { opacity: 0; transform: scale(0.9); }
+                            to { opacity: 1; transform: scale(1); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Handle timer
+                    if (timer > 0) {
+                        setTimeout(() => {
+                            if (modal.parentNode) modal.remove();
+                            resolve({ isConfirmed: false, isDismissed: true });
+                        }, timer);
+                    }
+                    
+                    const confirmBtn = content.querySelector('#swal-confirm');
+                    const cancelBtn = content.querySelector('#swal-cancel');
+                    
+                    confirmBtn.onclick = () => {
+                        modal.remove();
+                        resolve({ isConfirmed: true });
+                    };
+                    
+                    if (cancelBtn) {
+                        cancelBtn.onclick = () => {
+                            modal.remove();
+                            resolve({ isConfirmed: false, isDismissed: true });
+                        };
+                    }
+                    
+                    // Close on backdrop click
+                    modal.onclick = (e) => {
+                        if (e.target === modal && !showCancel) {
+                            modal.remove();
+                            resolve({ isConfirmed: false, isDismissed: true });
+                        }
+                    };
+                });
+            },
+            close: function() {
+                const modals = document.querySelectorAll('[style*="position: fixed"][style*="z-index: 99999"]');
+                modals.forEach(m => m.remove());
+            }
+        };
+    }
+    
     AOS.init({ duration: 800, once: true });
 
-    // Current step tracking
     let currentStep = 1;
     let ocrData = null;
     
-    // Drag and drop functionality
     const dropArea = document.getElementById('dropArea');
     const fileInput = document.getElementById('spmFile');
     
@@ -782,8 +908,8 @@
         }
     }
     
-    // OCR Processing
     function processUpload() {
+        const Swal = getSwal();
         const fileInput = document.getElementById('spmFile');
         if (!fileInput.files.length) {
             Swal.fire('Error', 'Please select a file to upload', 'error');
@@ -814,17 +940,16 @@
                 ocrData = data;
                 displayOCRResults(data);
             } else {
-                Swal.fire('Error', data.message, 'error');
+                Swal.fire('Error', data.message || 'Failed to process SPM certificate', 'error');
             }
         })
         .catch(error => {
             Swal.close();
-            Swal.fire('Error', 'Failed to process SPM certificate', 'error');
+            Swal.fire('Error', 'Failed to process SPM certificate. Please try again.', 'error');
             console.error('Error:', error);
         });
     }
     
-    // Display OCR results in editable table
     function displayOCRResults(data) {
         const isManual = data.manualEntry === true;
 
@@ -995,245 +1120,135 @@
         ocrData.totalAs = totalAs;
     }
     
-    function saveAllGrades() {
-        if (!ocrData) return;
-        
+    function showAddSubjectModal() {
+        const Swal = getSwal();
         Swal.fire({
-            title: 'Saving Changes',
-            html: '<div class="text-center"><div class="spinner-border text-maroon mb-3" role="status"></div><p>Saving grade changes...</p></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false
-        });
-        
-        fetch("{{ route('update.ocr.results') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ grades: ocrData.grades })
-        })
-        .then(response => response.json())
-        .then(data => {
-            Swal.close();
-            if (data.success) {
-                ocrData.totalAs = data.totalAs;
-                document.getElementById('totalAsBadge').textContent = data.totalAs;
-                Swal.fire({ icon: 'success', title: 'Grades Saved!', text: data.message, timer: 2000, showConfirmButton: false });
-            } else {
-                Swal.fire('Error', data.message, 'error');
+            title: 'Add Missing Subject',
+            html: `
+                <div class="text-start">
+                    <div class="mb-3">
+                        <label class="form-label">Subject Name</label>
+                        <select id="newSubjectName" class="form-select" onchange="toggleCustomSubject(this.value)">
+                            <option value="">-- Select Subject --</option>
+                            <option value="BAHASA MELAYU">BAHASA MELAYU</option>
+                            <option value="BAHASA INGGERIS">BAHASA INGGERIS</option>
+                            <option value="MATHEMATICS">MATHEMATICS</option>
+                            <option value="ADDITIONAL MATHEMATICS">ADDITIONAL MATHEMATICS</option>
+                            <option value="SCIENCE">SCIENCE</option>
+                            <option value="PHYSICS">PHYSICS</option>
+                            <option value="CHEMISTRY">CHEMISTRY</option>
+                            <option value="BIOLOGY">BIOLOGY</option>
+                            <option value="SEJARAH">SEJARAH</option>
+                            <option value="PENDIDIKAN ISLAM">PENDIDIKAN ISLAM</option>
+                            <option value="PENDIDIKAN MORAL">PENDIDIKAN MORAL</option>
+                            <option value="PRINSIP PERAKAUNAN">PRINSIP PERAKAUNAN</option>
+                            <option value="EKONOMI">EKONOMI</option>
+                            <option value="PERNIAGAAN">PERNIAGAAN</option>
+                            <option value="SAINS KOMPUTER">SAINS KOMPUTER</option>
+                            <option value="BAHASA ARAB">BAHASA ARAB</option>
+                            <option value="KESUSASTERAAN MELAYU">KESUSASTERAAN MELAYU</option>
+                            <option value="GEOGRAFI">GEOGRAFI</option>
+                            <option value="OTHER">OTHER</option>
+                        </select>
+                        <input type="text" id="customSubjectName" class="form-control mt-2 d-none" placeholder="Enter custom subject name">
+                        <small class="text-muted">Select a subject or choose OTHER</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Grade</label>
+                        <select id="newSubjectGrade" class="form-select">
+                            <option value="A+">A+</option>
+                            <option value="A">A</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B">B</option>
+                            <option value="B-">B-</option>
+                            <option value="C+">C+</option>
+                            <option value="C">C</option>
+                            <option value="C-">C-</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                            <option value="G">G</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Add Subject',
+            preConfirm: () => {
+                let subject = document.getElementById('newSubjectName').value;
+                const grade = document.getElementById('newSubjectGrade').value;
+                
+                if (subject === 'OTHER') {
+                    subject = document.getElementById('customSubjectName').value.trim().toUpperCase();
+                }
+                
+                if (!subject) {
+                    Swal.showValidationMessage('Please enter subject name');
+                    return false;
+                }
+                
+                return { subject: subject, grade: grade };
             }
-        })
-        .catch(error => {
-            Swal.close();
-            Swal.fire('Error', 'Failed to save grades', 'error');
+        }).then((result) => {
+            if (result.isConfirmed) {
+                addSubject(result.value.subject, result.value.grade);
+            }
         });
     }
-    
-   function showAddSubjectModal() {
-    Swal.fire({
-        title: 'Add Missing Subject',
-        html: `
-            <div class="text-start">
-                <div class="mb-3">
-                    <label class="form-label">Subject Name</label>
 
-                    <select id="newSubjectName"
-                            class="form-select"
-                            onchange="toggleCustomSubject(this.value)">
-                        <option value="">-- Select Subject --</option>
-
-                        <option value="BAHASA MELAYU">BAHASA MELAYU</option>
-                        <option value="BAHASA INGGERIS">BAHASA INGGERIS</option>
-                        <option value="MATHEMATICS">MATHEMATICS</option>
-                        <option value="ADDITIONAL MATHEMATICS">ADDITIONAL MATHEMATICS</option>
-                        <option value="SCIENCE">SCIENCE</option>
-                        <option value="PHYSICS">PHYSICS</option>
-                        <option value="CHEMISTRY">CHEMISTRY</option>
-                        <option value="BIOLOGY">BIOLOGY</option>
-                        <option value="SEJARAH">SEJARAH</option>
-                        <option value="PENDIDIKAN ISLAM">PENDIDIKAN ISLAM</option>
-                        <option value="PENDIDIKAN MORAL">PENDIDIKAN MORAL</option>
-                        <option value="PRINSIP PERAKAUNAN">PRINSIP PERAKAUNAN</option>
-                        <option value="EKONOMI">EKONOMI</option>
-                        <option value="PERNIAGAAN">PERNIAGAAN</option>
-                        <option value="SAINS KOMPUTER">SAINS KOMPUTER</option>
-                        <option value="BAHASA ARAB">BAHASA ARAB</option>
-                        <option value="KESUSASTERAAN MELAYU">KESUSASTERAAN MELAYU</option>
-                        <option value="GEOGRAFI">GEOGRAFI</option>
-                        <option value="OTHER">OTHER</option>
-                    </select>
-
-                    <input
-                        type="text"
-                        id="customSubjectName"
-                        class="form-control mt-2 d-none"
-                        placeholder="Enter custom subject name">
-
-                    <small class="text-muted">
-                        Select a subject or choose OTHER
-                    </small>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Grade</label>
-                    <select id="newSubjectGrade" class="form-select">
-                        <option value="A+">A+</option>
-                        <option value="A">A</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B">B</option>
-                        <option value="B-">B-</option>
-                        <option value="C+">C+</option>
-                        <option value="C">C</option>
-                        <option value="C-">C-</option>
-                        <option value="D">D</option>
-                        <option value="E">E</option>
-                        <option value="G">G</option>
-                    </select>
-                </div>
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Add Subject',
-
-        preConfirm: () => {
-
-            let subject =
-                document.getElementById('newSubjectName').value;
-
-            const grade =
-                document.getElementById('newSubjectGrade').value;
-
-            if (subject === 'OTHER') {
-
-                subject =
-                    document.getElementById('customSubjectName')
-                    .value
-                    .trim()
-                    .toUpperCase();
-            }
-
-            if (!subject) {
-                Swal.showValidationMessage(
-                    'Please enter subject name'
-                );
-                return false;
-            }
-
-
-            return {
-                subject: subject,
-                grade: grade
-            };
-        }
-    }).then((result) => {
-
-        if (result.isConfirmed) {
-            addSubject(
-                result.value.subject,
-                result.value.grade
-            );
-        }
-    });
-}
-
-    function toggleCustomSubject(value)
-    {
-        const customInput =
-            document.getElementById('customSubjectName');
-
+    function toggleCustomSubject(value) {
+        const customInput = document.getElementById('customSubjectName');
         if (!customInput) return;
-
         if (value === 'OTHER') {
-
             customInput.classList.remove('d-none');
-
         } else {
-
             customInput.classList.add('d-none');
             customInput.value = '';
         }
     }
 
     function addSubject(subject, grade) {
-
-    if (!ocrData) return;
-
-    if (ocrData.grades[subject]) {
-
-        Swal.fire(
-            'Warning',
-            `Subject "${subject}" already exists!`,
-            'warning'
-        );
-
-        return;
-    }
-
-    Swal.fire({
-        title: 'Adding Subject',
-        html: '<div class="spinner-border text-maroon"></div>',
-        allowOutsideClick: false,
-        showConfirmButton: false
-    });
-
-    fetch("{{ route('add.ocr.subject') }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            subject: subject,
-            grade: grade
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-
-        Swal.close();
-
-        if (data.success) {
-
-            ocrData.grades[subject] = grade;
-            ocrData.totalAs = data.totalAs;
-
-            addSubjectToTable(
-                subject,
-                grade,
-                data.totalAs
-            );
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Subject Added!',
-                timer: 1500,
-                showConfirmButton: false
-            });
-
-        } else {
-
-            Swal.fire(
-                'Error',
-                data.message,
-                'error'
-            );
+        const Swal = getSwal();
+        if (!ocrData) return;
+        
+        if (ocrData.grades[subject]) {
+            Swal.fire('Warning', `Subject "${subject}" already exists!`, 'warning');
+            return;
         }
-    })
-    .catch(error => {
-
-        Swal.close();
-
-        console.error(error);
-
-        Swal.fire(
-            'Error',
-            'Failed to add subject',
-            'error'
-        );
-    });
-}
+        
+        Swal.fire({
+            title: 'Adding Subject',
+            html: '<div class="spinner-border text-maroon"></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+        
+        fetch("{{ route('add.ocr.subject') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ subject: subject, grade: grade })
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.success) {
+                ocrData.grades[subject] = grade;
+                ocrData.totalAs = data.totalAs;
+                addSubjectToTable(subject, grade, data.totalAs);
+                Swal.fire({ icon: 'success', title: 'Subject Added!', timer: 1500, showConfirmButton: false });
+            } else {
+                Swal.fire('Error', data.message, 'error');
+            }
+        })
+        .catch(error => {
+            Swal.close();
+            console.error(error);
+            Swal.fire('Error', 'Failed to add subject', 'error');
+        });
+    }
     
     function addSubjectToTable(subject, grade, totalAs) {
         const safeSubjectId = subject.replace(/[^a-zA-Z0-9]/g, '-');
@@ -1259,6 +1274,7 @@
     }
     
     function removeSubject(subject) {
+        const Swal = getSwal();
         Swal.fire({
             title: 'Remove Subject?', text: `Remove "${subject}"?`, icon: 'warning',
             showCancelButton: true, confirmButtonText: 'Yes, Remove', confirmButtonColor: '#d33'
@@ -1287,6 +1303,7 @@
     }
     
     function verifyAndContinue() {
+        const Swal = getSwal();
         Swal.fire({
             title: 'Verify Results', text: 'Are you sure all grades are correct?', icon: 'question',
             showCancelButton: true, confirmButtonText: 'Yes, Continue', confirmButtonColor: '#3085d6'
@@ -1315,9 +1332,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({
-                grades: ocrData.grades
-            })
+            body: JSON.stringify({ grades: ocrData.grades })
         });
     }
     
@@ -1361,6 +1376,7 @@
     }
     
     function goBackToUpload() {
+        const Swal = getSwal();
         Swal.fire({
             title: 'Upload Again?', text: 'This will clear all extracted data.', icon: 'warning',
             showCancelButton: true, confirmButtonText: 'Yes, Upload Again'
@@ -1382,6 +1398,7 @@
     function goBackToStep2() { goToStep(2); }
 
     function skipOCR() {
+        const Swal = getSwal();
         Swal.fire({
             title: 'Manual Entry',
             text: 'Proceed without OCR and enter SPM results manually?',
@@ -1413,24 +1430,14 @@
     }
     
     document.getElementById('profileForm').addEventListener('submit', function(e) {
-
-        const income =
-            document.querySelector('input[name="monthly_income"]').value;
-
-        const study =
-            document.querySelector('select[name="study_path"]').value;
-
+        const income = document.querySelector('input[name="monthly_income"]').value;
+        const study = document.querySelector('select[name="study_path"]').value;
+        
         if (!income || !study) {
-
             e.preventDefault();
-
-            Swal.fire(
-                'Error',
-                'Please complete all required fields',
-                'error'
-            );
+            const Swal = getSwal();
+            Swal.fire('Error', 'Please complete all required fields', 'error');
         }
-
     });
 </script>
 @endpush
