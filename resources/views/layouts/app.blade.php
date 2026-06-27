@@ -9,11 +9,11 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap 5 CSS - CRITICAL: Must load first -->
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- FontAwesome 6 - For icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- AOS Animation -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -41,7 +41,6 @@
             color: var(--gray-800);
         }
         
-        /* Navbar Styles - ScholarEase Branding */
         .navbar-scholarease {
             background: rgba(255, 248, 238, 0.95);
             backdrop-filter: blur(20px);
@@ -101,7 +100,6 @@
             width: 80%;
         }
         
-        /* Unified Button Styles */
         .btn-nav {
             display: inline-flex;
             align-items: center;
@@ -238,7 +236,6 @@
             background: rgba(220, 38, 38, 0.1);
         }
         
-        /* Mobile Responsive */
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.4rem;
@@ -274,7 +271,6 @@
             color: var(--maroon);
         }
         
-        /* Fix for nav items alignment */
         .navbar-nav {
             align-items: center;
             gap: 0.5rem;
@@ -410,45 +406,39 @@
         </div>
     </footer>
 
-    <!-- Scripts - Must load in this order -->
-    <!-- jQuery first -->
+    <!-- ============================================ -->
+    <!-- SCRIPTS - URUTAN PENTING!                    -->
+    <!-- ============================================ -->
+    
+    <!-- jQuery (required for Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 - PASTIKAN INI ADA! -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!-- AOS Animation -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
+    <!-- Custom Scripts from child views (finder.blade.php etc) -->
+    @stack('scripts')
+    
+    <!-- Default initialization -->
     <script>
-        // Initialize AOS
         AOS.init({ duration: 800, once: true });
         
-        // CSRF Token for AJAX requests
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
         
-        // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         });
-        
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                const hash = this.getAttribute('href');
-                if(hash === '#') return;
-                const target = document.querySelector(hash);
-                if(target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
     </script>
-    
-    @stack('scripts')
 </body>
 </html>
