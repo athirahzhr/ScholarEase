@@ -62,7 +62,7 @@ class ScholarshipController extends Controller
     {
         $validated = $request->validate([
             'monthly_income' => 'required|numeric|min:0',
-            'study_level' => 'required|string|max:100',
+            'study_path' => 'required|string|max:100',
             'field_of_study' => 'required|string|max:255',
             'citizenship' => 'required|string|max:100',
             'age' => 'required|integer|min:15|max:30',
@@ -77,11 +77,16 @@ class ScholarshipController extends Controller
         $user = Auth::user();
         $verifiedData = Session::get('verified_ocr_data', []);
 
+        $incomeCategory = $this->deriveIncomeCategory(
+            $validated['monthly_income']
+        );
+
         UserProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'monthly_income' => $validated['monthly_income'],
-                'study_level' => $validated['study_level'],
+                'income_category' => $incomeCategory,
+                'study_level' => $validated['study_path'],
                 'field_of_study' => $validated['field_of_study'],
                 'citizenship' => $validated['citizenship'],
                 'age' => $validated['age'],
@@ -582,4 +587,20 @@ class ScholarshipController extends Controller
 
         return response()->json($scholarships);
     }
+
+    /**
+ * Convert monthly income to income category
+ */
+private function deriveIncomeCategory($income)
+{
+    if ($income <= 4850) {
+        return 'B40';
+    }
+
+    if ($income <= 10960) {
+        return 'M40';
+    }
+
+    return 'T20';
+}
 }
