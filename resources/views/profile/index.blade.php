@@ -277,6 +277,71 @@
                                                     {{ $profile->field_of_study ?? 'Not Set' }}
                                                 </div>
                                             </div>
+
+                                            @if(!empty($profile->spm_results))
+
+                                            <hr>
+
+                                            <div class="mt-3">
+
+                                                <div class="info-label mb-3">
+                                                    <i class="fas fa-file-alt"></i>
+                                                    SPM Results
+                                                </div>
+
+                                                <div class="table-responsive">
+
+                                                    <table class="table table-sm table-bordered align-middle">
+
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Subject</th>
+                                                                <th width="120">Grade</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+
+                                                        @foreach($profile->spm_results as $subject => $grade)
+
+                                                            <tr>
+
+                                                                <td>{{ $subject }}</td>
+
+                                                                <td class="text-center">
+
+                                                                    @php
+
+                                                                        $badge =
+                                                                            in_array($grade, ['A+','A','A-'])
+                                                                            ? 'bg-success'
+                                                                            : ($grade == 'B+' || $grade == 'B'
+                                                                                ? 'bg-primary'
+                                                                                : 'bg-secondary');
+
+                                                                    @endphp
+
+                                                                    <span class="badge {{ $badge }}">
+
+                                                                        {{ $grade }}
+
+                                                                    </span>
+
+                                                                </td>
+
+                                                            </tr>
+
+                                                        @endforeach
+
+                                                        </tbody>
+
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
