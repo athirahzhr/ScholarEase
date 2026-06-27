@@ -494,7 +494,7 @@
                                             name="monthly_income"
                                             class="form-control"
                                             min="0"
-                                            step="100"
+                                            step="0.01"
                                             required
                                             value="{{ old('monthly_income', $profile->monthly_income ?? '') }}"
                                             placeholder="e.g., 4500"
