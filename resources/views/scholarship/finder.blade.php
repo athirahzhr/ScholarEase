@@ -331,31 +331,6 @@
     .d-none { display: none !important; }
     .d-grid { display: grid; }
     
-    /* Custom Toast Notification (fallback) */
-    .toast-fallback {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 16px 24px;
-        border-radius: 12px;
-        color: white;
-        font-weight: 600;
-        z-index: 9999;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        max-width: 400px;
-        transform: translateX(120%);
-        transition: transform 0.4s ease;
-    }
-    
-    .toast-fallback.show {
-        transform: translateX(0);
-    }
-    
-    .toast-fallback.success { background: linear-gradient(135deg, #10b981, #059669); }
-    .toast-fallback.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
-    .toast-fallback.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .toast-fallback.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-    
     @media (max-width: 768px) {
         .step-card {
             padding: 1.25rem;
@@ -717,134 +692,10 @@
 </div>
 
 @push('scripts')
-<!-- Load SweetAlert2 with fallback -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" onerror="handleSwalError()"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
 <script>
-    // Handle SweetAlert2 load failure - use native fallback
-    function handleSwalError() {
-        console.warn('SweetAlert2 failed to load, using native fallback');
-        window.Swal = null;
-    }
-    
-    // Wait for Swal to load, fallback to native
-    function getSwal() {
-        if (typeof Swal !== 'undefined' && Swal) {
-            return Swal;
-        }
-        // Native fallback
-        return {
-            fire: function(options) {
-                const icon = options.icon || 'info';
-                const title = options.title || '';
-                const text = options.text || '';
-                const html = options.html || '';
-                const confirmText = options.confirmButtonText || 'OK';
-                const cancelText = options.cancelButtonText || 'Cancel';
-                const showCancel = options.showCancelButton || false;
-                const timer = options.timer || 0;
-                
-                return new Promise((resolve) => {
-                    // Create custom modal
-                    const modal = document.createElement('div');
-                    modal.style.cssText = `
-                        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                        background: rgba(0,0,0,0.5); display: flex; align-items: center;
-                        justify-content: center; z-index: 99999; padding: 20px;
-                    `;
-                    
-                    const colors = {
-                        success: '#10b981',
-                        error: '#ef4444',
-                        warning: '#f59e0b',
-                        info: '#3b82f6',
-                        question: '#6b7280'
-                    };
-                    
-                    const iconMap = {
-                        success: '✅',
-                        error: '❌',
-                        warning: '⚠️',
-                        info: 'ℹ️',
-                        question: '❓'
-                    };
-                    
-                    const content = document.createElement('div');
-                    content.style.cssText = `
-                        background: white; border-radius: 16px; padding: 24px;
-                        max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                        animation: modalFadeIn 0.3s ease;
-                    `;
-                    
-                    if (options.html) {
-                        content.innerHTML = options.html;
-                    } else {
-                        content.innerHTML = `
-                            <div style="text-align: center;">
-                                <div style="font-size: 48px; margin-bottom: 12px;">${iconMap[icon] || 'ℹ️'}</div>
-                                <h3 style="margin: 0 0 8px; color: #1f2937;">${title}</h3>
-                                <p style="margin: 0 0 20px; color: #4b5563;">${text}</p>
-                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                                    ${showCancel ? `<button id="swal-cancel" style="padding: 10px 24px; border: 2px solid #6b7280; background: transparent; border-radius: 40px; font-weight: 600; cursor: pointer;">${cancelText}</button>` : ''}
-                                    <button id="swal-confirm" style="padding: 10px 24px; border: none; background: ${colors[icon] || '#7A0019'}; color: white; border-radius: 40px; font-weight: 600; cursor: pointer;">${confirmText}</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    modal.appendChild(content);
-                    document.body.appendChild(modal);
-                    
-                    // Add animation
-                    const style = document.createElement('style');
-                    style.textContent = `
-                        @keyframes modalFadeIn {
-                            from { opacity: 0; transform: scale(0.9); }
-                            to { opacity: 1; transform: scale(1); }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                    
-                    // Handle timer
-                    if (timer > 0) {
-                        setTimeout(() => {
-                            if (modal.parentNode) modal.remove();
-                            resolve({ isConfirmed: false, isDismissed: true });
-                        }, timer);
-                    }
-                    
-                    const confirmBtn = content.querySelector('#swal-confirm');
-                    const cancelBtn = content.querySelector('#swal-cancel');
-                    
-                    confirmBtn.onclick = () => {
-                        modal.remove();
-                        resolve({ isConfirmed: true });
-                    };
-                    
-                    if (cancelBtn) {
-                        cancelBtn.onclick = () => {
-                            modal.remove();
-                            resolve({ isConfirmed: false, isDismissed: true });
-                        };
-                    }
-                    
-                    // Close on backdrop click
-                    modal.onclick = (e) => {
-                        if (e.target === modal && !showCancel) {
-                            modal.remove();
-                            resolve({ isConfirmed: false, isDismissed: true });
-                        }
-                    };
-                });
-            },
-            close: function() {
-                const modals = document.querySelectorAll('[style*="position: fixed"][style*="z-index: 99999"]');
-                modals.forEach(m => m.remove());
-            }
-        };
-    }
-    
     AOS.init({ duration: 800, once: true });
 
     let currentStep = 1;
@@ -909,7 +760,6 @@
     }
     
     function processUpload() {
-        const Swal = getSwal();
         const fileInput = document.getElementById('spmFile');
         if (!fileInput.files.length) {
             Swal.fire('Error', 'Please select a file to upload', 'error');
@@ -1120,8 +970,8 @@
         ocrData.totalAs = totalAs;
     }
     
+    // ===== FIXED: showAddSubjectModal with proper Add button =====
     function showAddSubjectModal() {
-        const Swal = getSwal();
         Swal.fire({
             title: 'Add Missing Subject',
             html: `
@@ -1173,7 +1023,7 @@
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: '<i class="fas fa-plus me-2"></i> Add Subject',
+            confirmButtonText: 'Add Subject',
             cancelButtonText: 'Cancel',
             confirmButtonColor: '#7A0019',
             cancelButtonColor: '#6b7280',
@@ -1187,6 +1037,11 @@
                 
                 if (!subject) {
                     Swal.showValidationMessage('Please select or enter a subject name');
+                    return false;
+                }
+                
+                if (!grade) {
+                    Swal.showValidationMessage('Please select a grade');
                     return false;
                 }
                 
@@ -1211,7 +1066,6 @@
     }
 
     function addSubject(subject, grade) {
-        const Swal = getSwal();
         if (!ocrData) return;
         
         if (ocrData.grades[subject]) {
@@ -1289,7 +1143,6 @@
     }
     
     function removeSubject(subject) {
-        const Swal = getSwal();
         Swal.fire({
             title: 'Remove Subject?', 
             text: `Remove "${subject}"?`, 
@@ -1329,7 +1182,6 @@
     }
     
     function verifyAndContinue() {
-        const Swal = getSwal();
         Swal.fire({
             title: 'Verify Results', 
             text: 'Are you sure all grades are correct?', 
@@ -1420,7 +1272,6 @@
     }
     
     function goBackToUpload() {
-        const Swal = getSwal();
         Swal.fire({
             title: 'Upload Again?', 
             text: 'This will clear all extracted data.', 
@@ -1450,7 +1301,6 @@
     }
 
     function skipOCR() {
-        const Swal = getSwal();
         Swal.fire({
             title: 'Manual Entry',
             text: 'Proceed without OCR and enter SPM results manually?',
@@ -1487,7 +1337,6 @@
         
         if (!income || !study) {
             e.preventDefault();
-            const Swal = getSwal();
             Swal.fire('Error', 'Please complete all required fields', 'error');
         }
     });
