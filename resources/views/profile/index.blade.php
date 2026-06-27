@@ -610,14 +610,7 @@
                                                     </span>
                                                 </span>
                                             </div>
-                                            <div class="info-item" style="border-bottom:none;">
-                                                <span class="info-label"><i class="fas fa-crown"></i> Leadership</span>
-                                                <span class="info-value">
-                                                    <span class="{{ $profile->has_leadership ? 'badge-yes' : 'badge-no' }}">
-                                                        {{ $profile->has_leadership ? 'Yes' : 'No' }}
-                                                    </span>
-                                                </span>
-                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>

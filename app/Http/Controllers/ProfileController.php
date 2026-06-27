@@ -64,8 +64,7 @@ class ProfileController extends Controller
 
         'state' => 'required|string|max:100',
 
-        // Extra
-        'has_leadership' => 'required|boolean',
+        
     ]);
 
     // ================= INCOME CONVERSION =================
@@ -153,9 +152,7 @@ class ProfileController extends Controller
             'state' =>
                 $validated['state'],
 
-            // Extra
-            'has_leadership' =>
-                $validated['has_leadership'],
+            
         ]
     );
 

@@ -627,15 +627,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6">
-                                            <div class="form-check">
-                                                <input type="hidden" name="has_leadership" value="0">
-                                                <input class="form-check-input" type="checkbox" name="has_leadership" value="1" id="leadership" {{ old('has_leadership', $profile->has_leadership ?? false) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="leadership">
-                                                    <i class="fas fa-trophy"></i> Leadership Experience
-                                                </label>
-                                            </div>
-                                        </div>
+                
                                     </div>
                                 </div>
                                 <span class="form-hint mt-2">Select all that apply to you</span>

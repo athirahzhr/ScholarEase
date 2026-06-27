@@ -690,16 +690,6 @@
                             </select>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-trophy me-2 text-maroon"></i>Leadership Experience
-                            </label>
-                            <select name="has_leadership" class="form-select" required>
-                                <option value="">-- Select --</option>
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
-                        </div>
                     </div>
                     
                     <div class="button-group button-group-between mt-4 pt-3">
