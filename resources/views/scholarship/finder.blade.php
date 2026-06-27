@@ -591,7 +591,6 @@
                                 <option value="Diploma">Diploma</option>
                                 <option value="Degree">Degree</option>
                                 <option value="TVET">TVET</option>
-                                <option value="Postgraduate">Postgraduate</option>
                             </select>
                         </div>
 
@@ -1414,12 +1413,24 @@
     }
     
     document.getElementById('profileForm').addEventListener('submit', function(e) {
-        const incomeSelected = document.querySelector('select[name="income_category"]').value;
-        const studySelected = document.querySelector('select[name="study_path"]').value;
-        if (!incomeSelected || !studySelected) {
+
+        const income =
+            document.querySelector('input[name="monthly_income"]').value;
+
+        const study =
+            document.querySelector('select[name="study_path"]').value;
+
+        if (!income || !study) {
+
             e.preventDefault();
-            Swal.fire('Error', 'Please complete all required fields', 'error');
+
+            Swal.fire(
+                'Error',
+                'Please complete all required fields',
+                'error'
+            );
         }
+
     });
 </script>
 @endpush
