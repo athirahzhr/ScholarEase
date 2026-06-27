@@ -9,11 +9,11 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap 5 CSS - CRITICAL: Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- FontAwesome 6 - For icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- AOS Animation -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -101,7 +101,7 @@
             width: 80%;
         }
         
-        /* Unified Button Styles - Both Login & Register now match */
+        /* Unified Button Styles */
         .btn-nav {
             display: inline-flex;
             align-items: center;
@@ -116,7 +116,6 @@
             cursor: pointer;
         }
         
-        /* Login Button Style */
         .btn-nav-login {
             background: rgba(122, 0, 25, 0.08);
             color: var(--maroon) !important;
@@ -130,7 +129,6 @@
             border-color: transparent;
         }
         
-        /* Register Button Style - Same size, different color */
         .btn-nav-register {
             background: linear-gradient(115deg, #ffb347, #ff8c00);
             color: #2c1a00 !important;
@@ -144,7 +142,6 @@
             color: #1f1400 !important;
         }
         
-        /* Primary Button Style (for forms) */
         .btn-primary {
             background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
             border: none;
@@ -172,6 +169,7 @@
             font-weight: 600;
             padding: 0.5rem 1.5rem;
             transition: all 0.3s ease;
+            background: transparent;
         }
         
         .btn-outline-primary:hover {
@@ -180,7 +178,6 @@
             transform: translateY(-2px);
         }
         
-        /* Card Styles */
         .card {
             border: none;
             border-radius: 20px;
@@ -194,7 +191,6 @@
             box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
         }
         
-        /* Alert Styles */
         .alert {
             border-radius: 16px;
             border: none;
@@ -206,7 +202,6 @@
             border-left: 4px solid var(--gold);
         }
         
-        /* Footer Styles */
         footer {
             background: var(--maroon-dark);
             color: white;
@@ -228,7 +223,6 @@
             padding-left: 5px;
         }
         
-        /* Dropdown Menu */
         .dropdown-menu {
             border-radius: 16px;
             border: 1px solid rgba(122, 0, 25, 0.1);
@@ -259,9 +253,12 @@
                 justify-content: center;
                 margin: 0.25rem 0;
             }
+            
+            .navbar-nav {
+                gap: 0;
+            }
         }
         
-        /* Custom Toggler for Mobile */
         .navbar-toggler {
             border: none;
             background: transparent;
@@ -281,12 +278,6 @@
         .navbar-nav {
             align-items: center;
             gap: 0.5rem;
-        }
-        
-        @media (max-width: 768px) {
-            .navbar-nav {
-                gap: 0;
-            }
         }
     </style>
     
@@ -309,7 +300,6 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     @auth
-                    
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('dashboard') }}">
                                 <i class="fas fa-home me-1"></i> Dashboard
@@ -420,9 +410,12 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts - Must load in this order -->
+    <!-- jQuery first -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
