@@ -1127,7 +1127,7 @@
             html: `
                 <div class="text-start">
                     <div class="mb-3">
-                        <label class="form-label">Subject Name</label>
+                        <label class="form-label fw-bold">Subject Name</label>
                         <select id="newSubjectName" class="form-select" onchange="toggleCustomSubject(this.value)">
                             <option value="">-- Select Subject --</option>
                             <option value="BAHASA MELAYU">BAHASA MELAYU</option>
@@ -1151,10 +1151,10 @@
                             <option value="OTHER">OTHER</option>
                         </select>
                         <input type="text" id="customSubjectName" class="form-control mt-2 d-none" placeholder="Enter custom subject name">
-                        <small class="text-muted">Select a subject or choose OTHER</small>
+                        <small class="text-muted">Select a subject or choose OTHER to enter custom</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Grade</label>
+                        <label class="form-label fw-bold">Grade</label>
                         <select id="newSubjectGrade" class="form-select">
                             <option value="A+">A+</option>
                             <option value="A">A</option>
@@ -1173,7 +1173,10 @@
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: 'Add Subject',
+            confirmButtonText: '<i class="fas fa-plus me-2"></i> Add Subject',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#7A0019',
+            cancelButtonColor: '#6b7280',
             preConfirm: () => {
                 let subject = document.getElementById('newSubjectName').value;
                 const grade = document.getElementById('newSubjectGrade').value;
@@ -1183,7 +1186,7 @@
                 }
                 
                 if (!subject) {
-                    Swal.showValidationMessage('Please enter subject name');
+                    Swal.showValidationMessage('Please select or enter a subject name');
                     return false;
                 }
                 
@@ -1257,15 +1260,27 @@
             <tr id="subject-row-${safeSubjectId}">
                 <td class="fw-bold">${subject} <span class="badge bg-info ms-2">Added</span></td>
                 <td><span class="grade-badge ${gradeClass}" id="grade-${safeSubjectId}">${grade}</span></td>
-                <td><select class="form-select form-select-sm" onchange="updateGrade('${subject}', this.value)" style="max-width: 140px;">
-                    <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option><option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
-                    <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option><option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
-                    <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option><option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
-                    <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option><option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
-                    <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option><option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
-                    <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option><option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
-                </select></td>
-                <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')"><i class="fas fa-trash"></i></button></td>
+                <td>
+                    <select class="form-select form-select-sm" onchange="updateGrade('${subject}', this.value)" style="max-width: 140px;">
+                        <option value="A+" ${grade === 'A+' ? 'selected' : ''}>A+</option>
+                        <option value="A" ${grade === 'A' ? 'selected' : ''}>A</option>
+                        <option value="A-" ${grade === 'A-' ? 'selected' : ''}>A-</option>
+                        <option value="B+" ${grade === 'B+' ? 'selected' : ''}>B+</option>
+                        <option value="B" ${grade === 'B' ? 'selected' : ''}>B</option>
+                        <option value="B-" ${grade === 'B-' ? 'selected' : ''}>B-</option>
+                        <option value="C+" ${grade === 'C+' ? 'selected' : ''}>C+</option>
+                        <option value="C" ${grade === 'C' ? 'selected' : ''}>C</option>
+                        <option value="C-" ${grade === 'C-' ? 'selected' : ''}>C-</option>
+                        <option value="D" ${grade === 'D' ? 'selected' : ''}>D</option>
+                        <option value="E" ${grade === 'E' ? 'selected' : ''}>E</option>
+                        <option value="G" ${grade === 'G' ? 'selected' : ''}>G</option>
+                    </select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSubject('${subject}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
             </tr>
         `;
         const tbody = document.getElementById('gradesTableBody');
@@ -1276,13 +1291,20 @@
     function removeSubject(subject) {
         const Swal = getSwal();
         Swal.fire({
-            title: 'Remove Subject?', text: `Remove "${subject}"?`, icon: 'warning',
-            showCancelButton: true, confirmButtonText: 'Yes, Remove', confirmButtonColor: '#d33'
+            title: 'Remove Subject?', 
+            text: `Remove "${subject}"?`, 
+            icon: 'warning',
+            showCancelButton: true, 
+            confirmButtonText: 'Yes, Remove', 
+            confirmButtonColor: '#d33'
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch("{{ route('remove.ocr.subject') }}", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                    },
                     body: JSON.stringify({ subject: subject })
                 })
                 .then(response => response.json())
@@ -1295,9 +1317,13 @@
                         if (row) row.remove();
                         document.getElementById('totalAsBadge').textContent = data.totalAs;
                         Swal.fire({ icon: 'success', title: 'Removed!', timer: 2000, showConfirmButton: false });
-                    } else { Swal.fire('Error', data.message, 'error'); }
+                    } else { 
+                        Swal.fire('Error', data.message, 'error'); 
+                    }
                 })
-                .catch(error => { Swal.fire('Error', 'Failed to remove subject', 'error'); });
+                .catch(error => { 
+                    Swal.fire('Error', 'Failed to remove subject', 'error'); 
+                });
             }
         });
     }
@@ -1305,13 +1331,20 @@
     function verifyAndContinue() {
         const Swal = getSwal();
         Swal.fire({
-            title: 'Verify Results', text: 'Are you sure all grades are correct?', icon: 'question',
-            showCancelButton: true, confirmButtonText: 'Yes, Continue', confirmButtonColor: '#3085d6'
+            title: 'Verify Results', 
+            text: 'Are you sure all grades are correct?', 
+            icon: 'question',
+            showCancelButton: true, 
+            confirmButtonText: 'Yes, Continue', 
+            confirmButtonColor: '#3085d6'
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch("{{ route('verify.ocr.results') }}", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                    },
                     body: JSON.stringify({ confirm: true })
                 })
                 .then(response => response.json())
@@ -1319,13 +1352,24 @@
                     if (data.success) {
                         displayVerifiedGrades(data.totalAs);
                         goToStep(3);
-                        Swal.fire({ icon: 'success', title: 'Verified!', text: data.message, timer: 1500, showConfirmButton: false });
-                    } else { Swal.fire('Error', data.message, 'error'); }
+                        Swal.fire({ 
+                            icon: 'success', 
+                            title: 'Verified!', 
+                            text: data.message, 
+                            timer: 1500, 
+                            showConfirmButton: false 
+                        });
+                    } else { 
+                        Swal.fire('Error', data.message, 'error'); 
+                    }
                 })
-                .catch(error => { Swal.fire('Error', 'Verification failed', 'error'); });
+                .catch(error => { 
+                    Swal.fire('Error', 'Verification failed', 'error'); 
+                });
             }
         });
 
+        // Update grades
         fetch("{{ route('update.ocr.results') }}", {
             method: 'POST',
             headers: {
@@ -1378,13 +1422,19 @@
     function goBackToUpload() {
         const Swal = getSwal();
         Swal.fire({
-            title: 'Upload Again?', text: 'This will clear all extracted data.', icon: 'warning',
-            showCancelButton: true, confirmButtonText: 'Yes, Upload Again'
+            title: 'Upload Again?', 
+            text: 'This will clear all extracted data.', 
+            icon: 'warning',
+            showCancelButton: true, 
+            confirmButtonText: 'Yes, Upload Again'
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch("{{ route('verify.ocr.results') }}", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                    },
                     body: JSON.stringify({ confirm: false })
                 }).then(() => {
                     document.getElementById('spmFile').value = '';
@@ -1395,7 +1445,9 @@
         });
     }
     
-    function goBackToStep2() { goToStep(2); }
+    function goBackToStep2() { 
+        goToStep(2); 
+    }
 
     function skipOCR() {
         const Swal = getSwal();
