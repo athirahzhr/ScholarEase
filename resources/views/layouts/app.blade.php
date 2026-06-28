@@ -569,6 +569,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('resource-centre') ? 'active' : '' }}"
+                            href="{{ route('resource-centre') }}">
+                                <i class="fas fa-video me-1"></i> Resources
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('feedback.*') ? 'active' : '' }}" href="{{ route('feedback.create') }}">
                                 <i class="fas fa-star me-1"></i> Feedback
                             </a>
@@ -650,6 +656,7 @@
                         <li class="mb-2"><a href="{{ route('welcome') }}" class="text-light opacity-75">Home</a></li>
                         <li class="mb-2"><a href="{{ route('dashboard') }}" class="text-light opacity-75">Dashboard</a></li>
                         <li class="mb-2"><a href="{{ route('scholarship.finder') }}" class="text-light opacity-75">Find Scholarships</a></li>
+                        <li class="mb-2"><a href="{{ route('resource-centre') }}" class="text-light opacity-75">Scholarship Resource Centre</a></li>
                         <li class="mb-2"><a href="{{ route('feedback.create') }}" class="text-light opacity-75">Give Feedback</a></li>
                     </ul>
                 </div>

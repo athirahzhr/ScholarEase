@@ -766,6 +766,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.resource-videos.*') ? 'active' : '' }}" 
+                       href="{{ route('admin.resource-videos.index') }}">
+                        <i class="fas fa-video"></i>
+                        <span class="nav-text">Resource Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.scholarships.create') ? 'active' : '' }}" 
                        href="{{ route('admin.scholarships.create') }}">
                         <i class="fas fa-plus-circle"></i>
@@ -812,20 +819,13 @@
                     
                     <div>
                         <h5 class="page-title">
-                            <i class="fas fa-{{ request()->routeIs('admin.dashboard') ? 'tachometer-alt' : (request()->routeIs('admin.users.*') ? 'users' : (request()->routeIs('admin.scholarships.*') ? 'graduation-cap' : 'star')) }}"></i>
+                            <i class="fas fa-{{ request()->routeIs('admin.dashboard') ? 'tachometer-alt' : (request()->routeIs('admin.users.*') ? 'users' : (request()->routeIs('admin.scholarships.*') ? 'graduation-cap' : (request()->routeIs('admin.resource-videos.*') ? 'video' : 'star'))) }}"></i>
                             @yield('title')
                         </h5>
                     </div>
                 </div>
                 
                 <div class="d-flex align-items-center gap-3">
-                    <!-- Quick Actions -->
-                    <div class="d-none d-md-flex align-items-center gap-2">
-                        <a href="{{ route('admin.scholarships.create') }}" class="btn btn-sm btn-primary" style="border-radius: 40px; padding: 0.35rem 1rem; font-size: 0.8rem;">
-                            <i class="fas fa-plus-circle me-1"></i> New Scholarship
-                        </a>
-                    </div>
-
                     <!-- User Dropdown -->
                     <div class="dropdown">
                         <button class="user-dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -838,22 +838,12 @@
                             </div>
                             <i class="fas fa-chevron-down dropdown-arrow"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" style="border-radius: var(--radius-lg); padding: 8px; min-width: 200px; box-shadow: var(--shadow-lg); border: 1px solid rgba(0,0,0,0.04);">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('profile.index') }}" style="border-radius: var(--radius-sm); padding: 8px 14px;">
-                                    <i class="fas fa-user me-2" style="width: 18px; color: var(--maroon);"></i> My Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#" style="border-radius: var(--radius-sm); padding: 8px 14px;">
-                                    <i class="fas fa-cog me-2" style="width: 18px; color: var(--maroon);"></i> Settings
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
+                        <ul class="dropdown-menu dropdown-menu-end" style="border-radius: var(--radius-lg); padding: 8px; min-width: 180px; box-shadow: var(--shadow-lg); border: 1px solid rgba(0,0,0,0.04);">
+                            {{-- Only Logout button remains --}}
                             <li>
                                 <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                                   style="border-radius: var(--radius-sm); padding: 8px 14px; font-weight: 600;">
+                                   style="border-radius: var(--radius-sm); padding: 10px 14px; font-weight: 600;">
                                     <i class="fas fa-sign-out-alt me-2"></i> Logout
                                 </a>
                             </li>

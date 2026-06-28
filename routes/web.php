@@ -14,6 +14,8 @@ use App\Http\Controllers\ProfileController;
 use App\Models\Scholarship;
 use App\Models\Feedback;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\Admin\ResourceVideoController;
+use App\Http\Controllers\ResourceCentreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +97,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Feedback Routes
     Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('feedback.create');
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
+    Route::get('/resource-centre',[ResourceCentreController::class, 'index'])->name('resource-centre');
 });
 
 /*
@@ -166,4 +169,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/feedbacks/{id}/approve', [AdminController::class, 'approveFeedback'])->name('feedbacks.approve');
     Route::delete('/feedbacks/{id}/reject', [AdminController::class, 'rejectFeedback'])->name('feedbacks.reject');
     Route::post('/feedbacks/bulk-approve', [AdminController::class, 'bulkApproveFeedbacks'])->name('feedbacks.bulk-approve');
+
+    // Scholarship Resource Centre
+    Route::resource('resource-videos', ResourceVideoController::class);
+   
 });

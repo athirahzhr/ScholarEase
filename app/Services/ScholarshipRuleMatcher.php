@@ -10,28 +10,23 @@ namespace App\Services;
  * DESIGN PHILOSOPHY:
  * ─────────────────────────────────────────────────────────
  * Every criterion is evaluated as a binary pass/fail rule.
- * No scoring weights, no percentage, no points.
- * Directly reflects the policy language used by Malaysian
- * scholarship providers. No external weight justification needed.
- *
  * ─────────────────────────────────────────────────────────
  * HARD FILTERS (pass/fail — any fail = excluded immediately):
  *
  *   1. Citizenship       Must match if required. Empty = open to all.
  *   2. Bumiputera        Must be Bumiputera if bumiputera_required = true.
  *   3. Study level       Must be in allowed list (Foundation / Matriculation /
- *                        Diploma / Degree / TVET only — no postgraduate).
+ *                        Diploma / Degree / TVET only.
  *   4. Field of study    Must be in allowed list. Empty = open to all.
  *   5. Age               Must be within min/max range. Not set = no restriction.
  *   6. SPM result        Must meet or exceed min_spm_as. Strict — no tolerance.
  *   7. Income RM ceiling monthly_income ≤ max_monthly_income if set.
  *   8. Income category   If 1 category ticked → syarat wajib hard filter.
- *   9. State             Must be in allowed states. Empty = open to all.
- *                        Both English and Malay state names are supported
- *                        via normalisation map — handles scraping inconsistencies.
+ *   9. State             Must match required state. Empty = open to all.
+ *                        Dropdown ensures consistent naming — no mapping needed.
  *
  * ─────────────────────────────────────────────────────────
- * KEUTAMAAN FLAG (not a filter — affects ordering only):
+ * PRIORITY FLAG (not a filter — affects ordering only):
  *
  *   Income categories — auto-resolved from checkbox count:
  *   0 ticked  → no restriction  → Priority Match (no penalty)
@@ -44,17 +39,8 @@ namespace App\Services;
  *   1st → Priority Match  (soonest deadline first)
  *   2nd → General Match   (soonest deadline first)
  *
- * ─────────────────────────────────────────────────────────
- * NOT INCLUDED IN MATCHING (shown in scholarship detail only):
- *   Leadership, sports achievement, rural priority
- *   — excluded because scholarship providers typically express
- *     these as preferences, not mandatory requirements.
- *
- * ─────────────────────────────────────────────────────────
  * ALLOWED STUDY LEVELS:
- *   Foundation, Matriculation, Diploma, Degree, TVET
- *   Postgraduate (Master's, PhD) excluded — not relevant
- *   for SPM-based scholarship recommendations.
+ * Foundation, Matriculation, Diploma, Degree, TVET
  *
  * ─────────────────────────────────────────────────────────
  * INCOME THRESHOLDS (Rafizi Ramli, Ministry of Economy, 2023):
@@ -65,12 +51,7 @@ namespace App\Services;
  */
 class ScholarshipRuleMatcher
 {
-    /**
-     * Allowed study levels.
-     * Postgraduate levels (Master's, PhD) are excluded — this system
-     * is designed for SPM leavers applying for pre-degree and
-     * undergraduate programmes only.
-     */
+
     private const ALLOWED_STUDY_LEVELS = [
         'Foundation',
         'Matriculation',
@@ -88,7 +69,7 @@ class ScholarshipRuleMatcher
         'M40' => 10960,
     ];
 
-  
+
 
     // =========================================================================
     // PUBLIC: Auto-derive income category from actual monthly income (RM)
@@ -178,8 +159,8 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        // ── Keutamaan Flag ────────────────────────────────────────────────────
-        $priority = $this->resolveKeutamaan($student, $criteria);
+        // ── Priority Flag ─────────────────────────────────────────────────────
+        $priority = $this->resolvePriority($student, $criteria);
 
         return [
             'eligible'    => true,
@@ -360,7 +341,7 @@ class ScholarshipRuleMatcher
     }
 
     /**
-     * Filter 6 — SPM Result (strict hard filter)
+     * Filter 6 — SPM Result 
      * Student's total As must meet or exceed min_spm_as.
      * No tolerance — if requirement is 8A, student needs exactly 8A or more.
      * If no requirement → pass.
@@ -450,7 +431,7 @@ class ScholarshipRuleMatcher
     /**
      * Filter 9 — State
      *
-     * Student's state must be in scholarship's allowed states.
+     * Student's state must match scholarship's required state.
      * If no restriction → open to all states → pass.
      *
      */
@@ -478,7 +459,7 @@ class ScholarshipRuleMatcher
     }
 
     // =========================================================================
-    // Keutamaan Flag
+    // Priority Flag
     // =========================================================================
 
     /**
@@ -491,7 +472,7 @@ class ScholarshipRuleMatcher
      *   'priority_match' → student in preferred group OR no preference set
      *   'general_match'  → student outside preferred group (still eligible)
      */
-    private function resolveKeutamaan($student, $criteria): string
+    private function resolvePriority($student, $criteria): string
     {
         $categories = $criteria->income_categories ?? [];
 
@@ -510,7 +491,6 @@ class ScholarshipRuleMatcher
     // =========================================================================
     // Helpers
     // =========================================================================
-
 
     /**
      * Auto-resolve income type from number of ticked categories.

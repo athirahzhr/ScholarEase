@@ -131,12 +131,18 @@
         font-weight: 600;
         font-size: 0.85rem;
         transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        color: white;
     }
     
     .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(122, 0, 25, 0.3);
         background: linear-gradient(115deg, var(--maroon-dark), var(--maroon));
+        color: white;
     }
     
     .btn-outline-primary {
@@ -148,12 +154,38 @@
         font-weight: 600;
         transition: all 0.3s ease;
         background: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
     }
     
     .btn-outline-primary:hover {
         background: var(--maroon);
         color: white;
         transform: translateY(-2px);
+    }
+    
+    .btn-success {
+        background: linear-gradient(115deg, #10b981, #059669);
+        border: none;
+        border-radius: 40px;
+        padding: 0.5rem 1.2rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        background: linear-gradient(115deg, #059669, #047857);
+        color: white;
     }
     
     .scholarship-card {
@@ -212,6 +244,29 @@
         background: linear-gradient(90deg, var(--maroon), var(--gold));
     }
     
+    /* Resource Centre Button */
+    .btn-resource {
+        background: linear-gradient(115deg, #dc2626, #b91c1c);
+        border: none;
+        border-radius: 40px;
+        padding: 0.5rem 1.2rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+    
+    .btn-resource:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+        color: white;
+        background: linear-gradient(115deg, #b91c1c, #991b1b);
+    }
+
     @media (max-width: 768px) {
         .dashboard-header {
             padding: 1.5rem;
@@ -223,6 +278,11 @@
         
         .greeting-text {
             font-size: 0.9rem;
+        }
+        
+        .btn-resource {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
@@ -280,6 +340,10 @@
                 <a href="{{ route('feedback.create') }}" class="nav-item">
                     <i class="fas fa-star me-2" style="color: var(--gold);"></i>
                     <span>Give Feedback</span>
+                </a>
+                <a href="{{ route('resource-centre') }}" class="nav-item">
+                    <i class="fas fa-video me-2" style="color: #dc2626;"></i>
+                    <span>Resource Centre</span>
                 </a>
                 @if(auth()->user()->isAdmin())
                     <div class="mt-4 pt-3 border-top">
@@ -360,6 +424,7 @@
                     </div>
                 </div>
             </div>
+            
             <!-- User Guideline -->
             <div class="row mb-4">
                 <div class="col-12">
@@ -405,9 +470,10 @@
             <!-- Featured Scholarships -->
             <div class="row">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h4 style="color: var(--maroon);">General Scholarships</h4>
-                        
+                        <div class="d-flex gap-2 flex-wrap">
+                        </div>
                     </div>
                     
                     <div class="row"> 
@@ -455,84 +521,50 @@
 
             <!-- Student Feedback -->
             <div class="row mt-5">
-
                 <div class="col-12">
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <div>
-
                             <h4 style="color: var(--maroon);">
                                 <i class="fas fa-comments me-2"></i>
                                 Student Feedback
                             </h4>
-
                             <small class="text-muted">
                                 ⭐ {{ number_format($averageRating,1) }}/5
                                 ({{ $totalFeedback }} reviews)
                             </small>
-
                         </div>
-
-                        <a href="{{ route('feedback.create') }}"
-                        class="btn btn-outline-primary btn-sm">
-
-                            Share Feedback
-
-                        </a>
-
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ route('feedback.create') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i> Share Feedback
+                            </a>
+                        </div>
                     </div>
 
                     <div class="row">
-
                         @forelse($feedbacks as $feedback)
-
                         <div class="col-md-4 mb-4">
-
                             <div class="scholarship-card">
-
                                 <div class="mb-2">
-
                                     @for($i=1;$i<=5;$i++)
-
                                         <i class="fas fa-star {{ $i <= $feedback->rating ? 'text-warning' : 'text-muted' }}"></i>
-
                                     @endfor
-
                                 </div>
-
                                 <p class="text-muted fst-italic">
-
                                     "{{ Str::limit($feedback->comment,120) }}"
-
                                 </p>
-
                                 <hr>
-
                                 <strong>{{ $feedback->user->name }}</strong>
-
                             </div>
-
                         </div>
-
                         @empty
-
                         <div class="col-12">
-
                             <div class="alert alert-light">
-
                                 No feedback available yet.
-
                             </div>
-
                         </div>
-
                         @endforelse
-
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>
