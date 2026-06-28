@@ -88,49 +88,7 @@ class ScholarshipRuleMatcher
         'M40' => 10960,
     ];
 
-    /**
-     * State normalisation map.
-     *
-     * Maps both English and Malay state names to a canonical
-     * lowercase Malay name for consistent comparison.
-     *
-     * Needed because:
-     *   - Student profile may store English names (e.g. "Malacca")
-     *   - Scraped scholarship data typically stores Malay names (e.g. "Melaka")
-     *   - Scraping may produce inconsistent capitalisation or spelling
-     *
-     * All values normalised to lowercase Malay for comparison.
-     */
-    private const STATE_MAP = [
-        // English → Malay canonical
-        'malacca'         => 'melaka',
-        'penang'          => 'pulau pinang',
-        'johor'           => 'johor',
-        'kedah'           => 'kedah',
-        'kelantan'        => 'kelantan',
-        'perak'           => 'perak',
-        'perlis'          => 'perlis',
-        'pahang'          => 'pahang',
-        'sabah'           => 'sabah',
-        'sarawak'         => 'sarawak',
-        'selangor'        => 'selangor',
-        'terengganu'      => 'terengganu',
-        'kuala lumpur'    => 'kuala lumpur',
-        'putrajaya'       => 'putrajaya',
-        'labuan'          => 'labuan',
-
-        // Malay → Malay canonical (handles capitalisation)
-        'melaka'          => 'melaka',
-        'pulau pinang'    => 'pulau pinang',
-        'negeri sembilan' => 'negeri sembilan',
-        'negri sembilan'  => 'negeri sembilan', // common scraping typo
-
-        // WP prefix variants
-        'wp kuala lumpur' => 'kuala lumpur',
-        'w.p. kuala lumpur' => 'kuala lumpur',
-        'wp putrajaya'    => 'putrajaya',
-        'wp labuan'       => 'labuan',
-    ];
+  
 
     // =========================================================================
     // PUBLIC: Auto-derive income category from actual monthly income (RM)
@@ -495,20 +453,11 @@ class ScholarshipRuleMatcher
      * Student's state must be in scholarship's allowed states.
      * If no restriction → open to all states → pass.
      *
-     * Both English and Malay state names are supported.
-     * Both sides normalised via STATE_MAP before comparison
-     * to handle mismatches between student form and scraped data.
-     *
-     * Example:
-     *   Student:     "MALACCA"  → normalised → "melaka"
-     *   Scholarship: ["Melaka"] → normalised → "melaka"
-     *   Result:      match → PASS ✅
      */
     private function checkState($student, $criteria): array
     {
         $requiredState = trim($criteria->state_requirement ?? '');
 
-        // No restriction
         if ($requiredState === '') {
             return [
                 'passed' => true,
@@ -517,9 +466,7 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        $studentState = $this->normaliseState($student->state ?? '');
-
-        $passed = $studentState === $this->normaliseState($requiredState);
+        $passed = $student->state === $requiredState;
 
         return [
             'passed' => $passed,
@@ -564,18 +511,6 @@ class ScholarshipRuleMatcher
     // Helpers
     // =========================================================================
 
-    /**
-     * Normalise a state name to canonical lowercase Malay.
-     * Used by checkState() for consistent comparison.
-     *
-     * Falls back to lowercase original if not found in map —
-     * still allows exact Malay-to-Malay comparison.
-     */
-    private function normaliseState(string $state): string
-    {
-        $key = strtolower(trim($state));
-        return self::STATE_MAP[$key] ?? $key;
-    }
 
     /**
      * Auto-resolve income type from number of ticked categories.
