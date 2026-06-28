@@ -37,12 +37,6 @@
                                 <i class="fas fa-users stat-icon"></i>
                             </div>
                         </div>
-                        <div class="stat-footer">
-                            <span class="stat-trend">
-                                <i class="fas fa-user-plus me-1"></i> 
-                                +{{ $newUsersThisMonth ?? 0 }} this month
-                            </span>
-                        </div>
                     </div>
                 </div>
                 
@@ -56,12 +50,6 @@
                             <div class="stat-icon-wrapper">
                                 <i class="fas fa-graduation-cap stat-icon"></i>
                             </div>
-                        </div>
-                        <div class="stat-footer">
-                            <span class="stat-trend">
-                                <i class="fas fa-plus-circle me-1"></i> 
-                                {{ $activeScholarships ?? 0 }} active
-                            </span>
                         </div>
                     </div>
                 </div>
