@@ -243,7 +243,7 @@
                                     $selectedFields = [];
                                 }
                             @endphp
-                            <div class="row g-2">
+                            <div class="row g-2 fields-scroll">
                                 @foreach ($fieldOptions as $field)
                                     <div class="col-md-6">
                                         <div class="form-check">
@@ -267,22 +267,36 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Citizenship Required</label>
-                                <input type="text" 
-                                       name="citizenship_required" 
-                                       class="form-control @error('citizenship_required') is-invalid @enderror" 
-                                       placeholder="e.g., Malaysia" 
-                                       value="{{ old('citizenship_required', $criteria->citizenship_required ?? '') }}">
+                                <select name="citizenship_required" 
+                                        class="form-select @error('citizenship_required') is-invalid @enderror">
+                                    <option value="">No Restriction</option>
+                                    <option value="Malaysia" {{ old('citizenship_required', $criteria->citizenship_required ?? '') == 'Malaysia' ? 'selected' : '' }}>
+                                        Malaysia
+                                    </option>
+                                    <option value="International" {{ old('citizenship_required', $criteria->citizenship_required ?? '') == 'International' ? 'selected' : '' }}>
+                                        International
+                                    </option>
+                                </select>
+                                <small class="text-muted">Select the citizenship requirement for this scholarship</small>
                                 @error('citizenship_required')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">State Requirement</label>
-                                <input type="text" 
-                                       name="state_requirement" 
-                                       class="form-control @error('state_requirement') is-invalid @enderror" 
-                                       placeholder="e.g., Selangor (Optional)" 
-                                       value="{{ old('state_requirement', $criteria->state_requirement ?? '') }}">
+                                @php
+                                    $states = ['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'Kuala Lumpur', 'Labuan', 'Putrajaya'];
+                                @endphp
+                                <select name="state_requirement" 
+                                        class="form-select @error('state_requirement') is-invalid @enderror">
+                                    <option value="">No Restriction</option>
+                                    @foreach($states as $state)
+                                        <option value="{{ $state }}" {{ old('state_requirement', $criteria->state_requirement ?? '') == $state ? 'selected' : '' }}>
+                                            {{ $state }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Select the state requirement (if any)</small>
                                 @error('state_requirement')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -408,26 +422,6 @@
                     </div>
                 </div>
 
-                {{-- QUICK ACTIONS --}}
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header">
-                        <h6 class="mb-0">
-                            <i class="fas fa-bolt me-2"></i>
-                            Quick Actions
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary w-100 mb-2">
-                            <i class="fas fa-save me-2"></i>
-                            Update Scholarship
-                        </button>
-                        <a href="{{ route('admin.scholarships.show', $scholarship->id) }}" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-times me-2"></i>
-                            Cancel
-                        </a>
-                    </div>
-                </div>
-
                 {{-- HELPFUL TIPS --}}
                 <div class="card shadow-sm border-0">
                     <div class="card-header">
@@ -469,6 +463,28 @@
                 </div>
             </div>
         </div>
+
+        {{-- ============================================ --}}
+        {{-- FORM ACTIONS - MOVED TO BOTTOM               --}}
+        {{-- ============================================ --}}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <a href="{{ route('admin.scholarships.show', $scholarship->id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>
+                                Update Scholarship
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 
@@ -504,12 +520,6 @@
 
     .card-body {
         padding: 20px;
-    }
-
-    .card-footer {
-        background: white;
-        border-top: 1px solid rgba(0, 0, 0, 0.04);
-        padding: 15px 20px;
     }
 
     /* ============================================ */
@@ -633,10 +643,10 @@
     .btn-primary {
         background: linear-gradient(115deg, #7A0019, #4e0010);
         border: none;
-        padding: 0.65rem 1.5rem;
+        padding: 0.75rem 2rem;
         border-radius: 40px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 1rem;
         transition: all 0.3s ease;
         color: white;
         display: inline-flex;
@@ -724,16 +734,6 @@
             padding: 16px;
         }
 
-        .card-footer {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .card-footer .btn {
-            width: 100%;
-            justify-content: center;
-        }
-
         .form-control,
         .form-select {
             padding: 8px 12px;
@@ -767,6 +767,10 @@
 
         .text-maroon {
             font-size: 1.1rem;
+        }
+
+        .d-flex.justify-content-between.align-items-center {
+            flex-direction: column-reverse;
         }
     }
 
