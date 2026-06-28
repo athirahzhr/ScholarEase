@@ -278,7 +278,7 @@
                 <p>Scholarships matched to your eligibility based on academic results, income, study path, state, and other criteria</p>
             </div>
             <div class="header-actions">
-                <!-- EDIT PROFILE BUTTON - Using route() helper -->
+                <!-- EDIT PROFILE BUTTON -->
                 <a href="{{ route('profile.create') }}" class="btn-edit-profile">
                     <i class="fas fa-user-edit"></i>
                     Edit Profile
@@ -329,11 +329,6 @@
             <div class="profile-summary-item">
                 <i class="fas fa-map-marker-alt"></i>
                 <strong>State:</strong> {{ $profile->state ?? 'N/A' }}
-            </div>
-            <div style="margin-left: auto;">
-                <a href="{{ route('profile.create') }}" class="btn-edit-profile" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
             </div>
         </div>
     @else
