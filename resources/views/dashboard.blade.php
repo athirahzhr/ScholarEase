@@ -410,14 +410,7 @@
                         <a href="{{ route('scholarship.recommendations') }}" class="btn btn-outline-primary btn-sm">View All</a>
                     </div>
                     
-                    <div class="row">
-                        @php
-                            $featuredScholarships = \App\Models\Scholarship::where('deadline', '>', now())
-                                ->inRandomOrder()
-                                ->limit(3)
-                                ->get();
-                        @endphp
-                        
+                    <div class="row"> 
                         @foreach($featuredScholarships as $scholarship)
                         <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
                             <div class="scholarship-card">

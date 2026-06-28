@@ -28,6 +28,30 @@ class DashboardController extends Controller
             Session::get('recommendation_ids', [])
         )->count();
 
+        // Featured scholarships (random every login session)
+        if (!Session::has('featured_scholarships')) {
+
+            $featuredScholarships = Scholarship::where('is_active', 1)
+                ->where(function ($query) {
+                    $query->whereNull('deadline')
+                        ->orWhere('deadline', '>=', now());
+                })
+                ->inRandomOrder()
+                ->take(3)
+                ->get();
+
+            Session::put(
+                'featured_scholarships',
+                $featuredScholarships
+            );
+
+        } else {
+
+            $featuredScholarships =
+                Session::get('featured_scholarships');
+
+        }
+
         // Latest approved feedback
         $feedbacks = Feedback::with('user')
             ->where('approved', 1)
@@ -45,6 +69,7 @@ class DashboardController extends Controller
             compact(
                 'user',
                 'recommendationCount',
+                'featuredScholarships',
                 'feedbacks',
                 'averageRating',
                 'totalFeedback'
