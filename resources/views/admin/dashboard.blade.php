@@ -65,12 +65,6 @@
                                 <i class="fas fa-bookmark stat-icon"></i>
                             </div>
                         </div>
-                        <div class="stat-footer">
-                            <span class="stat-trend">
-                                <i class="fas fa-chart-line me-1"></i> 
-                                Student interest
-                            </span>
-                        </div>
                     </div>
                 </div>
                 
@@ -84,12 +78,6 @@
                             <div class="stat-icon-wrapper">
                                 <i class="fas fa-clock stat-icon"></i>
                             </div>
-                        </div>
-                        <div class="stat-footer">
-                            <span class="stat-trend">
-                                <i class="fas fa-hourglass-half me-1"></i> 
-                                Within 7 days
-                            </span>
                         </div>
                     </div>
                 </div>
