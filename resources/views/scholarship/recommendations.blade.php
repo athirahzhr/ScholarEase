@@ -220,15 +220,16 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 20px;
+        gap: 16px 20px;
         margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .profile-summary-item {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: var(--gray-600);
     }
 
@@ -239,14 +240,53 @@
 
     .profile-summary-item i {
         color: var(--maroon);
-        font-size: 1rem;
-        width: 20px;
+        font-size: 0.95rem;
+        width: 18px;
+        text-align: center;
     }
 
     .profile-summary-divider {
         width: 1px;
-        height: 30px;
+        height: 28px;
         background: #e5e7eb;
+        flex-shrink: 0;
+    }
+
+    .badge-bumiputera-yes {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+        padding: 2px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .badge-bumiputera-no {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+        padding: 2px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .badge-income {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        color: #1e40af;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    @media (max-width: 992px) {
+        .profile-summary {
+            gap: 12px 16px;
+            padding: 14px 16px;
+        }
+        .profile-summary-item {
+            font-size: 0.8rem;
+        }
     }
 
     @media (max-width: 768px) {
@@ -256,10 +296,32 @@
         .recommendation-footer  { flex-direction: column; align-items: flex-start; }
         .recommendation-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
         .breakdown-label        { min-width: 110px; }
-        .profile-summary        { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .profile-summary        { flex-direction: column; align-items: flex-start; gap: 8px; }
         .profile-summary-divider { display: none; }
         .header-actions         { flex-direction: column; width: 100%; }
         .header-actions .btn    { width: 100%; justify-content: center; }
+        .profile-summary-item   { font-size: 0.85rem; }
+    }
+
+    @media (max-width: 576px) {
+        .profile-summary {
+            padding: 12px 14px;
+        }
+        .profile-summary-item {
+            font-size: 0.8rem;
+            width: 100%;
+        }
+        .profile-summary-item i {
+            width: 16px;
+            font-size: 0.85rem;
+        }
+        .recommendation-card {
+            padding: 16px;
+        }
+        .recommendation-actions .btn {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.8rem;
+        }
     }
 </style>
 
@@ -278,7 +340,6 @@
                 <p>Scholarships matched to your eligibility based on academic results, income, study path, state, and other criteria</p>
             </div>
             <div class="header-actions">
-                <!-- EDIT PROFILE BUTTON -->
                 <a href="{{ route('profile.create') }}" class="btn-edit-profile">
                     <i class="fas fa-user-edit"></i>
                     Edit Profile
@@ -298,7 +359,7 @@
     @endif
 
     <!-- ============================================ -->
-    <!-- PROFILE SUMMARY (if profile exists)          -->
+    <!-- PROFILE SUMMARY - ALL FIELDS DISPLAYED       -->
     <!-- ============================================ -->
     @if(auth()->user()->profile)
         @php $profile = auth()->user()->profile; @endphp
@@ -308,27 +369,56 @@
                 <strong>Total A's:</strong> {{ $profile->total_as ?? 'N/A' }}
             </div>
             <div class="profile-summary-divider"></div>
+            
             <div class="profile-summary-item">
                 <i class="fas fa-road"></i>
-                <strong>Study Level:</strong> {{ $profile->study_level ?? 'N/A' }}
+                <strong>Study Path:</strong> {{ $profile->study_level ?? 'N/A' }}
             </div>
             <div class="profile-summary-divider"></div>
+            
             <div class="profile-summary-item">
                 <i class="fas fa-book"></i>
                 <strong>Field:</strong> {{ $profile->field_of_study ?? 'N/A' }}
             </div>
             <div class="profile-summary-divider"></div>
+            
             <div class="profile-summary-item">
                 <i class="fas fa-money-bill-wave"></i>
                 <strong>Income:</strong> RM {{ number_format($profile->monthly_income ?? 0, 2) }}
-                <span class="badge" style="background: linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem;">
-                    {{ $profile->income_category ?? 'N/A' }}
-                </span>
+                <span class="badge-income">{{ $profile->income_category ?? 'N/A' }}</span>
             </div>
             <div class="profile-summary-divider"></div>
+            
             <div class="profile-summary-item">
                 <i class="fas fa-map-marker-alt"></i>
                 <strong>State:</strong> {{ $profile->state ?? 'N/A' }}
+            </div>
+            <div class="profile-summary-divider"></div>
+            
+            <div class="profile-summary-item">
+                <i class="fas fa-passport"></i>
+                <strong>Citizenship:</strong> {{ $profile->citizenship ?? 'N/A' }}
+            </div>
+            <div class="profile-summary-divider"></div>
+            
+            <div class="profile-summary-item">
+                <i class="fas fa-birthday-cake"></i>
+                <strong>Age:</strong> {{ $profile->age ?? 'N/A' }} years
+            </div>
+            <div class="profile-summary-divider"></div>
+            
+            <div class="profile-summary-item">
+                <i class="fas fa-star-of-life"></i>
+                <strong>Bumiputera:</strong> 
+                <span class="{{ $profile->bumiputera ? 'badge-bumiputera-yes' : 'badge-bumiputera-no' }}">
+                    {{ $profile->bumiputera ? 'Yes' : 'No' }}
+                </span>
+            </div>
+            
+            <div style="margin-left: auto;">
+                <a href="{{ route('profile.create') }}" class="btn-edit-profile" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
             </div>
         </div>
     @else
