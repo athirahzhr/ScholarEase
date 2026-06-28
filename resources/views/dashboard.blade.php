@@ -480,6 +480,88 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Student Feedback -->
+            <div class="row mt-5">
+
+                <div class="col-12">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <div>
+
+                            <h4 style="color: var(--maroon);">
+                                <i class="fas fa-comments me-2"></i>
+                                Student Feedback
+                            </h4>
+
+                            <small class="text-muted">
+                                ⭐ {{ number_format($averageRating,1) }}/5
+                                ({{ $totalFeedback }} reviews)
+                            </small>
+
+                        </div>
+
+                        <a href="{{ route('feedback.create') }}"
+                        class="btn btn-outline-primary btn-sm">
+
+                            Share Feedback
+
+                        </a>
+
+                    </div>
+
+                    <div class="row">
+
+                        @forelse($feedbacks as $feedback)
+
+                        <div class="col-md-4 mb-4">
+
+                            <div class="scholarship-card">
+
+                                <div class="mb-2">
+
+                                    @for($i=1;$i<=5;$i++)
+
+                                        <i class="fas fa-star {{ $i <= $feedback->rating ? 'text-warning' : 'text-muted' }}"></i>
+
+                                    @endfor
+
+                                </div>
+
+                                <p class="text-muted fst-italic">
+
+                                    "{{ Str::limit($feedback->comment,120) }}"
+
+                                </p>
+
+                                <hr>
+
+                                <strong>{{ $feedback->user->name }}</strong>
+
+                            </div>
+
+                        </div>
+
+                        @empty
+
+                        <div class="col-12">
+
+                            <div class="alert alert-light">
+
+                                No feedback available yet.
+
+                            </div>
+
+                        </div>
+
+                        @endforelse
+
+                    </div>
+
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
