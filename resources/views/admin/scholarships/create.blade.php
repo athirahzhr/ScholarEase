@@ -422,26 +422,6 @@
                                     </div>
                                 </div>
 
-                                {{-- QUICK ACTIONS --}}
-                                <div class="card mb-4 border-0 shadow-sm">
-                                    <div class="card-header bg-maroon-light">
-                                        <h6 class="mb-0 text-maroon">
-                                            <i class="fas fa-bolt me-2"></i>
-                                            Quick Actions
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <button type="submit" class="btn btn-primary w-100 mb-2">
-                                            <i class="fas fa-save me-2"></i>
-                                            Create Scholarship
-                                        </button>
-                                        <a href="{{ route('admin.scholarships.index') }}" class="btn btn-outline-secondary w-100">
-                                            <i class="fas fa-times me-2"></i>
-                                            Cancel
-                                        </a>
-                                    </div>
-                                </div>
-
                                 {{-- HELPFUL TIPS --}}
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-header bg-maroon-light">
