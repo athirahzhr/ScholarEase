@@ -388,18 +388,11 @@ class ScholarshipController extends Controller
                 'max_monthly_income',
                 $oldCriteria->max_monthly_income ?? null
             ),
+            'income_categories' => $request->input('income_categories', []),
 
-            'income_categories' => $request->filled('income_categories')
-                ? $request->input('income_categories')
-                : ($oldCriteria->income_categories ?? []),
+            'study_paths' => $request->input('study_paths', []),
 
-            'study_paths' => $request->filled('study_paths')
-                ? $request->input('study_paths')
-                : ($oldCriteria->study_paths ?? []),
-
-            'fields_of_study' => $request->filled('fields_of_study')
-                ? $request->input('fields_of_study')
-                : ($oldCriteria->fields_of_study ?? []),
+            'fields_of_study' => $request->input('fields_of_study', []),
 
             'min_age' => $request->input(
                 'min_age',
@@ -422,28 +415,8 @@ class ScholarshipController extends Controller
             ),
 
             // FIXED: Use boolean() method for checkbox fields
-            'bumiputera_required' => $request->boolean(
-                'bumiputera_required'
-            ),
+            'bumiputera_required' => $request->input('bumiputera_required', []),
 
-            'bumiputera_priority' => $request->boolean(
-                'bumiputera_priority'
-            ),
-
-            'leadership_required' => $request->boolean(
-                'leadership_required'
-            ),
-
-            'leadership_priority' => $request->boolean(
-                'leadership_priority'
-            ),
-
-            'priority_weight' => $request->input(
-                'priority_weight',
-                $oldCriteria->priority_weight ?? 1
-            ),
-
-            'max_score' => 100,
         ];
     }
 
