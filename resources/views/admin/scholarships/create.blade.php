@@ -6,7 +6,7 @@
 <div class="container-fluid px-0">
 
     <!-- Page Header -->
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <div>
             <h4 class="mb-0 fw-bold text-maroon">
                 <i class="fas fa-plus-circle me-2"></i>
@@ -422,6 +422,26 @@
                                     </div>
                                 </div>
 
+                                {{-- QUICK ACTIONS --}}
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-maroon-light">
+                                        <h6 class="mb-0 text-maroon">
+                                            <i class="fas fa-bolt me-2"></i>
+                                            Quick Actions
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                                            <i class="fas fa-save me-2"></i>
+                                            Create Scholarship
+                                        </button>
+                                        <a href="{{ route('admin.scholarships.index') }}" class="btn btn-outline-secondary w-100">
+                                            <i class="fas fa-times me-2"></i>
+                                            Cancel
+                                        </a>
+                                    </div>
+                                </div>
+
                                 {{-- HELPFUL TIPS --}}
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-header bg-maroon-light">
@@ -686,6 +706,17 @@
     /* ============================================ */
     /* RESPONSIVE                                  */
     /* ============================================ */
+    @media (max-width: 992px) {
+        .d-flex.align-items-center.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+
+        .d-flex.align-items-center.justify-content-between .btn {
+            width: 100%;
+        }
+    }
+
     @media (max-width: 768px) {
         .card-header {
             padding: 12px 16px;
@@ -706,15 +737,6 @@
         .btn-secondary {
             padding: 0.5rem 1rem;
             font-size: 0.85rem;
-            width: 100%;
-        }
-
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .d-flex.justify-content-between .btn {
             width: 100%;
         }
 
