@@ -414,12 +414,6 @@
                     {{ $profile->bumiputera ? 'Yes' : 'No' }}
                 </span>
             </div>
-            
-            <div style="margin-left: auto;">
-                <a href="{{ route('profile.create') }}" class="btn-edit-profile" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-            </div>
         </div>
     @else
         <div class="alert-warning mb-4" data-aos="fade-down">
