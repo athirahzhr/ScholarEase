@@ -181,85 +181,98 @@
                                         </div>
 
                                         {{-- INCOME CATEGORIES --}}
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Income Categories
-                                            </label>
-                                            <div class="row g-2">
-                                                @php $selectedIncome = old('income_categories', []); @endphp
-                                                @foreach (['B40' => 'B40 (Low Income)', 'M40' => 'M40 (Middle Income)', 'T20' => 'T20 (High Income)'] as $value => $label)
-                                                    <div class="col-md-4">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" 
-                                                                   type="checkbox" 
-                                                                   name="income_categories[]" 
-                                                                   value="{{ $value }}" 
-                                                                   id="income_{{ $value }}"
-                                                                   {{ in_array($value, $selectedIncome) ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="income_{{ $value }}">
-                                                                {{ $label }}
-                                                            </label>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">
+                                                    Income Categories
+                                                </label>
+                                                <div class="row g-2">
+                                                    @php 
+                                                        $selectedIncome = old('income_categories', []); 
+                                                        if (!is_array($selectedIncome)) {
+                                                            $selectedIncome = [];
+                                                        }
+                                                    @endphp
+                                                    @foreach (['B40' => 'B40 (Low Income)', 'M40' => 'M40 (Middle Income)', 'T20' => 'T20 (High Income)'] as $value => $label)
+                                                        <div class="col-md-4">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" 
+                                                                    type="checkbox" 
+                                                                    name="income_categories[]" 
+                                                                    value="{{ $value }}" 
+                                                                    id="income_{{ $value }}"
+                                                                    {{ in_array($value, $selectedIncome) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="income_{{ $value }}">
+                                                                    {{ $label }}
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
+                                                <small class="text-muted">Select applicable income categories</small>
                                             </div>
-                                            <small class="text-muted">Select applicable income categories</small>
-                                        </div>
 
-                                        {{-- STUDY LEVELS --}}
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Study Levels
-                                            </label>
-                                            @php $selectedStudyPaths = old('study_paths', []); @endphp
-                                            <div class="row g-2">
-                                                @foreach (['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate'] as $level)
-                                                    <div class="col-md-4">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" 
-                                                                   type="checkbox" 
-                                                                   name="study_paths[]" 
-                                                                   value="{{ $level }}" 
-                                                                   id="study_{{ $level }}"
-                                                                   {{ in_array($level, $selectedStudyPaths) ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="study_{{ $level }}">
-                                                                {{ $level }}
-                                                            </label>
+                                            {{-- STUDY LEVELS --}}
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">
+                                                    Study Levels
+                                                </label>
+                                                @php 
+                                                    $selectedStudyPaths = old('study_paths', []); 
+                                                    if (!is_array($selectedStudyPaths)) {
+                                                        $selectedStudyPaths = [];
+                                                    }
+                                                @endphp
+                                                <div class="row g-2">
+                                                    @foreach (['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate'] as $level)
+                                                        <div class="col-md-4">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" 
+                                                                    type="checkbox" 
+                                                                    name="study_paths[]" 
+                                                                    value="{{ $level }}" 
+                                                                    id="study_{{ $level }}"
+                                                                    {{ in_array($level, $selectedStudyPaths) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="study_{{ $level }}">
+                                                                    {{ $level }}
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
+                                                <small class="text-muted">Select all applicable study levels</small>
                                             </div>
-                                            <small class="text-muted">Select all applicable study levels</small>
-                                        </div>
 
-                                        {{-- FIELDS OF STUDY --}}
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Fields of Study
-                                            </label>
-                                            @php
-                                                $fieldOptions = ['Computer Science', 'Engineering', 'Business', 'Medicine', 'Education', 'TVET', 'Data Science', 'Finance', 'Accounting', 'Economics', 'Law', 'Actuarial Science', 'Mathematics', 'Statistics', 'Science', 'Physics', 'Chemistry', 'Biological Science', 'Pharmacy', 'Environmental Science', 'Architecture', 'Technical', 'Social Science', 'Communication', 'Hospitality', 'Anthropology', 'History', 'Linguistics', 'Performing Arts', 'Philosophy', 'Art & Design', 'Archaeology'];
-                                                $selectedFields = old('fields_of_study', []);
-                                            @endphp
-                                            <div class="row g-2">
-                                                @foreach ($fieldOptions as $field)
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" 
-                                                                   type="checkbox" 
-                                                                   name="fields_of_study[]" 
-                                                                   value="{{ $field }}" 
-                                                                   id="field_{{ Str::slug($field) }}"
-                                                                   {{ in_array($field, $selectedFields) ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="field_{{ Str::slug($field) }}">
-                                                                {{ $field }}
-                                                            </label>
+                                            {{-- FIELDS OF STUDY --}}
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">
+                                                    Fields of Study
+                                                </label>
+                                                @php
+                                                    $fieldOptions = ['Computer Science', 'Engineering', 'Business', 'Medicine', 'Education', 'TVET', 'Data Science', 'Finance', 'Accounting', 'Economics', 'Law', 'Actuarial Science', 'Mathematics', 'Statistics', 'Science', 'Physics', 'Chemistry', 'Biological Science', 'Pharmacy', 'Environmental Science', 'Architecture', 'Technical', 'Social Science', 'Communication', 'Hospitality', 'Anthropology', 'History', 'Linguistics', 'Performing Arts', 'Philosophy', 'Art & Design', 'Archaeology'];
+                                                    $selectedFields = old('fields_of_study', []);
+                                                    if (!is_array($selectedFields)) {
+                                                        $selectedFields = [];
+                                                    }
+                                                @endphp
+                                                <div class="row g-2">
+                                                    @foreach ($fieldOptions as $field)
+                                                        <div class="col-md-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" 
+                                                                    type="checkbox" 
+                                                                    name="fields_of_study[]" 
+                                                                    value="{{ $field }}" 
+                                                                    id="field_{{ Str::slug($field) }}"
+                                                                    {{ in_array($field, $selectedFields) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="field_{{ Str::slug($field) }}">
+                                                                    {{ $field }}
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
+                                                <small class="text-muted">Select fields of study covered by this scholarship</small>
                                             </div>
-                                            <small class="text-muted">Select fields of study covered by this scholarship</small>
-                                        </div>
 
                                         {{-- CITIZENSHIP & STATE --}}
                                         <div class="row">
