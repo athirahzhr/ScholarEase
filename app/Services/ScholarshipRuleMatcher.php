@@ -27,13 +27,15 @@ namespace App\Services;
  *   7. Income RM ceiling monthly_income ≤ max_monthly_income if set.
  *   8. Income category   If 1 category ticked → syarat wajib hard filter.
  *   9. State             Must be in allowed states. Empty = open to all.
+ *                        Both English and Malay state names are supported
+ *                        via normalisation map — handles scraping inconsistencies.
  *
  * ─────────────────────────────────────────────────────────
  * KEUTAMAAN FLAG (not a filter — affects ordering only):
  *
  *   Income categories — auto-resolved from checkbox count:
  *   0 ticked  → no restriction  → Priority Match (no penalty)
- *   1 ticked  → hard filter     → handled in Step 1
+ *   1 ticked  → hard filter     → handled in Filter 8
  *   2+ ticked → preference      → Priority Match if in list
  *                                  General Match if outside list
  *
@@ -51,6 +53,7 @@ namespace App\Services;
  * ─────────────────────────────────────────────────────────
  * ALLOWED STUDY LEVELS:
  *   Foundation, Matriculation, Diploma, Degree, TVET
+ *   Postgraduate (Master's, PhD) excluded — not relevant
  *   for SPM-based scholarship recommendations.
  *
  * ─────────────────────────────────────────────────────────
@@ -64,7 +67,8 @@ class ScholarshipRuleMatcher
 {
     /**
      * Allowed study levels.
-     * designed for SPM leavers applying for pre-degree and
+     * Postgraduate levels (Master's, PhD) are excluded — this system
+     * is designed for SPM leavers applying for pre-degree and
      * undergraduate programmes only.
      */
     private const ALLOWED_STUDY_LEVELS = [
@@ -82,6 +86,50 @@ class ScholarshipRuleMatcher
     private const INCOME_THRESHOLDS = [
         'B40' => 4850,
         'M40' => 10960,
+    ];
+
+    /**
+     * State normalisation map.
+     *
+     * Maps both English and Malay state names to a canonical
+     * lowercase Malay name for consistent comparison.
+     *
+     * Needed because:
+     *   - Student profile may store English names (e.g. "Malacca")
+     *   - Scraped scholarship data typically stores Malay names (e.g. "Melaka")
+     *   - Scraping may produce inconsistent capitalisation or spelling
+     *
+     * All values normalised to lowercase Malay for comparison.
+     */
+    private const STATE_MAP = [
+        // English → Malay canonical
+        'malacca'         => 'melaka',
+        'penang'          => 'pulau pinang',
+        'johor'           => 'johor',
+        'kedah'           => 'kedah',
+        'kelantan'        => 'kelantan',
+        'perak'           => 'perak',
+        'perlis'          => 'perlis',
+        'pahang'          => 'pahang',
+        'sabah'           => 'sabah',
+        'sarawak'         => 'sarawak',
+        'selangor'        => 'selangor',
+        'terengganu'      => 'terengganu',
+        'kuala lumpur'    => 'kuala lumpur',
+        'putrajaya'       => 'putrajaya',
+        'labuan'          => 'labuan',
+
+        // Malay → Malay canonical (handles capitalisation)
+        'melaka'          => 'melaka',
+        'pulau pinang'    => 'pulau pinang',
+        'negeri sembilan' => 'negeri sembilan',
+        'negri sembilan'  => 'negeri sembilan', // common scraping typo
+
+        // WP prefix variants
+        'wp kuala lumpur' => 'kuala lumpur',
+        'w.p. kuala lumpur' => 'kuala lumpur',
+        'wp putrajaya'    => 'putrajaya',
+        'wp labuan'       => 'labuan',
     ];
 
     // =========================================================================
@@ -262,10 +310,8 @@ class ScholarshipRuleMatcher
     /**
      * Filter 3 — Study Level
      * Must be in scholarship's allowed study paths.
-     * If no restriction → pass.
-     *
-     * Allowed values: Foundation, Matriculation, Diploma, Degree, TVET.
-     * Postgraduate levels are not applicable for this system.
+     * Postgraduate values are stripped via ALLOWED_STUDY_LEVELS intersection.
+     * If no valid restriction remains → pass.
      */
     private function checkStudyLevel($student, $criteria): array
     {
@@ -358,7 +404,7 @@ class ScholarshipRuleMatcher
     /**
      * Filter 6 — SPM Result (strict hard filter)
      * Student's total As must meet or exceed min_spm_as.
-     * No tolerance — SV feedback: "if requirement is 8A, student needs 8A."
+     * No tolerance — if requirement is 8A, student needs exactly 8A or more.
      * If no requirement → pass.
      */
     private function checkSpm($student, $criteria): array
@@ -445,11 +491,18 @@ class ScholarshipRuleMatcher
 
     /**
      * Filter 9 — State
+     *
      * Student's state must be in scholarship's allowed states.
      * If no restriction → open to all states → pass.
      *
-     * Common use case: state-based scholarships
-     * e.g. Yayasan Sarawak, Yayasan Negeri Sembilan
+     * Both English and Malay state names are supported.
+     * Both sides normalised via STATE_MAP before comparison
+     * to handle mismatches between student form and scraped data.
+     *
+     * Example:
+     *   Student:     "MALACCA"  → normalised → "melaka"
+     *   Scholarship: ["Melaka"] → normalised → "melaka"
+     *   Result:      match → PASS ✅
      */
     private function checkState($student, $criteria): array
     {
@@ -463,7 +516,13 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        $passed = in_array($student->state, $allowed, true);
+        $studentNormalised = $this->normaliseState($student->state ?? '');
+        $allowedNormalised = array_map(
+            fn($s) => $this->normaliseState($s),
+            $allowed
+        );
+
+        $passed = in_array($studentNormalised, $allowedNormalised, true);
 
         return [
             'passed' => $passed,
@@ -486,7 +545,7 @@ class ScholarshipRuleMatcher
      * All other scholarships default to 'priority_match'.
      *
      * Returns:
-     *   'priority_match' → student in preferred group OR no preference
+     *   'priority_match' → student in preferred group OR no preference set
      *   'general_match'  → student outside preferred group (still eligible)
      */
     private function resolveKeutamaan($student, $criteria): string
@@ -508,6 +567,19 @@ class ScholarshipRuleMatcher
     // =========================================================================
     // Helpers
     // =========================================================================
+
+    /**
+     * Normalise a state name to canonical lowercase Malay.
+     * Used by checkState() for consistent comparison.
+     *
+     * Falls back to lowercase original if not found in map —
+     * still allows exact Malay-to-Malay comparison.
+     */
+    private function normaliseState(string $state): string
+    {
+        $key = strtolower(trim($state));
+        return self::STATE_MAP[$key] ?? $key;
+    }
 
     /**
      * Auto-resolve income type from number of ticked categories.
