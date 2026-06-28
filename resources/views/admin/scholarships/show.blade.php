@@ -266,47 +266,7 @@
                                         <span class="badge badge-danger">Required</span>
                                     </div>
                                 </div>
-                            @elseif($criteria->bumiputera_priority)
-                                <div class="eligibility-item">
-                                    <div class="eligibility-label">
-                                        <i class="fas fa-star-of-life me-2" style="color: #6b7280;"></i> Bumiputera:
-                                    </div>
-                                    <div class="eligibility-badges mt-2">
-                                        <span class="badge badge-secondary">Priority Given</span>
-                                    </div>
-                                </div>
-                            @endif
-
-                            {{-- LEADERSHIP --}}
-                            @if($criteria->leadership_required)
-                                <div class="eligibility-item">
-                                    <div class="eligibility-label">
-                                        <i class="fas fa-trophy me-2" style="color: #dc2626;"></i> Leadership:
-                                    </div>
-                                    <div class="eligibility-badges mt-2">
-                                        <span class="badge badge-danger">Required</span>
-                                    </div>
-                                </div>
-                            @elseif($criteria->leadership_priority)
-                                <div class="eligibility-item">
-                                    <div class="eligibility-label">
-                                        <i class="fas fa-trophy me-2" style="color: #6b7280;"></i> Leadership:
-                                    </div>
-                                    <div class="eligibility-badges mt-2">
-                                        <span class="badge badge-secondary">Priority Given</span>
-                                    </div>
-                                </div>
-                            @endif
-
-                            {{-- PRIORITY WEIGHT --}}
-                            <div class="eligibility-item">
-                                <div class="eligibility-label">
-                                    <i class="fas fa-chart-line me-2" style="color: #F4C542;"></i> Priority Weight:
-                                </div>
-                                <div class="eligibility-badges mt-2">
-                                    <span class="badge badge-gold fw-bold">{{ $criteria->priority_weight ?? 1 }} / 10</span>
-                                </div>
-                            </div>
+                            
                         </div>
                     @else
                         <div class="text-center py-4">

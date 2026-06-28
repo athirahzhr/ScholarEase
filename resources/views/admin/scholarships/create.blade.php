@@ -237,30 +237,11 @@
                                                         <input class="form-check-input" type="checkbox" name="bumiputera_required" value="1" id="bumiputera_required" {{ old('bumiputera_required') ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="bumiputera_required">Bumiputera Required</label>
                                                     </div>
-                                                    <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="checkbox" name="bumiputera_priority" value="1" id="bumiputera_priority" {{ old('bumiputera_priority') ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="bumiputera_priority">Bumiputera Priority</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="checkbox" name="leadership_required" value="1" id="leadership_required" {{ old('leadership_required') ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="leadership_required">Leadership Required</label>
-                                                    </div>
-                                                    <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="checkbox" name="leadership_priority" value="1" id="leadership_priority" {{ old('leadership_priority') ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="leadership_priority">Leadership Priority</label>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {{-- PRIORITY WEIGHT --}}
-                                        <div class="mt-4">
-                                            <label class="form-label fw-semibold">Priority Weight (1-10)</label>
-                                            <input type="number" name="priority_weight" class="form-control" min="1" max="10" value="{{ old('priority_weight', 1) }}">
-                                            <small class="text-muted">Higher weight = higher recommendation priority</small>
-                                        </div>
+                                    
                                     </div>
                                 </div>
                             </div>
