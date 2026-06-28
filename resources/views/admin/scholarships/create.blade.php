@@ -143,8 +143,8 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
+                                        {{-- SPM A's & Monthly Income --}}
                                         <div class="row">
-                                            {{-- SPM A's --}}
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold">
                                                     Minimum SPM A's
@@ -162,7 +162,6 @@
                                                 @enderror
                                             </div>
 
-                                            {{-- MONTHLY INCOME --}}
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold">
                                                     Max Monthly Income (RM)
@@ -181,98 +180,98 @@
                                         </div>
 
                                         {{-- INCOME CATEGORIES --}}
-                                            <div class="mb-3">
-                                                <label class="form-label fw-semibold">
-                                                    Income Categories
-                                                </label>
-                                                <div class="row g-2">
-                                                    @php 
-                                                        $selectedIncome = old('income_categories', []); 
-                                                        if (!is_array($selectedIncome)) {
-                                                            $selectedIncome = [];
-                                                        }
-                                                    @endphp
-                                                    @foreach (['B40' => 'B40 (Low Income)', 'M40' => 'M40 (Middle Income)', 'T20' => 'T20 (High Income)'] as $value => $label)
-                                                        <div class="col-md-4">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" 
-                                                                    type="checkbox" 
-                                                                    name="income_categories[]" 
-                                                                    value="{{ $value }}" 
-                                                                    id="income_{{ $value }}"
-                                                                    {{ in_array($value, $selectedIncome) ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="income_{{ $value }}">
-                                                                    {{ $label }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                                <small class="text-muted">Select applicable income categories</small>
-                                            </div>
-
-                                            {{-- STUDY LEVELS --}}
-                                            <div class="mb-3">
-                                                <label class="form-label fw-semibold">
-                                                    Study Levels
-                                                </label>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Income Categories
+                                            </label>
+                                            <div class="row g-2">
                                                 @php 
-                                                    $selectedStudyPaths = old('study_paths', []); 
-                                                    if (!is_array($selectedStudyPaths)) {
-                                                        $selectedStudyPaths = [];
+                                                    $selectedIncome = old('income_categories', []); 
+                                                    if (!is_array($selectedIncome)) {
+                                                        $selectedIncome = [];
                                                     }
                                                 @endphp
-                                                <div class="row g-2">
-                                                    @foreach (['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate'] as $level)
-                                                        <div class="col-md-4">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" 
-                                                                    type="checkbox" 
-                                                                    name="study_paths[]" 
-                                                                    value="{{ $level }}" 
-                                                                    id="study_{{ $level }}"
-                                                                    {{ in_array($level, $selectedStudyPaths) ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="study_{{ $level }}">
-                                                                    {{ $level }}
-                                                                </label>
-                                                            </div>
+                                                @foreach (['B40' => 'B40 (Low Income)', 'M40' => 'M40 (Middle Income)', 'T20' => 'T20 (High Income)'] as $value => $label)
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" 
+                                                                   type="checkbox" 
+                                                                   name="income_categories[]" 
+                                                                   value="{{ $value }}" 
+                                                                   id="income_{{ $value }}"
+                                                                   {{ in_array($value, $selectedIncome) ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="income_{{ $value }}">
+                                                                {{ $label }}
+                                                            </label>
                                                         </div>
-                                                    @endforeach
-                                                </div>
-                                                <small class="text-muted">Select all applicable study levels</small>
+                                                    </div>
+                                                @endforeach
                                             </div>
+                                            <small class="text-muted">Select applicable income categories</small>
+                                        </div>
 
-                                            {{-- FIELDS OF STUDY --}}
-                                            <div class="mb-3">
-                                                <label class="form-label fw-semibold">
-                                                    Fields of Study
-                                                </label>
-                                                @php
-                                                    $fieldOptions = ['Computer Science', 'Engineering', 'Business', 'Medicine', 'Education', 'TVET', 'Data Science', 'Finance', 'Accounting', 'Economics', 'Law', 'Actuarial Science', 'Mathematics', 'Statistics', 'Science', 'Physics', 'Chemistry', 'Biological Science', 'Pharmacy', 'Environmental Science', 'Architecture', 'Technical', 'Social Science', 'Communication', 'Hospitality', 'Anthropology', 'History', 'Linguistics', 'Performing Arts', 'Philosophy', 'Art & Design', 'Archaeology'];
-                                                    $selectedFields = old('fields_of_study', []);
-                                                    if (!is_array($selectedFields)) {
-                                                        $selectedFields = [];
-                                                    }
-                                                @endphp
-                                                <div class="row g-2">
-                                                    @foreach ($fieldOptions as $field)
-                                                        <div class="col-md-6">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" 
-                                                                    type="checkbox" 
-                                                                    name="fields_of_study[]" 
-                                                                    value="{{ $field }}" 
-                                                                    id="field_{{ Str::slug($field) }}"
-                                                                    {{ in_array($field, $selectedFields) ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="field_{{ Str::slug($field) }}">
-                                                                    {{ $field }}
-                                                                </label>
-                                                            </div>
+                                        {{-- STUDY LEVELS --}}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Study Levels
+                                            </label>
+                                            @php 
+                                                $selectedStudyPaths = old('study_paths', []); 
+                                                if (!is_array($selectedStudyPaths)) {
+                                                    $selectedStudyPaths = [];
+                                                }
+                                            @endphp
+                                            <div class="row g-2">
+                                                @foreach (['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate'] as $level)
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" 
+                                                                   type="checkbox" 
+                                                                   name="study_paths[]" 
+                                                                   value="{{ $level }}" 
+                                                                   id="study_{{ $level }}"
+                                                                   {{ in_array($level, $selectedStudyPaths) ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="study_{{ $level }}">
+                                                                {{ $level }}
+                                                            </label>
                                                         </div>
-                                                    @endforeach
-                                                </div>
-                                                <small class="text-muted">Select fields of study covered by this scholarship</small>
+                                                    </div>
+                                                @endforeach
                                             </div>
+                                            <small class="text-muted">Select all applicable study levels</small>
+                                        </div>
+
+                                        {{-- FIELDS OF STUDY --}}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Fields of Study
+                                            </label>
+                                            @php
+                                                $fieldOptions = ['Computer Science', 'Engineering', 'Business', 'Medicine', 'Education', 'TVET', 'Data Science', 'Finance', 'Accounting', 'Economics', 'Law', 'Actuarial Science', 'Mathematics', 'Statistics', 'Science', 'Physics', 'Chemistry', 'Biological Science', 'Pharmacy', 'Environmental Science', 'Architecture', 'Technical', 'Social Science', 'Communication', 'Hospitality', 'Anthropology', 'History', 'Linguistics', 'Performing Arts', 'Philosophy', 'Art & Design', 'Archaeology'];
+                                                $selectedFields = old('fields_of_study', []);
+                                                if (!is_array($selectedFields)) {
+                                                    $selectedFields = [];
+                                                }
+                                            @endphp
+                                            <div class="row g-2 fields-scroll">
+                                                @foreach ($fieldOptions as $field)
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" 
+                                                                   type="checkbox" 
+                                                                   name="fields_of_study[]" 
+                                                                   value="{{ $field }}" 
+                                                                   id="field_{{ Str::slug($field) }}"
+                                                                   {{ in_array($field, $selectedFields) ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="field_{{ Str::slug($field) }}">
+                                                                {{ $field }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            <small class="text-muted">Select fields of study covered by this scholarship</small>
+                                        </div>
 
                                         {{-- CITIZENSHIP & STATE --}}
                                         <div class="row">
@@ -280,114 +279,39 @@
                                                 <label class="form-label fw-semibold">
                                                     Citizenship Required
                                                 </label>
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label fw-semibold">
-                                                        Citizenship Required
-                                                    </label>
-
-                                                    <select name="citizenship_required"
-                                                            class="form-select @error('citizenship_required') is-invalid @enderror">
-
-                                                        <option value="">No Restriction</option>
-
-                                                        <option value="Malaysia"
-                                                            {{ old('citizenship_required') == 'Malaysia' ? 'selected' : '' }}>
-                                                            Malaysia
-                                                        </option>
-
-                                                        <option value="International"
-                                                            {{ old('citizenship_required') == 'International' ? 'selected' : '' }}>
-                                                            International
-                                                        </option>
-
-                                                    </select>
-
-                                                    <small class="text-muted">
-                                                        Select the citizenship requirement for this scholarship.
-                                                    </small>
-
-                                                    @error('citizenship_required')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div><div class="col-md-6 mb-3">
-                                                    <label class="form-label fw-semibold">
-                                                        Citizenship Required
-                                                    </label>
-
-                                                    <select name="citizenship_required"
-                                                            class="form-select @error('citizenship_required') is-invalid @enderror">
-
-                                                        <option value="">No Restriction</option>
-
-                                                        <option value="Malaysia"
-                                                            {{ old('citizenship_required') == 'Malaysia' ? 'selected' : '' }}>
-                                                            Malaysia
-                                                        </option>
-
-                                                        <option value="International"
-                                                            {{ old('citizenship_required') == 'International' ? 'selected' : '' }}>
-                                                            International
-                                                        </option>
-
-                                                    </select>
-
-                                                    <small class="text-muted">
-                                                        Select the citizenship requirement for this scholarship.
-                                                    </small>
-
-                                                    @error('citizenship_required')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                                       placeholder="e.g., Malaysia" 
-                                                       value="{{ old('citizenship_required') }}">
+                                                <select name="citizenship_required" 
+                                                        class="form-select @error('citizenship_required') is-invalid @enderror">
+                                                    <option value="">No Restriction</option>
+                                                    <option value="Malaysia" {{ old('citizenship_required') == 'Malaysia' ? 'selected' : '' }}>
+                                                        Malaysia
+                                                    </option>
+                                                    <option value="International" {{ old('citizenship_required') == 'International' ? 'selected' : '' }}>
+                                                        International
+                                                    </option>
+                                                </select>
+                                                <small class="text-muted">Select the citizenship requirement for this scholarship</small>
                                                 @error('citizenship_required')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
+
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold">
                                                     State Requirement
                                                 </label>
                                                 @php
-                                                $states = [
-                                                    'Johor',
-                                                    'Kedah',
-                                                    'Kelantan',
-                                                    'Melaka',
-                                                    'Negeri Sembilan',
-                                                    'Pahang',
-                                                    'Perak',
-                                                    'Perlis',
-                                                    'Pulau Pinang',
-                                                    'Sabah',
-                                                    'Sarawak',
-                                                    'Selangor',
-                                                    'Terengganu',
-                                                    'Kuala Lumpur',
-                                                    'Labuan',
-                                                    'Putrajaya'
-                                                ];
+                                                    $states = ['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'Kuala Lumpur', 'Labuan', 'Putrajaya'];
                                                 @endphp
-
-                                                <select name="state_requirement" class="form-select">
-
+                                                <select name="state_requirement" 
+                                                        class="form-select @error('state_requirement') is-invalid @enderror">
                                                     <option value="">No Restriction</option>
-
                                                     @foreach($states as $state)
-
-                                                    <option value="{{ $state }}"
-                                                        {{ old('state_requirement') == $state ? 'selected' : '' }}>
-
-                                                        {{ $state }}
-
-                                                    </option>
-
+                                                        <option value="{{ $state }}" {{ old('state_requirement') == $state ? 'selected' : '' }}>
+                                                            {{ $state }}
+                                                        </option>
                                                     @endforeach
-
                                                 </select>
-                                                       placeholder="e.g., Selangor (Optional)" 
-                                                       value="{{ old('state_requirement') }}">
+                                                <small class="text-muted">Select the state requirement (if any)</small>
                                                 @error('state_requirement')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -405,10 +329,12 @@
                                                        class="form-control @error('min_age') is-invalid @enderror" 
                                                        value="{{ old('min_age') }}" 
                                                        placeholder="e.g., 17">
+                                                <small class="text-muted">Minimum age requirement</small>
                                                 @error('min_age')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
+
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold">
                                                     Maximum Age
@@ -418,6 +344,7 @@
                                                        class="form-control @error('max_age') is-invalid @enderror" 
                                                        value="{{ old('max_age') }}" 
                                                        placeholder="e.g., 25">
+                                                <small class="text-muted">Maximum age requirement</small>
                                                 @error('max_age')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -432,6 +359,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-check">
+                                                        <input type="hidden" name="bumiputera_required" value="0">
                                                         <input class="form-check-input" 
                                                                type="checkbox" 
                                                                name="bumiputera_required" 
@@ -478,7 +406,7 @@
                                             @enderror
                                         </div>
 
-                                        {{-- LINK --}}
+                                        {{-- APPLICATION LINK --}}
                                         <div class="mb-3">
                                             <label class="form-label fw-semibold">
                                                 Application Link
@@ -508,7 +436,7 @@
                                             @enderror
                                         </div>
 
-                                        {{-- ACTIVE --}}
+                                        {{-- ACTIVE STATUS --}}
                                         <div class="mb-0">
                                             <label class="form-label fw-semibold">
                                                 Active Status
@@ -785,27 +713,6 @@
         transform: translateY(-2px);
     }
 
-    .btn-secondary {
-        background: #6b7280;
-        border: none;
-        padding: 0.65rem 1.5rem;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        color: white;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .btn-secondary:hover {
-        background: #4b5563;
-        transform: translateY(-2px);
-        color: white;
-    }
-
     /* ============================================ */
     /* RESPONSIVE                                  */
     /* ============================================ */
@@ -836,8 +743,7 @@
         }
 
         .btn-primary,
-        .btn-outline-secondary,
-        .btn-secondary {
+        .btn-outline-secondary {
             padding: 0.5rem 1rem;
             font-size: 0.85rem;
             width: 100%;
