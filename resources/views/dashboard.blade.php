@@ -360,27 +360,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Feedback Card -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card" style="background: linear-gradient(135deg, #FFF8EE, #f5ebe0); border-left: 4px solid var(--gold);">
-                        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <div>
-                                <h5 class="mb-1" style="color: var(--maroon);">
-                                    <i class="fas fa-star me-2" style="color: var(--gold);"></i>
-                                    Share Your Experience
-                                </h5>
-                                <p class="text-muted mb-0">Your feedback helps us improve ScholarEase and serve you better!</p>
-                            </div>
-                            <a href="{{ route('feedback.create') }}" class="btn btn-primary">
-                                <i class="fas fa-comment me-2"></i> Give Feedback
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- User Guideline -->
             <div class="row mb-4">
                 <div class="col-12">
