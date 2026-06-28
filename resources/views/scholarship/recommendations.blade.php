@@ -278,8 +278,8 @@
                 <p>Scholarships matched to your eligibility based on academic results, income, study path, state, and other criteria</p>
             </div>
             <div class="header-actions">
-                <!-- EDIT PROFILE BUTTON - FIXED LINK -->
-                <a href="http://76.13.220.70/profile/create" class="btn-edit-profile">
+                <!-- EDIT PROFILE BUTTON - Using route() helper -->
+                <a href="{{ route('profile.create') }}" class="btn-edit-profile">
                     <i class="fas fa-user-edit"></i>
                     Edit Profile
                 </a>
@@ -331,7 +331,7 @@
                 <strong>State:</strong> {{ $profile->state ?? 'N/A' }}
             </div>
             <div style="margin-left: auto;">
-                <a href="http://76.13.220.70/profile/create" class="btn-edit-profile" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;">
+                <a href="{{ route('profile.create') }}" class="btn-edit-profile" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;">
                     <i class="fas fa-edit"></i> Edit
                 </a>
             </div>
@@ -340,7 +340,7 @@
         <div class="alert-warning mb-4" data-aos="fade-down">
             <i class="fas fa-exclamation-triangle me-2"></i>
             Please complete your profile to get personalised recommendations.
-            <a href="http://76.13.220.70/profile/create" class="ms-2">
+            <a href="{{ route('profile.create') }}" class="ms-2">
                 <i class="fas fa-arrow-right"></i> Create Profile
             </a>
         </div>
@@ -547,7 +547,7 @@
                 <h5 class="mb-2">No Scholarships Found</h5>
                 <p class="mb-0">No scholarships match your current eligibility criteria. Try updating your profile or check back later.</p>
                 <div class="mt-3 d-flex gap-3 justify-content-center flex-wrap">
-                    <a href="http://76.13.220.70/profile/create" class="btn-edit-profile">
+                    <a href="{{ route('profile.create') }}" class="btn-edit-profile">
                         <i class="fas fa-edit me-2"></i> Update Profile
                     </a>
                     <a href="{{ route('scholarship.finder') }}" class="btn-find-more">
