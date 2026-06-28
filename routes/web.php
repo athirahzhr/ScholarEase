@@ -21,7 +21,7 @@ use App\Http\Controllers\FeedbackController;
 |--------------------------------------------------------------------------
 */
 
-// Welcome Page - FIXED: Properly fetch scholarships and feedbacks
+// Welcome Page 
 Route::get('/', function () {
     $today = \Carbon\Carbon::today();
     
