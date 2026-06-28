@@ -280,9 +280,65 @@
                                                 <label class="form-label fw-semibold">
                                                     Citizenship Required
                                                 </label>
-                                                <input type="text" 
-                                                       name="citizenship_required" 
-                                                       class="form-control @error('citizenship_required') is-invalid @enderror" 
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-semibold">
+                                                        Citizenship Required
+                                                    </label>
+
+                                                    <select name="citizenship_required"
+                                                            class="form-select @error('citizenship_required') is-invalid @enderror">
+
+                                                        <option value="">No Restriction</option>
+
+                                                        <option value="Malaysia"
+                                                            {{ old('citizenship_required') == 'Malaysia' ? 'selected' : '' }}>
+                                                            Malaysia
+                                                        </option>
+
+                                                        <option value="International"
+                                                            {{ old('citizenship_required') == 'International' ? 'selected' : '' }}>
+                                                            International
+                                                        </option>
+
+                                                    </select>
+
+                                                    <small class="text-muted">
+                                                        Select the citizenship requirement for this scholarship.
+                                                    </small>
+
+                                                    @error('citizenship_required')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div><div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-semibold">
+                                                        Citizenship Required
+                                                    </label>
+
+                                                    <select name="citizenship_required"
+                                                            class="form-select @error('citizenship_required') is-invalid @enderror">
+
+                                                        <option value="">No Restriction</option>
+
+                                                        <option value="Malaysia"
+                                                            {{ old('citizenship_required') == 'Malaysia' ? 'selected' : '' }}>
+                                                            Malaysia
+                                                        </option>
+
+                                                        <option value="International"
+                                                            {{ old('citizenship_required') == 'International' ? 'selected' : '' }}>
+                                                            International
+                                                        </option>
+
+                                                    </select>
+
+                                                    <small class="text-muted">
+                                                        Select the citizenship requirement for this scholarship.
+                                                    </small>
+
+                                                    @error('citizenship_required')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
                                                        placeholder="e.g., Malaysia" 
                                                        value="{{ old('citizenship_required') }}">
                                                 @error('citizenship_required')
@@ -293,9 +349,43 @@
                                                 <label class="form-label fw-semibold">
                                                     State Requirement
                                                 </label>
-                                                <input type="text" 
-                                                       name="state_requirement" 
-                                                       class="form-control @error('state_requirement') is-invalid @enderror" 
+                                                @php
+                                                $states = [
+                                                    'Johor',
+                                                    'Kedah',
+                                                    'Kelantan',
+                                                    'Melaka',
+                                                    'Negeri Sembilan',
+                                                    'Pahang',
+                                                    'Perak',
+                                                    'Perlis',
+                                                    'Pulau Pinang',
+                                                    'Sabah',
+                                                    'Sarawak',
+                                                    'Selangor',
+                                                    'Terengganu',
+                                                    'Kuala Lumpur',
+                                                    'Labuan',
+                                                    'Putrajaya'
+                                                ];
+                                                @endphp
+
+                                                <select name="state_requirement" class="form-select">
+
+                                                    <option value="">No Restriction</option>
+
+                                                    @foreach($states as $state)
+
+                                                    <option value="{{ $state }}"
+                                                        {{ old('state_requirement') == $state ? 'selected' : '' }}>
+
+                                                        {{ $state }}
+
+                                                    </option>
+
+                                                    @endforeach
+
+                                                </select>
                                                        placeholder="e.g., Selangor (Optional)" 
                                                        value="{{ old('state_requirement') }}">
                                                 @error('state_requirement')
