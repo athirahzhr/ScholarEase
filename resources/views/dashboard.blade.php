@@ -211,141 +211,7 @@
     .progress-bar-custom {
         background: linear-gradient(90deg, var(--maroon), var(--gold));
     }
-
-    /* ============================================ */
-    /* FEEDBACK SECTION STYLES                      */
-    /* ============================================ */
-    .feedback-card {
-        background: white;
-        border-radius: 20px;
-        padding: 1.5rem;
-        box-shadow: var(--shadow);
-        border-left: 4px solid var(--gold);
-        transition: all 0.3s ease;
-        margin-bottom: 1rem;
-    }
-
-    .feedback-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .feedback-rating {
-        display: flex;
-        gap: 2px;
-        color: var(--gold);
-        font-size: 1rem;
-    }
-
-    .feedback-rating .star-filled {
-        color: var(--gold);
-    }
-
-    .feedback-rating .star-empty {
-        color: #d1d5db;
-    }
-
-    .feedback-meta {
-        font-size: 0.8rem;
-        color: var(--gray-600);
-    }
-
-    .feedback-meta i {
-        color: var(--maroon);
-        margin-right: 4px;
-    }
-
-    .feedback-empty {
-        text-align: center;
-        padding: 3rem 1rem;
-        background: #f9fafb;
-        border-radius: 16px;
-        border: 2px dashed #e5e7eb;
-    }
-
-    .feedback-empty i {
-        font-size: 3rem;
-        color: #d1d5db;
-        margin-bottom: 1rem;
-        display: block;
-    }
-
-    .feedback-empty h6 {
-        color: var(--gray-800);
-        margin-bottom: 0.5rem;
-    }
-
-    .feedback-empty p {
-        color: var(--gray-600);
-        margin-bottom: 1rem;
-    }
-
-    .feedback-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 1rem;
-        color: white;
-        flex-shrink: 0;
-    }
-
-    .feedback-avatar.bg-maroon { background: var(--maroon); }
-    .feedback-avatar.bg-gold { background: var(--gold); color: #2c1a00; }
-    .feedback-avatar.bg-green { background: #10b981; }
-    .feedback-avatar.bg-blue { background: #3b82f6; }
-    .feedback-avatar.bg-purple { background: #8b5cf6; }
-    .feedback-avatar.bg-orange { background: #f59e0b; }
-
-    .feedback-content {
-        flex: 1;
-    }
-
-    .feedback-content h6 {
-        color: var(--gray-800);
-        margin-bottom: 2px;
-        font-weight: 600;
-    }
-
-    .feedback-content p {
-        color: var(--gray-600);
-        margin-bottom: 4px;
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    .feedback-content .text-truncate-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .feedback-status-badge {
-        padding: 2px 10px;
-        border-radius: 20px;
-        font-size: 0.65rem;
-        font-weight: 600;
-    }
-
-    .feedback-status-badge.approved {
-        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-        color: #065f46;
-    }
-
-    .feedback-status-badge.pending {
-        background: linear-gradient(135deg, #fef3c7, #fde68a);
-        color: #92400e;
-    }
-
-    .feedback-status-badge.rejected {
-        background: linear-gradient(135deg, #fee2e2, #fecaca);
-        color: #991b1b;
-    }
-
+    
     @media (max-width: 768px) {
         .dashboard-header {
             padding: 1.5rem;
@@ -357,24 +223,6 @@
         
         .greeting-text {
             font-size: 0.9rem;
-        }
-
-        .feedback-card {
-            padding: 1rem;
-        }
-
-        .feedback-avatar {
-            width: 32px;
-            height: 32px;
-            font-size: 0.8rem;
-        }
-
-        .feedback-content h6 {
-            font-size: 0.9rem;
-        }
-
-        .feedback-content p {
-            font-size: 0.8rem;
         }
     }
 </style>
@@ -533,81 +381,6 @@
                 </div>
             </div>
 
-            <!-- ============================================ -->
-            <!-- USER FEEDBACK SECTION                        -->
-            <!-- ============================================ -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 style="color: var(--maroon);">
-                            <i class="fas fa-comments me-2"></i>
-                            Recent Feedback
-                        </h4>
-                        <a href="{{ route('feedback.create') }}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-plus me-1"></i> Add Feedback
-                        </a>
-                    </div>
-
-                    @php
-                        $userFeedback = auth()->user()->feedback()->latest()->take(5)->get();
-                    @endphp
-
-                    @if($userFeedback->count() > 0)
-                        <div class="row">
-                            @foreach($userFeedback as $feedback)
-                                <div class="col-12" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 50 }}">
-                                    <div class="feedback-card">
-                                        <div class="d-flex gap-3">
-                                            <!-- Avatar -->
-                                            <div class="feedback-avatar bg-maroon">
-                                                {{ substr(auth()->user()->name, 0, 1) }}
-                                            </div>
-                                            
-                                            <!-- Content -->
-                                            <div class="feedback-content">
-                                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                                                    <div>
-                                                        <h6>{{ auth()->user()->name }}</h6>
-                                                        <div class="feedback-rating">
-                                                            @for ($i = 1; $i <= 5; $i++)
-                                                                @if ($i <= $feedback->rating)
-                                                                    <i class="fas fa-star star-filled"></i>
-                                                                @else
-                                                                    <i class="fas fa-star star-empty"></i>
-                                                                @endif
-                                                            @endfor
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <span class="feedback-status-badge {{ $feedback->approved ? 'approved' : ($feedback->rejected ? 'rejected' : 'pending') }}">
-                                                            {{ $feedback->approved ? 'Approved' : ($feedback->rejected ? 'Rejected' : 'Pending') }}
-                                                        </span>
-                                                        <div class="feedback-meta mt-1">
-                                                            <i class="far fa-clock"></i>
-                                                            {{ $feedback->created_at->diffForHumans() }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p class="mb-0">{{ Str::limit($feedback->comment, 150) }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="feedback-empty">
-                            <i class="fas fa-comment-slash"></i>
-                            <h6>No Feedback Yet</h6>
-                            <p>You haven't submitted any feedback. Share your experience with us!</p>
-                            <a href="{{ route('feedback.create') }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus me-2"></i> Write Feedback
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
             <!-- User Guideline -->
             <div class="row mb-4">
                 <div class="col-12">
@@ -666,7 +439,7 @@
                                 ->get();
                         @endphp
                         
-                        @forelse($featuredScholarships as $scholarship)
+                        @foreach($featuredScholarships as $scholarship)
                         <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
                             <div class="scholarship-card">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -703,20 +476,16 @@
                                 </div>
                             </div>
                         </div>
-                        @empty
-                            <div class="col-12">
-                                <div class="alert-info text-center py-4" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 16px;">
-                                    <i class="fas fa-info-circle fa-2x mb-2" style="display:block; color: #1e40af;"></i>
-                                    <p class="mb-0" style="color: #1e40af;">No featured scholarships available at the moment. Check back later!</p>
-                                </div>
-                            </div>
-                        @endforelse
+                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Add FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 @push('scripts')
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
