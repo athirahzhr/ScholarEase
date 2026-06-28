@@ -407,7 +407,7 @@
                 <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 style="color: var(--maroon);">General Scholarships</h4>
-                        <a href="{{ route('scholarship.recommendations') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                        
                     </div>
                     
                     <div class="row"> 
