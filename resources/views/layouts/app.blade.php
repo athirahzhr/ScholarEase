@@ -66,6 +66,13 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
         }
         
         .navbar-brand i {
@@ -530,7 +537,10 @@
     <!-- ============================================ -->
     <nav class="navbar navbar-expand-lg navbar-scholarease">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">
+            <!-- ============================================ -->
+            <!-- FIXED: ScholarEase Logo - Now links to welcome page -->
+            <!-- ============================================ -->
+            <a class="navbar-brand" href="{{ route('welcome') }}">
                 <i class="fas fa-graduation-cap me-2"></i> ScholarEase
             </a>
             
@@ -637,9 +647,9 @@
                 <div class="col-md-3">
                     <h6>Quick Links</h6>
                     <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ route('welcome') }}" class="text-light opacity-75">Home</a></li>
                         <li class="mb-2"><a href="{{ route('dashboard') }}" class="text-light opacity-75">Dashboard</a></li>
                         <li class="mb-2"><a href="{{ route('scholarship.finder') }}" class="text-light opacity-75">Find Scholarships</a></li>
-                        <li class="mb-2"><a href="{{ route('bookmarks.index') }}" class="text-light opacity-75">Bookmarks</a></li>
                         <li class="mb-2"><a href="{{ route('feedback.create') }}" class="text-light opacity-75">Give Feedback</a></li>
                     </ul>
                 </div>
