@@ -21,10 +21,74 @@
         border-radius: 24px;
         margin-bottom: 2rem;
         border-left: 4px solid var(--gold);
+        position: relative;
     }
 
-    .recommendations-header h2 { color: var(--maroon); font-weight: 700; margin-bottom: 0.5rem; }
-    .recommendations-header p  { color: var(--gray-600); margin-bottom: 0; }
+    .recommendations-header h2 { 
+        color: var(--maroon); 
+        font-weight: 700; 
+        margin-bottom: 0.5rem; 
+    }
+    
+    .recommendations-header p  { 
+        color: var(--gray-600); 
+        margin-bottom: 0; 
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .btn-edit-profile {
+        background: linear-gradient(115deg, var(--gold), #e6b13e);
+        color: #2c1a00;
+        border: none;
+        border-radius: 40px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(244, 197, 66, 0.25);
+    }
+
+    .btn-edit-profile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(244, 197, 66, 0.35);
+        color: #2c1a00;
+        background: linear-gradient(115deg, #ffda77, #F4C542);
+    }
+
+    .btn-edit-profile i {
+        font-size: 1rem;
+    }
+
+    .btn-find-more {
+        background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
+        border: none;
+        border-radius: 40px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-find-more:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(122, 0, 25, 0.3);
+        color: white;
+    }
 
     .recommendation-card {
         display: flex;
@@ -106,20 +170,28 @@
     .recommendation-footer  { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
     .deadline-text          { color: var(--gray-600); font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
     .deadline-text i        { color: var(--gold); }
-    .recommendation-actions { display: flex; gap: 10px; }
+    .recommendation-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .btn-primary {
         background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
         border: none; border-radius: 40px;
         padding: 0.5rem 1.2rem; font-weight: 600; font-size: 0.85rem;
         transition: all 0.3s ease; color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(122,0,25,.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(122,0,25,.3); color: white; }
 
     .btn-outline-secondary {
         border: 2px solid #e5e7eb; color: var(--gray-600); border-radius: 40px;
         padding: 0.5rem 1.2rem; font-size: 0.85rem; font-weight: 600;
         transition: all 0.3s ease; background: transparent;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
     .btn-outline-secondary:hover { border-color: var(--maroon); color: var(--maroon); transform: translateY(-2px); }
 
@@ -127,6 +199,11 @@
         border: 2px solid var(--maroon); color: var(--maroon); border-radius: 40px;
         padding: 0.5rem 1.2rem; font-size: 0.85rem; font-weight: 600;
         transition: all 0.3s ease; background: transparent;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
     }
     .btn-outline-primary:hover { background: var(--maroon); color: white; transform: translateY(-2px); }
 
@@ -135,24 +212,83 @@
     .alert-info    { background: linear-gradient(135deg,#dbeafe,#bfdbfe); border: none; border-left: 4px solid #3b82f6; border-radius: 16px; color: #1e40af; padding: 1rem; }
     .alert-warning a, .alert-info a { color: var(--maroon); font-weight: 600; text-decoration: none; }
 
+    .profile-summary {
+        background: white;
+        border-radius: 16px;
+        padding: 16px 20px;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-summary-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: var(--gray-600);
+    }
+
+    .profile-summary-item strong {
+        color: var(--gray-800);
+        font-weight: 600;
+    }
+
+    .profile-summary-item i {
+        color: var(--maroon);
+        font-size: 1rem;
+        width: 20px;
+    }
+
+    .profile-summary-divider {
+        width: 1px;
+        height: 30px;
+        background: #e5e7eb;
+    }
+
     @media (max-width: 768px) {
         .recommendation-card    { flex-direction: column; padding: 20px; gap: 12px; }
         .recommendation-icon    { font-size: 36px; }
         .scholarship-title      { font-size: 1.2rem; }
         .recommendation-footer  { flex-direction: column; align-items: flex-start; }
-        .recommendation-actions { width: 100%; justify-content: flex-start; }
+        .recommendation-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
         .breakdown-label        { min-width: 110px; }
+        .profile-summary        { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .profile-summary-divider { display: none; }
+        .header-actions         { flex-direction: column; width: 100%; }
+        .header-actions .btn    { width: 100%; justify-content: center; }
     }
 </style>
 
 <div class="container py-4">
 
+    <!-- ============================================ -->
+    <!-- HEADER WITH EDIT PROFILE BUTTON              -->
+    <!-- ============================================ -->
     <div class="recommendations-header" data-aos="fade-up">
-        <h2>
-            <i class="fas fa-graduation-cap me-2" style="color:var(--gold)"></i>
-            Scholarship Recommendations
-        </h2>
-        <p>Scholarships matched to your eligibility based on academic results, income, study path, state, and other criteria</p>
+        <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+            <div>
+                <h2>
+                    <i class="fas fa-graduation-cap me-2" style="color:var(--gold)"></i>
+                    Scholarship Recommendations
+                </h2>
+                <p>Scholarships matched to your eligibility based on academic results, income, study path, state, and other criteria</p>
+            </div>
+            <div class="header-actions">
+                <!-- EDIT PROFILE BUTTON - FIXED LINK -->
+                <a href="http://76.13.220.70/profile/create" class="btn-edit-profile">
+                    <i class="fas fa-user-edit"></i>
+                    Edit Profile
+                </a>
+                <a href="{{ route('scholarship.finder') }}" class="btn-find-more">
+                    <i class="fas fa-search"></i>
+                    Find More
+                </a>
+            </div>
+        </div>
     </div>
 
     @if(session('success'))
@@ -161,15 +297,56 @@
         </div>
     @endif
 
-    @if(!auth()->user()->profile)
+    <!-- ============================================ -->
+    <!-- PROFILE SUMMARY (if profile exists)          -->
+    <!-- ============================================ -->
+    @if(auth()->user()->profile)
+        @php $profile = auth()->user()->profile; @endphp
+        <div class="profile-summary" data-aos="fade-up">
+            <div class="profile-summary-item">
+                <i class="fas fa-star"></i>
+                <strong>Total A's:</strong> {{ $profile->total_as ?? 'N/A' }}
+            </div>
+            <div class="profile-summary-divider"></div>
+            <div class="profile-summary-item">
+                <i class="fas fa-road"></i>
+                <strong>Study Level:</strong> {{ $profile->study_level ?? 'N/A' }}
+            </div>
+            <div class="profile-summary-divider"></div>
+            <div class="profile-summary-item">
+                <i class="fas fa-book"></i>
+                <strong>Field:</strong> {{ $profile->field_of_study ?? 'N/A' }}
+            </div>
+            <div class="profile-summary-divider"></div>
+            <div class="profile-summary-item">
+                <i class="fas fa-money-bill-wave"></i>
+                <strong>Income:</strong> RM {{ number_format($profile->monthly_income ?? 0, 2) }}
+                <span class="badge" style="background: linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem;">
+                    {{ $profile->income_category ?? 'N/A' }}
+                </span>
+            </div>
+            <div class="profile-summary-divider"></div>
+            <div class="profile-summary-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <strong>State:</strong> {{ $profile->state ?? 'N/A' }}
+            </div>
+            <div style="margin-left: auto;">
+                <a href="http://76.13.220.70/profile/create" class="btn-edit-profile" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+            </div>
+        </div>
+    @else
         <div class="alert-warning mb-4" data-aos="fade-down">
             <i class="fas fa-exclamation-triangle me-2"></i>
             Please complete your profile to get personalised recommendations.
-            <a href="{{ route('scholarship.finder') }}" class="ms-2">
-                <i class="fas fa-arrow-right"></i> Complete Profile
+            <a href="http://76.13.220.70/profile/create" class="ms-2">
+                <i class="fas fa-arrow-right"></i> Create Profile
             </a>
         </div>
-    @else
+    @endif
+
+    @if(auth()->user()->profile)
         <div class="alert-success mb-4" data-aos="fade-down">
             <i class="fas fa-check-circle me-2"></i>
             All scholarships below meet your eligibility criteria.
@@ -369,9 +546,14 @@
                 <i class="fas fa-search fa-3x mb-3" style="display:block"></i>
                 <h5 class="mb-2">No Scholarships Found</h5>
                 <p class="mb-0">No scholarships match your current eligibility criteria. Try updating your profile or check back later.</p>
-                <a href="{{ route('scholarship.finder') }}" class="btn btn-primary mt-3">
-                    <i class="fas fa-edit me-2"></i> Update Profile
-                </a>
+                <div class="mt-3 d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="http://76.13.220.70/profile/create" class="btn-edit-profile">
+                        <i class="fas fa-edit me-2"></i> Update Profile
+                    </a>
+                    <a href="{{ route('scholarship.finder') }}" class="btn-find-more">
+                        <i class="fas fa-search me-2"></i> Find More
+                    </a>
+                </div>
             </div>
         </div>
     @endif
