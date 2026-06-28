@@ -171,16 +171,6 @@
                                                     </span>
                                                 @endif
 
-                                                {{-- LEADERSHIP --}}
-                                                @if($c->leadership_required)
-                                                    <span class="eligibility-badge eligibility-danger">
-                                                        <i class="fas fa-trophy me-1"></i> Leadership Required
-                                                    </span>
-                                                @elseif($c->leadership_priority)
-                                                    <span class="eligibility-badge eligibility-secondary">
-                                                        <i class="fas fa-trophy me-1"></i> Leadership Priority
-                                                    </span>
-                                                @endif
                                             @else
                                                 <span class="eligibility-badge eligibility-secondary">
                                                     <i class="fas fa-info-circle me-1"></i> No eligibility rules
