@@ -506,9 +506,10 @@ class ScholarshipRuleMatcher
      */
     private function checkState($student, $criteria): array
     {
-        $allowed = $criteria->states ?? [];
+        $requiredState = trim($criteria->state_requirement ?? '');
 
-        if (empty($allowed)) {
+        // No restriction
+        if ($requiredState === '') {
             return [
                 'passed' => true,
                 'label'  => 'State',
@@ -516,21 +517,16 @@ class ScholarshipRuleMatcher
             ];
         }
 
-        $studentNormalised = $this->normaliseState($student->state ?? '');
-        $allowedNormalised = array_map(
-            fn($s) => $this->normaliseState($s),
-            $allowed
-        );
+        $studentState = $this->normaliseState($student->state ?? '');
 
-        $passed = in_array($studentNormalised, $allowedNormalised, true);
+        $passed = $studentState === $this->normaliseState($requiredState);
 
         return [
             'passed' => $passed,
             'label'  => 'State',
             'reason' => $passed
                 ? "Eligible ({$student->state})"
-                : "{$student->state} is not in required states: "
-                    . implode(', ', $allowed),
+                : "{$student->state} is not eligible. Required state: {$requiredState}",
         ];
     }
 
