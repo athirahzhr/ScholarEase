@@ -147,7 +147,49 @@
                                     <div class="col-md-6 mb-2">
                                         <div class="scraper-item">
                                             <i class="fas fa-cog me-2" style="color: #F4C542;"></i>
-                                            <span class="small">{{ $cmd }}</span>
+                                            @switch($cmd)
+                                                @case('scrape:all')
+                                                    <span class="small">All Scrapers (Complete Collection)</span>
+                                                    @break
+                                                @case('scrape:bnm')
+                                                    <span class="small">Bank Negara Malaysia Scholarship</span>
+                                                    @break
+                                                @case('scrape:k.watan')
+                                                    <span class="small">Khazanah Watan Scholarship</span>
+                                                    @break
+                                                @case('scrape:k.equity')
+                                                    <span class="small">Khazanah Equity Scholarship</span>
+                                                    @break
+                                                @case('scrape:petronas')
+                                                    <span class="small">Petronas Scholarship</span>
+                                                    @break
+                                                @case('scrape:jpa.db40')
+                                                    <span class="small">JPA DB40 Scholarship</span>
+                                                    @break
+                                                @case('scrape:jpa.lspm')
+                                                    <span class="small">JPA LSPM Scholarship</span>
+                                                    @break
+                                                @case('scrape:axiata')
+                                                    <span class="small">Axiata Scholarship</span>
+                                                    @break
+                                                @case('scrape:bpmb')
+                                                    <span class="small">BPMB Scholarship</span>
+                                                    @break
+                                                @case('scrape:k.paynet')
+                                                    <span class="small">PayNet Scholarship</span>
+                                                    @break
+                                                @case('scrape:mar')
+                                                    <span class="small">MAR Scholarship</span>
+                                                    @break
+                                                @case('scrape:shell')
+                                                    <span class="small">Shell Scholarship</span>
+                                                    @break
+                                                @case('scrape:jpa.ppn')
+                                                    <span class="small">JPA PPN Scholarship</span>
+                                                    @break
+                                                @default
+                                                    <span class="small">{{ $cmd }}</span>
+                                            @endswitch
                                         </div>
                                     </div>
                                 @endforeach
