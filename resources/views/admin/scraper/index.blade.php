@@ -152,40 +152,40 @@
                                                     <span class="small">All Scrapers (Complete Collection)</span>
                                                     @break
                                                 @case('scrape:bnm')
-                                                    <span class="small">Bank Negara Malaysia Scholarship</span>
+                                                    <span class="small">scrape:bnm for Bank Negara Malaysia Scholarship</span>
                                                     @break
                                                 @case('scrape:k.watan')
-                                                    <span class="small">Khazanah Watan Scholarship</span>
+                                                    <span class="small">scrape:k.watan for Khazanah Watan Scholarship</span>
                                                     @break
                                                 @case('scrape:k.equity')
-                                                    <span class="small">Khazanah Equity Scholarship</span>
+                                                    <span class="small">scrape:k.equity for Khazanah Equity Scholarship</span>
                                                     @break
                                                 @case('scrape:petronas')
-                                                    <span class="small">Petronas Scholarship</span>
+                                                    <span class="small">scrape:petronas for Petronas Scholarship</span>
                                                     @break
                                                 @case('scrape:jpa.db40')
-                                                    <span class="small">JPA DB40 Scholarship</span>
+                                                    <span class="small">scrape:jpa.db40 for JPA DB40 Scholarship</span>
                                                     @break
                                                 @case('scrape:jpa.lspm')
-                                                    <span class="small">JPA LSPM Scholarship</span>
+                                                    <span class="small">scrape:jpa.lspm for JPA LSPM Scholarship</span>
                                                     @break
                                                 @case('scrape:axiata')
-                                                    <span class="small">Axiata Scholarship</span>
+                                                    <span class="small">scrape:axiata for Axiata Scholarship</span>
                                                     @break
                                                 @case('scrape:bpmb')
-                                                    <span class="small">BPMB Scholarship</span>
+                                                    <span class="small">scrape:bpmb for BPMB Scholarship</span>
                                                     @break
                                                 @case('scrape:k.paynet')
-                                                    <span class="small">PayNet Scholarship</span>
+                                                    <span class="small">scrape:k.paynet for PayNet Scholarship</span>
                                                     @break
-                                                @case('scrape:mar')
-                                                    <span class="small">MAR Scholarship</span>
+                                                @case('scrape:mara')
+                                                    <span class="small">scrape:mara for MARA Scholarship</span>
                                                     @break
                                                 @case('scrape:shell')
-                                                    <span class="small">Shell Scholarship</span>
+                                                    <span class="small">scrape:shell for Shell Scholarship</span>
                                                     @break
                                                 @case('scrape:jpa.ppn')
-                                                    <span class="small">JPA PPN Scholarship</span>
+                                                    <span class="small">scrape:jpa.ppn for JPA PPN Scholarship</span>
                                                     @break
                                                 @default
                                                     <span class="small">{{ $cmd }}</span>
