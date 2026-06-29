@@ -68,9 +68,9 @@
                                         <select name="command" class="form-select scraper-select" required>
                                             <option value="" disabled selected>-- Choose a scraper to run --</option>
                                             @foreach($commands as $cmd)
-                                                <option value="{{ $cmd }}">
-                                                    <i class="fas fa-cog me-2"></i>
-                                                    {{ $cmd }}
+                                                <option value="{{ $cmd['command'] }}">
+                                                    {{ $cmd['display_name'] }}
+                                                    <span class="text-muted small">({{ $cmd['command'] }})</span>
                                                 </option>
                                             @endforeach
                                         </select>
@@ -144,10 +144,13 @@
                             </h6>
                             <div class="row">
                                 @foreach($commands as $cmd)
-                                    <div class="col-md-6 mb-2">
-                                        <div class="scraper-item">
+                                    <div class="col-md-6 col-lg-4 mb-2">
+                                        <div class="scraper-item" onclick="selectScraper('{{ $cmd['command'] }}')" style="cursor: pointer;">
                                             <i class="fas fa-cog me-2" style="color: #F4C542;"></i>
-                                            <span class="small">{{ $cmd }}</span>
+                                            <div>
+                                                <div class="scraper-name">{{ $cmd['display_name'] }}</div>
+                                                <div class="scraper-command small text-muted">{{ $cmd['command'] }}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -285,15 +288,34 @@
     .scraper-item {
         display: flex;
         align-items: center;
-        padding: 8px 12px;
+        padding: 10px 14px;
         background: #f9fafb;
         border-radius: 10px;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
     }
     
     .scraper-item:hover {
         background: rgba(244, 197, 66, 0.1);
         transform: translateX(5px);
+        border-color: #F4C542;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .scraper-item.active {
+        background: rgba(244, 197, 66, 0.2);
+        border-color: #F4C542;
+    }
+    
+    .scraper-name {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 14px;
+    }
+    
+    .scraper-command {
+        font-size: 11px;
+        color: #6b7280;
     }
     
     .scraper-select option {
@@ -337,12 +359,68 @@
         .info-card {
             padding: 15px;
         }
+        
+        .scraper-item {
+            padding: 8px 12px;
+        }
     }
 </style>
 @endpush
 
 @push('scripts')
 <script>
+    // Define the mapping of commands to display names
+    const scraperNames = {
+        'scrape:all': 'All Scrapers (Complete Collection)',
+        'scrape:bnm': 'Bank Negara Malaysia Scholarship',
+        'scrape:k.watan': 'Khazanah Watan Scholarship',
+        'scrape:k.equity': 'Khazanah Equity Scholarship',
+        'scrape:petronas': 'Petronas Scholarship',
+        'scrape:jpa.db40': 'JPA DB40 Scholarship',
+        'scrape:jpa.lspm': 'JPA LSPM Scholarship',
+        'scrape:axiata': 'Axiata Scholarship',
+        'scrape:bpmb': 'BPMB Scholarship',
+        'scrape:k.paynet': 'PayNet Scholarship',
+        'scrape:mar': 'MAR Scholarship',
+        'scrape:shell': 'Shell Scholarship',
+        'scrape:jpa.ppn': 'JPA PPN Scholarship'
+    };
+
+    // Function to select a scraper when clicking on the list item
+    function selectScraper(command) {
+        // Select the dropdown option
+        const select = document.querySelector('.scraper-select');
+        select.value = command;
+        
+        // Trigger change event to update UI
+        const event = new Event('change', { bubbles: true });
+        select.dispatchEvent(event);
+        
+        // Highlight the selected scraper item
+        document.querySelectorAll('.scraper-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Find and highlight the clicked item
+        const items = document.querySelectorAll('.scraper-item');
+        items.forEach(item => {
+            if (item.textContent.includes(command)) {
+                item.classList.add('active');
+            }
+        });
+    }
+
+    // Auto-submit when Enter key is pressed (optional)
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.ctrlKey) {
+            const select = document.querySelector('.scraper-select');
+            if (select.value) {
+                document.getElementById('scraperForm').submit();
+            }
+        }
+    });
+
+    // Form submission handler
     document.getElementById('scraperForm').addEventListener('submit', function() {
         const submitBtn = document.getElementById('runScraperBtn');
         const loadingIndicator = document.getElementById('loadingIndicator');
@@ -352,11 +430,10 @@
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Running Scraper...';
         loadingIndicator.style.display = 'block';
         
-        // Prevent double submission
         return true;
     });
     
-    // Auto-dismiss alerts after 10 seconds for success, keep errors
+    // Auto-dismiss success alerts after 10 seconds
     setTimeout(function() {
         const successAlerts = document.querySelectorAll('.alert-success');
         successAlerts.forEach(alert => {
