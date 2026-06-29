@@ -214,7 +214,7 @@
                                 }
                             @endphp
                             <div class="row g-2">
-                                @foreach (['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET', 'Postgraduate'] as $level)
+                                @foreach (['Foundation', 'Matriculation', 'Diploma', 'Degree', 'TVET'] as $level)
                                     <div class="col-md-4">
                                         <div class="form-check">
                                             <input class="form-check-input" 
