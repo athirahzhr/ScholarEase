@@ -155,8 +155,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/scraper/review', [AdminScraperController::class, 'review'])->name('scraper.review');
     Route::post('/scraper/import', [AdminScraperController::class, 'import'])->name('scraper.import');
 
-    // Scraping Logs
-    Route::get('/scraping-logs', [ScrapingController::class, 'logs'])->name('scraping.logs');
 
     // Notifications
     Route::get('/notifications', [AdminController::class, 'notifications'])->name('notifications');
