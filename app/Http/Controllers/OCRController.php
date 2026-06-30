@@ -100,8 +100,8 @@ class OCRController extends Controller
         'A1' => 'A+',
         'A!' => 'A+',
         'A ' => 'A',
-        'As ' => 'A+',
-        'Ar ' => 'A+',
+        'As' => 'A+',
+        'Ar' => 'A+',
         
         
         'BS' => 'B+',
