@@ -34,9 +34,10 @@ class Kernel extends ConsoleKernel
 protected function schedule(Schedule $schedule): void
 {
     // Weekly Scraping
-    // Weekly Scraping (Testing)
     $schedule->command('scrape:all')
-    ->everyMinute(); 
+    ->weekly()
+    ->mondays()
+    ->at('02:00');
 
     // Update Scholarship Status
     $schedule->command('scholarships:update-status')
