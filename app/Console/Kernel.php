@@ -45,10 +45,10 @@ protected function schedule(Schedule $schedule): void
     ->at('00:05');
 
     // Deadline Notification
+    // Deadline Notification (Testing)
     $schedule->command('notify:scholarship-deadline')
-        ->daily()
-        ->at('08:00');
-}
+    ->everyMinute();
+    }
 
 
 
