@@ -526,8 +526,41 @@
                                         <select name="field_of_study" class="form-select" required>
                                             <option value="">Select Field of Study</option>
                                             @php
-                                            $fieldOptions = ['Computer Science', 'Engineering', 'Business', 'Medicine', 'Education', 'TVET', 'Data Science', 'Finance', 'Accounting', 'Economics', 'Law', 'Actuarial Science', 'Mathematics', 'Statistics', 'Science', 'Physics', 'Chemistry', 'Biological Science', 'Pharmacy', 'Environmental Science', 'Architecture', 'Technical', 'Social Science', 'Communication', 'Hospitality', 'Anthropology', 'History', 'Linguistics', 'Performing Arts', 'Philosophy', 'Art & Design', 'Archaeology'];
-                                            sort($fieldOptions);
+                                            // Sorted alphabetically A-Z
+                                            $fieldOptions = [
+                                                'Accounting',
+                                                'Actuarial Science',
+                                                'Anthropology',
+                                                'Archaeology',
+                                                'Architecture',
+                                                'Art & Design',
+                                                'Biological Science',
+                                                'Business',
+                                                'Chemistry',
+                                                'Communication',
+                                                'Computer Science',
+                                                'Data Science',
+                                                'Economics',
+                                                'Education',
+                                                'Engineering',
+                                                'Environmental Science',
+                                                'Finance',
+                                                'History',
+                                                'Hospitality',
+                                                'Law',
+                                                'Linguistics',
+                                                'Mathematics',
+                                                'Medicine',
+                                                'Performing Arts',
+                                                'Pharmacy',
+                                                'Philosophy',
+                                                'Physics',
+                                                'Science',
+                                                'Social Science',
+                                                'Statistics',
+                                                'Technical',
+                                                'TVET'
+                                            ];
                                             @endphp
                                             @foreach ($fieldOptions as $field)
                                                 <option value="{{ $field }}" {{ old('field_of_study', $profile->field_of_study ?? '') == $field ? 'selected' : '' }}>
@@ -555,13 +588,25 @@
                                         <select name="state" class="form-select" required>
                                             <option value="">Select Your State</option>
                                             @php
+                                            // Sorted alphabetically A-Z
                                             $states = [
-                                                'Johor', 'Kedah', 'Kelantan', 'Kuala Lumpur', 'Labuan', 
-                                                'Melaka', 'Negeri Sembilan', 'Pahang', 'Penang', 'Perak', 
-                                                'Perlis', 'Putrajaya', 'Sabah', 'Sarawak', 'Selangor', 
+                                                'Johor',
+                                                'Kedah',
+                                                'Kelantan',
+                                                'Kuala Lumpur',
+                                                'Labuan',
+                                                'Melaka',
+                                                'Negeri Sembilan',
+                                                'Pahang',
+                                                'Penang',
+                                                'Perak',
+                                                'Perlis',
+                                                'Putrajaya',
+                                                'Sabah',
+                                                'Sarawak',
+                                                'Selangor',
                                                 'Terengganu'
                                             ];
-                                            sort($states);
                                             @endphp
                                             @foreach ($states as $state)
                                                 <option value="{{ $state }}" {{ old('state', $profile->state ?? '') == $state ? 'selected' : '' }}>
