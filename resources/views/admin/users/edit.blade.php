@@ -143,34 +143,6 @@
                         </div>
                     </form>
 
-                    {{-- DANGER ZONE (SEPARATE FORM) --}}
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">
-                                <i class="fas fa-exclamation-triangle me-2" style="color: #dc2626;"></i>
-                                Danger Zone
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <strong>Warning:</strong> This action is irreversible. All user data including bookmarks and preferences will be permanently deleted.
-                            </div>
-
-                            <form id="delete-user-form"
-                                  action="{{ route('admin.users.destroy', $user->id) }}"
-                                  method="POST"
-                                  onsubmit="return confirmDelete()">
-                                @csrf
-                                @method('DELETE')
-
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-trash-alt me-2"></i> Delete User Permanently
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
                     {{-- FOOTER ACTIONS --}}
                     <div class="d-flex justify-content-between mt-4">
                         <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-secondary">
