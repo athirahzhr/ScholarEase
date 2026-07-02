@@ -612,22 +612,23 @@
                             </label>
                             <select name="field_of_study" class="form-select" required>
                                 <option value="">-- Select Field --</option>
-                                <option value="Computer Science">Computer Science</option>
-                                <option value="Engineering">Engineering</option>
-                                <option value="Business">Business</option>
-                                <option value="Medicine">Medicine</option>
-                                <option value="Education">Education</option>
-                                <option value="Data Science">Data Science</option>
-                                <option value="Finance">Finance</option>
+                                <!-- SORTED ALPHABETICALLY A-Z -->
                                 <option value="Accounting">Accounting</option>
-                                <option value="Economics">Economics</option>
-                                <option value="Law">Law</option>
-                                <option value="Science">Science</option>
+                                <option value="Art &amp; Design">Art &amp; Design</option>
                                 <option value="Architecture">Architecture</option>
-                                <option value="Social Science">Social Science</option>
+                                <option value="Business">Business</option>
                                 <option value="Communication">Communication</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Data Science">Data Science</option>
+                                <option value="Economics">Economics</option>
+                                <option value="Education">Education</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Finance">Finance</option>
                                 <option value="Hospitality">Hospitality</option>
-                                <option value="Art & Design">Art & Design</option>
+                                <option value="Law">Law</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Science">Science</option>
+                                <option value="Social Science">Social Science</option>
                             </select>
                         </div>
 
@@ -660,22 +661,23 @@
                             </label>
                             <select name="state" class="form-select" required>
                                 <option value="">-- Select State --</option>
+                                <!-- SORTED ALPHABETICALLY A-Z -->
                                 <option value="Johor">Johor</option>
                                 <option value="Kedah">Kedah</option>
                                 <option value="Kelantan">Kelantan</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                <option value="Labuan">Labuan</option>
                                 <option value="Melaka">Melaka</option>
                                 <option value="Negeri Sembilan">Negeri Sembilan</option>
                                 <option value="Pahang">Pahang</option>
                                 <option value="Perak">Perak</option>
                                 <option value="Perlis">Perlis</option>
                                 <option value="Pulau Pinang">Pulau Pinang</option>
+                                <option value="Putrajaya">Putrajaya</option>
                                 <option value="Sabah">Sabah</option>
                                 <option value="Sarawak">Sarawak</option>
                                 <option value="Selangor">Selangor</option>
                                 <option value="Terengganu">Terengganu</option>
-                                <option value="Kuala Lumpur">Kuala Lumpur</option>
-                                <option value="Putrajaya">Putrajaya</option>
-                                <option value="Labuan">Labuan</option>
                             </select>
                         </div>
 
