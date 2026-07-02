@@ -379,11 +379,6 @@
         });
     }
     
-    // Confirm delete with user details
-    function confirmDelete() {
-        const userName = "{{ $user->name }}";
-        return confirm(`⚠️ WARNING: You are about to delete user "${userName}"\n\nThis action is IRREVERSIBLE and will permanently remove:\n• All user data\n• Bookmarks and saved scholarships\n• Application history\n\nAre you ABSOLUTELY sure you want to proceed?`);
-    }
 </script>
 @endpush
 
