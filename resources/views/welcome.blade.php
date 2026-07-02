@@ -680,7 +680,7 @@
                         <a href="{{ url('/home') }}" class="btn btn-secondary"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                     @else
                         <a href="{{ route('login') }}" class="btn btn-secondary"><i class="fas fa-sign-in-alt"></i> Login</a>
-                        <a href="{{ route('register') }}" class="btn btn-primary"><i class="fas fa-user-plus"></i> Get Started</a>
+                        <a href="{{ route('register') }}" class="btn btn-primary"><i class="fas fa-user-plus"></i> Register</a>
                     @endauth
                 </nav>
             </div>
