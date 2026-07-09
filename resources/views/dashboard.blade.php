@@ -20,7 +20,107 @@
         --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
-    
+
+    /* Fix untuk header/logo */
+    .navbar-brand {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        text-decoration: none !important;
+    }
+
+    .navbar-brand img {
+        height: 50px !important;
+        width: auto !important;
+        max-height: 60px !important;
+        object-fit: contain !important;
+    }
+
+    .navbar-brand span {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: var(--maroon) !important;
+        white-space: nowrap !important;
+    }
+
+    .navbar {
+        padding: 0.75rem 1rem !important;
+        background: white !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important;
+        border-bottom: 3px solid var(--gold) !important;
+        min-height: 70px !important;
+    }
+
+    .navbar .container-fluid {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+    }
+
+    .navbar-nav {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        flex-wrap: wrap !important;
+    }
+
+    .nav-link {
+        color: var(--gray-600) !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 40px !important;
+        transition: all 0.3s ease !important;
+        font-size: 0.9rem !important;
+    }
+
+    .nav-link:hover {
+        background: rgba(122,0,25,0.05) !important;
+        color: var(--maroon) !important;
+    }
+
+    .nav-link.active {
+        background: linear-gradient(135deg, rgba(122,0,25,0.1), rgba(244,197,66,0.1)) !important;
+        color: var(--maroon) !important;
+    }
+
+    .nav-link i {
+        margin-right: 6px !important;
+    }
+
+    .user-profile-nav {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 0.3rem 0.8rem 0.3rem 0.8rem !important;
+        border-radius: 40px !important;
+        background: rgba(122,0,25,0.05) !important;
+        border: 1px solid rgba(122,0,25,0.1) !important;
+    }
+
+    .user-profile-nav .avatar {
+        width: 35px !important;
+        height: 35px !important;
+        border-radius: 50% !important;
+        background: var(--maroon) !important;
+        color: white !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+    }
+
+    .user-profile-nav .user-name {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        color: var(--maroon) !important;
+        max-width: 150px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
     .dashboard-header {
         background: var(--gradient-primary);
         color: white;
@@ -115,14 +215,6 @@
         backdrop-filter: blur(10px);
     }
     
-    .alert-warning {
-        background: linear-gradient(135deg, #fef3c7, #fde68a);
-        border: none;
-        border-left: 4px solid #f59e0b;
-        border-radius: 16px;
-        color: #92400e;
-    }
-    
     .btn-primary {
         background: linear-gradient(115deg, var(--maroon), var(--maroon-dark));
         border: none;
@@ -164,28 +256,6 @@
         background: var(--maroon);
         color: white;
         transform: translateY(-2px);
-    }
-    
-    .btn-success {
-        background: linear-gradient(115deg, #10b981, #059669);
-        border: none;
-        border-radius: 40px;
-        padding: 0.5rem 1.2rem;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.3s ease;
-        color: white;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        text-decoration: none;
-    }
-    
-    .btn-success:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-        background: linear-gradient(115deg, #059669, #047857);
-        color: white;
     }
     
     .scholarship-card {
@@ -290,33 +360,6 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         border-color: var(--gold);
     }
-    
-    .progress-bar-custom {
-        background: linear-gradient(90deg, var(--maroon), var(--gold));
-    }
-    
-    /* Resource Centre Button */
-    .btn-resource {
-        background: linear-gradient(115deg, #dc2626, #b91c1c);
-        border: none;
-        border-radius: 40px;
-        padding: 0.5rem 1.2rem;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.3s ease;
-        color: white;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        text-decoration: none;
-    }
-    
-    .btn-resource:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
-        color: white;
-        background: linear-gradient(115deg, #b91c1c, #991b1b);
-    }
 
     .welcome-banner {
         background: linear-gradient(135deg, rgba(122,0,25,0.05), rgba(244,197,66,0.08));
@@ -354,6 +397,39 @@
         min-height: 60px;
     }
 
+    /* Mobile Navigation Fix */
+    .navbar-toggler {
+        border: none !important;
+        padding: 0.5rem !important;
+        color: var(--maroon) !important;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none !important;
+    }
+
+    .navbar-collapse {
+        flex-grow: 0 !important;
+    }
+
+    @media (max-width: 991px) {
+        .navbar-collapse {
+            flex-grow: 1 !important;
+            padding-top: 1rem !important;
+        }
+        
+        .navbar-nav {
+            flex-direction: column !important;
+            width: 100% !important;
+            align-items: stretch !important;
+        }
+
+        .user-profile-nav {
+            margin-top: 0.5rem !important;
+            justify-content: center !important;
+        }
+    }
+
     @media (max-width: 768px) {
         .dashboard-header {
             padding: 1.5rem;
@@ -365,11 +441,6 @@
         
         .greeting-text {
             font-size: 0.9rem;
-        }
-        
-        .btn-resource {
-            width: 100%;
-            justify-content: center;
         }
 
         .arrow-connector {
@@ -384,8 +455,87 @@
         .step-description {
             min-height: auto;
         }
+
+        .navbar-brand img {
+            height: 40px !important;
+        }
+
+        .navbar-brand span {
+            font-size: 1.2rem !important;
+        }
+
+        .user-profile-nav .user-name {
+            max-width: 100px !important;
+            font-size: 0.75rem !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .navbar-brand img {
+            height: 35px !important;
+        }
+
+        .navbar-brand span {
+            font-size: 1rem !important;
+        }
+
+        .user-profile-nav .user-name {
+            max-width: 80px !important;
+            font-size: 0.7rem !important;
+        }
+
+        .user-profile-nav .avatar {
+            width: 30px !important;
+            height: 30px !important;
+            font-size: 0.75rem !important;
+        }
     }
 </style>
+
+<!-- Override untuk layout utama -->
+@push('styles')
+<style>
+    /* Ensure navbar brand shows properly */
+    .navbar-brand {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .navbar-brand img {
+        height: 50px !important;
+        width: auto !important;
+        max-height: 60px !important;
+        object-fit: contain !important;
+        display: block !important;
+    }
+
+    /* Fix for any container clipping */
+    .navbar .container-fluid {
+        overflow: visible !important;
+    }
+
+    /* Make sure the brand text is visible */
+    .navbar-brand .brand-text {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: var(--maroon) !important;
+        white-space: nowrap !important;
+    }
+
+    /* Fix for small screens */
+    @media (max-width: 576px) {
+        .navbar-brand img {
+            height: 35px !important;
+        }
+        .navbar-brand .brand-text {
+            font-size: 1rem !important;
+        }
+    }
+</style>
+@endpush
 
 <div class="container-fluid py-4">
     <!-- Dashboard Header -->
