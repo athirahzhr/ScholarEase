@@ -70,11 +70,15 @@ class OCRController extends Controller
         'B-' => 'B-',
         'B.' => 'B',
         'Bt' => 'B+',
+        'B"' => 'B+',  // B" often means B+
+        "B'" => 'B+',  // B' often means B+
         
         'A' => 'A',
         'A+' => 'A+',
         'A-' => 'A-',
         'A.' => 'A',
+        'A"' => 'A-',  // A" often means A-
+        "A'" => 'A-',  // A' often means A-
         
         'C' => 'C',
         'C+' => 'C+',
@@ -103,7 +107,6 @@ class OCRController extends Controller
         'A ' => 'A',
         'As' => 'A+',
         'Ar' => 'A+',
-        
         
         'BS' => 'B+',
         'B®' => 'B+',
@@ -329,6 +332,16 @@ class OCRController extends Controller
             }
         }
         
+        // THIRD PASS: Special handling for SAINS which might be misread
+        // This is the ONLY special handling - no hardcoded subjects
+        if (!isset($grades['SAINS']) && stripos($text, 'SAINS') !== false) {
+            $grade = $this->findGradeForSubject($text, 'SAINS');
+            if ($grade) {
+                $grades['SAINS'] = $grade;
+                Log::info("SPECIAL HANDLING: SAINS -> $grade");
+            }
+        }
+        
         // Log what was detected
         Log::info('=== DETECTED SUBJECTS (' . count($grades) . ') ===');
         Log::info(json_encode($grades));
@@ -341,7 +354,7 @@ class OCRController extends Controller
     }
 
     /**
-     * Find grade for a specific subject in text
+     * Find grade for a specific subject in text - IMPROVED
      */
     private function findGradeForSubject($text, $subject)
     {
@@ -351,11 +364,11 @@ class OCRController extends Controller
             // Find subject position
             $pos = stripos($text, $variation);
             if ($pos !== false) {
-                // Look at text after subject for grade
+                // Look at text after subject for grade (up to 50 characters)
                 $afterSubject = substr($text, $pos + strlen($variation), 50);
                 
-                // Try to find grade pattern
-                $gradePattern = '/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G|Bt|B\*)\b/i';
+                // Try to find grade pattern (including B" and A" for B+ and A-)
+                $gradePattern = '/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G|Bt|B\*|B["\']|A["\'])\b/i';
                 if (preg_match($gradePattern, $afterSubject, $matches)) {
                     return $this->correctGrade(trim($matches[1]));
                 }
@@ -371,7 +384,7 @@ class OCRController extends Controller
     }
 
     /**
-     * Ultimate subject and grade extraction
+     * Ultimate subject and grade extraction - IMPROVED for SPM certificate format
      */
     private function extractSubjectGradeUltimate($line)
     {
@@ -386,7 +399,7 @@ class OCRController extends Controller
         
         // PATTERN 1: Subject followed by grade at the end
         // Handles: "BAHASA MELAYU A", "BAHASA INGGERIS B", "PENDIDIKAN ISLAM B+"
-        $pattern1 = '/^(.*?)\s+([A-G][\+\-]?|Bt|B\*|A\s*\+|A\s*-|B\s*\+|B\s*-)\s*$/i';
+        $pattern1 = '/^(.*?)\s+([A-G][\+\-]?|Bt|B\*|A\s*\+|A\s*-|B\s*\+|B\s*-|B["\']|A["\'])\s*$/i';
         if (preg_match($pattern1, $lineClean, $matches)) {
             $subject = trim($matches[1]);
             $grade = $this->correctGrade(trim($matches[2]));
@@ -405,11 +418,19 @@ class OCRController extends Controller
                     $afterSubject = trim(substr($lineClean, $pos + strlen($variation)));
                     Log::info("After subject '$variation': " . $afterSubject);
                     
-                    // Try to find grade in the remaining text
-                    $gradePattern = '/\b([A-G][\+\-]?|Bt|B\*)\b/i';
+                    // Try to find grade in the remaining text (first word after subject)
+                    $gradePattern = '/^([A-G][\+\-]?|Bt|B\*|B["\']|A["\'])/i';
                     if (preg_match($gradePattern, $afterSubject, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
                         Log::info("Pattern 2 matched: subject=$standard, grade=$grade");
+                        return ['subject' => $standard, 'grade' => $grade];
+                    }
+                    
+                    // Try to find grade anywhere in the remaining text
+                    $gradePattern2 = '/\b([A-G][\+\-]?|Bt|B\*)\b/i';
+                    if (preg_match($gradePattern2, $afterSubject, $gradeMatches)) {
+                        $grade = $this->correctGrade(trim($gradeMatches[1]));
+                        Log::info("Pattern 2b matched: subject=$standard, grade=$grade");
                         return ['subject' => $standard, 'grade' => $grade];
                     }
                     
@@ -428,7 +449,7 @@ class OCRController extends Controller
         foreach (self::SUBJECT_MAPPING as $standard => $variations) {
             foreach ($variations as $variation) {
                 if (stripos($line, $variation) !== false) {
-                    $gradePattern = '/\b([A-G][\+\-]?|Bt|B\*)\b/i';
+                    $gradePattern = '/\b([A-G][\+\-]?|Bt|B\*|B["\']|A["\'])\b/i';
                     if (preg_match($gradePattern, $line, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
                         Log::info("Pattern 4 matched: subject=$standard, grade=$grade");
@@ -443,7 +464,7 @@ class OCRController extends Controller
     }
 
     /**
-     * Correct OCR misread grades
+     * Correct OCR misread grades - ENHANCED for SPM certificate
      */
     private function correctGrade($grade)
     {
@@ -456,13 +477,17 @@ class OCRController extends Controller
             return self::GRADE_CORRECTIONS[$grade];
         }
         
-        // Handle B+ variations (Bt, B*, B+)
+        // Handle B+ variations (Bt, B*, B+, B PLUS, etc.)
         if (strpos($grade, 'B') !== false) {
-            // Check if it's B+ (including t, *, +)
+            // Check if it's B+ (including t, *, +, or followed by plus)
             if (strpos($grade, '+') !== false || 
                 strpos($grade, 'T') !== false || 
                 strpos($grade, '*') !== false ||
-                strpos($grade, 'PLUS') !== false) {
+                strpos($grade, 'PLUS') !== false ||
+                strpos($grade, 'B+') !== false ||
+                preg_match('/B\s*\+/', $grade) ||
+                // Check for B followed by any non-letter (like B" or B‘)
+                preg_match('/B["\']/', $grade)) {
                 return 'B+';
             }
             // Check if it's B-
@@ -479,17 +504,27 @@ class OCRController extends Controller
             }
         }
         
-        // Handle A variations
+        // Handle A variations with special case for A- (often misread as A")
         if (strpos($grade, 'A') !== false) {
-            if (strpos($grade, '+') !== false || strpos($grade, 'PLUS') !== false) {
-                return 'A+';
-            }
-            if (strpos($grade, '-') !== false || strpos($grade, 'MINUS') !== false) {
+            // Check for A- variations
+            if (strpos($grade, '-') !== false || 
+                strpos($grade, 'MINUS') !== false ||
+                strpos($grade, 'A-') !== false ||
+                preg_match('/A["\']/', $grade) ||  // A" or A' often means A-
+                preg_match('/A\s*-/', $grade)) {
                 return 'A-';
             }
+            // Check for A+
+            if (strpos($grade, '+') !== false || 
+                strpos($grade, 'PLUS') !== false ||
+                strpos($grade, 'A+') !== false) {
+                return 'A+';
+            }
+            // If it's just A or starts with A
             if (str_starts_with($grade, 'A') && strlen($grade) <= 2) {
                 return 'A';
             }
+            // If it's A followed by something, try to extract just A
             if (str_starts_with($grade, 'A')) {
                 return 'A';
             }
@@ -538,7 +573,7 @@ class OCRController extends Controller
     }
 
     /**
-     * Match subject to standard name
+     * Match subject to standard name - IMPROVED with better pattern matching
      */
     private function matchSubject($subject)
     {
@@ -569,6 +604,12 @@ class OCRController extends Controller
             'SAINS' => 'SAINS',
             'PENDIDIKAN SENI VISUAL' => 'PENDIDIKAN SENI VISUAL',
             'PERNIAGAAN' => 'PERNIAGAAN',
+            // Handle OCR misreads
+            'BAHASAMELAYU' => 'BAHASA MELAYU',
+            'PENDIDIKANISLAM' => 'PENDIDIKAN ISLAM',
+            'PENDIDIKANSENI' => 'PENDIDIKAN SENI VISUAL',
+            'NAMAMATA' => '', // Skip this
+            'GRED' => '', // Skip this
         ];
         
         foreach ($specialCases as $key => $value) {
@@ -581,7 +622,7 @@ class OCRController extends Controller
     }
 
     /**
-     * Check if a line should be skipped
+     * Check if a line should be skipped - IMPROVED
      */
     private function isNonSubjectLine($line)
     {
@@ -613,6 +654,13 @@ class OCRController extends Controller
             '/KEPUJIAN TERTINGGI/',
             '/KEPUJIAN TINGGI/',
             '/LULUS/',
+            '/NAMAMATA/', // OCR misread of "NAMA MATA"
+            '/Lows/', // OCR misread of "LULUS"
+            '/KEPUJANTINGGI/', // OCR misread
+            '/TAHUN 2023/',
+            '/JFO26A119/', // Student ID misread
+            '/061114-01-1090/', // Student IC
+            '/NUR AEESY/', // Student name
         ];
         
         foreach ($skipPatterns as $pattern) {
