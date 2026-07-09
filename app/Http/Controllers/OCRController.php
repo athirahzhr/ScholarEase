@@ -120,6 +120,13 @@ class OCRController extends Controller
         'B +' => 'B+',
         'C +' => 'C+',
         'A -' => 'A-',
+        
+        // Additional corrections for common OCR issues
+        'A+' => 'A+',
+        'A+' => 'A+',
+        'B+' => 'B+',
+        'C+' => 'C+',
+        'A -' => 'A-',
     ];
 
     /**
@@ -168,6 +175,13 @@ class OCRController extends Controller
         '/KEPUJANTINGGI/i',
         '/TERTINGOD/i',
         '/NAMAMATA/i',
+        '/GRED GRADE/i',
+        '/Mata Pelajaran/i',
+        '/Subject/i',
+        '/Gred/i',
+        '/Grade/i',
+        '/1119\(GCE-O\)/i',
+        '/PERKARA ASAS FARDU\'AIN/i',
     ];
 
     /**
@@ -350,12 +364,29 @@ class OCRController extends Controller
             }
         }
 
-        // THIRD PASS: Special handling for SAINS (often misread or overlapped)
-        if (!isset($grades['SAINS']) && stripos($text, 'SAINS') !== false) {
-            $grade = $this->findGradeForSubject($text, 'SAINS');
-            if ($grade) {
-                $grades['SAINS'] = $grade;
-                Log::info("THIRD PASS (SAINS): SAINS -> $grade");
+        // THIRD PASS: Try to find any remaining subjects by scanning for grade patterns
+        // This handles cases where subjects might be in a table format without clear line breaks
+        if (count($grades) < 5) {
+            $allGrades = $this->findAllGradesInText($text);
+            $allSubjects = array_keys(self::SUBJECT_MAPPING);
+            
+            Log::info("THIRD PASS: Found " . count($allGrades) . " grades in text");
+            
+            foreach ($allSubjects as $subject) {
+                if (!isset($grades[$subject])) {
+                    $variations = self::SUBJECT_MAPPING[$subject] ?? [$subject];
+                    foreach ($variations as $variation) {
+                        if (stripos($text, $variation) !== false) {
+                            // Try to find a grade near this subject
+                            $grade = $this->findGradeForSubject($text, $subject);
+                            if ($grade) {
+                                $grades[$subject] = $grade;
+                                Log::info("THIRD PASS DETECTED: $subject -> $grade");
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -369,14 +400,28 @@ class OCRController extends Controller
     }
 
     /**
+     * Find all grades in text - helper for third pass
+     */
+    private function findAllGradesInText($text)
+    {
+        $gradePattern = '/\b(A\+|A-|A|B\+|B|C\+|C|D|E|G|Bt|B\*|B["\']|A["\'])(?!\w)/i';
+        preg_match_all($gradePattern, $text, $matches);
+        
+        $grades = [];
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                $grade = $this->correctGrade(trim($match));
+                if (!in_array($grade, $grades)) {
+                    $grades[] = $grade;
+                }
+            }
+        }
+        
+        return $grades;
+    }
+
+    /**
      * Find grade for a specific subject in text.
-     *
-     * FIX: the old pattern ended in a plain \b, which fails right after
-     * "+" (since + and the following space/newline are both non-word
-     * characters, there's no boundary there) — causing "B+" to silently
-     * match as just "B". Using a negative lookahead (?!\w) instead fixes
-     * this: it only requires that the match isn't immediately followed by
-     * another word character, so "+" and "-" survive.
      */
     private function findGradeForSubject($text, $subject)
     {
@@ -385,6 +430,7 @@ class OCRController extends Controller
         foreach ($variations as $variation) {
             $pos = stripos($text, $variation);
             if ($pos !== false) {
+                // Look at text after subject for grade (up to 50 characters)
                 $afterSubject = substr($text, $pos + strlen($variation), 50);
 
                 $gradePattern = '/\b(A\+|A-|A|B\+|B|C\+|C|D|E|G|Bt|B\*|B["\']|A["\'])(?!\w)/i';
@@ -403,6 +449,12 @@ class OCRController extends Controller
 
     /**
      * Ultimate subject and grade extraction.
+     * Handles multiple SPM certificate formats:
+     * - "BAHASA MELAYU A" (subject + grade)
+     * - "1103 BAHASA MELAYU A CEMERLANG TINGGI" (code + subject + grade + description)
+     * - "BAHASA MELAYU | A" (subject | grade)
+     * - "BAHASA MELAYU A+" (subject + grade with +)
+     * - "BAHASA MELAYU A- (CEMERLANG)" (subject + grade with description in parentheses)
      */
     private function extractSubjectGradeUltimate($line)
     {
@@ -416,6 +468,7 @@ class OCRController extends Controller
         Log::info("Cleaned line: " . $lineClean);
 
         // PATTERN 1: Subject followed by grade at the end of the line
+        // Handles: "BAHASA MELAYU A", "BAHASA INGGERIS B+", "PENDIDIKAN ISLAM A-"
         $pattern1 = '/^(.*?)\s+([A-G][\+\-]?|Bt|B\*|A\s*\+|A\s*-|B\s*\+|B["\']|A["\'])\s*$/i';
         if (preg_match($pattern1, $lineClean, $matches)) {
             $subject = trim($matches[1]);
@@ -427,7 +480,33 @@ class OCRController extends Controller
             }
         }
 
-        // PATTERN 2: Known subject with grade after it
+        // PATTERN 2: Code + Subject + Grade (for certificate format with codes)
+        // Handles: "1103 BAHASA MELAYU A CEMERLANG TINGGI"
+        $pattern2 = '/^(\d+)\s+([A-Z\s]+)\s+([A-G][\+\-]?)\s+/i';
+        if (preg_match($pattern2, $lineClean, $matches)) {
+            $subject = trim($matches[2]);
+            $grade = $this->correctGrade(trim($matches[3]));
+            Log::info("Pattern 2 matched: subject=$subject, grade=$grade");
+            
+            if (!empty($subject) && !empty($grade)) {
+                return ['subject' => $subject, 'grade' => $grade];
+            }
+        }
+
+        // PATTERN 3: Subject followed by grade with optional description
+        // Handles: "BAHASA MELAYU A CEMERLANG TINGGI"
+        $pattern3 = '/^(.*?)\s+([A-G][\+\-]?)\s+[A-Z\s]+$/i';
+        if (preg_match($pattern3, $lineClean, $matches)) {
+            $subject = trim($matches[1]);
+            $grade = $this->correctGrade(trim($matches[2]));
+            Log::info("Pattern 3 matched: subject=$subject, grade=$grade");
+            
+            if (!empty($subject) && !empty($grade)) {
+                return ['subject' => $subject, 'grade' => $grade];
+            }
+        }
+
+        // PATTERN 4: Known subject with grade after it (most reliable)
         foreach (self::SUBJECT_MAPPING as $standard => $variations) {
             foreach ($variations as $variation) {
                 $pos = stripos($lineClean, $variation);
@@ -435,18 +514,19 @@ class OCRController extends Controller
                     $afterSubject = trim(substr($lineClean, $pos + strlen($variation)));
                     Log::info("After subject '$variation': " . $afterSubject);
 
-                    // FIX: (?!\w) instead of trailing \b — see note above.
+                    // Try to find grade at the start of the remaining text
                     $gradePattern = '/^([A-G][\+\-]?|Bt|B\*|B["\']|A["\'])(?!\w)/i';
                     if (preg_match($gradePattern, $afterSubject, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
-                        Log::info("Pattern 2 matched: subject=$standard, grade=$grade");
+                        Log::info("Pattern 4a matched: subject=$standard, grade=$grade");
                         return ['subject' => $standard, 'grade' => $grade];
                     }
 
+                    // Try to find grade anywhere in the remaining text
                     $gradePattern2 = '/\b([A-G][\+\-]?|Bt|B\*)(?!\w)/i';
                     if (preg_match($gradePattern2, $afterSubject, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
-                        Log::info("Pattern 2b matched: subject=$standard, grade=$grade");
+                        Log::info("Pattern 4b matched: subject=$standard, grade=$grade");
                         return ['subject' => $standard, 'grade' => $grade];
                     }
 
@@ -455,20 +535,20 @@ class OCRController extends Controller
             }
         }
 
-        // PATTERN 3: Line is just a grade, no subject — skip
+        // PATTERN 5: Line is just a grade, no subject — skip
         if (preg_match('/^([A-G][\+\-]?|Bt|B\*)$/i', trim($lineClean))) {
-            Log::info("Pattern 3: Line is just a grade, skipping");
+            Log::info("Pattern 5: Line is just a grade, skipping");
             return null;
         }
 
-        // PATTERN 4: Subject anywhere in line with a grade nearby
+        // PATTERN 6: Subject anywhere in line with a grade nearby
         foreach (self::SUBJECT_MAPPING as $standard => $variations) {
             foreach ($variations as $variation) {
                 if (stripos($line, $variation) !== false) {
                     $gradePattern = '/\b([A-G][\+\-]?|Bt|B\*|B["\']|A["\'])(?!\w)/i';
                     if (preg_match($gradePattern, $line, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
-                        Log::info("Pattern 4 matched: subject=$standard, grade=$grade");
+                        Log::info("Pattern 6 matched: subject=$standard, grade=$grade");
                         return ['subject' => $standard, 'grade' => $grade];
                     }
                     break 2;
@@ -476,14 +556,21 @@ class OCRController extends Controller
             }
         }
 
-        // PATTERN 5: Try to extract subject and grade from lines like "103 BAHASAMELAYU A CEMERLANG TINGGI"
-        if (preg_match('/^\d+\s+([A-Z]+)\s+([A-G][\+\-]?)\s+/i', $lineClean, $matches)) {
-            $subject = trim($matches[1]);
-            $grade = $this->correctGrade(trim($matches[2]));
-            Log::info("Pattern 5 matched: subject=$subject, grade=$grade");
-            
-            if (!empty($subject) && !empty($grade)) {
-                return ['subject' => $subject, 'grade' => $grade];
+        // PATTERN 7: Table format with pipe separators: "BAHASA MELAYU | A"
+        if (strpos($lineClean, '|') !== false) {
+            $parts = array_map('trim', explode('|', $lineClean));
+            foreach ($parts as $part) {
+                if (preg_match('/\b([A-G][\+\-]?)\b/i', $part, $gradeMatch)) {
+                    $grade = $this->correctGrade($gradeMatch[1]);
+                    // Find subject in the other parts
+                    foreach ($parts as $otherPart) {
+                        $subject = $this->matchSubject($otherPart);
+                        if ($subject) {
+                            Log::info("Pattern 7 matched: subject=$subject, grade=$grade");
+                            return ['subject' => $subject, 'grade' => $grade];
+                        }
+                    }
+                }
             }
         }
 
@@ -623,6 +710,12 @@ class OCRController extends Controller
             'PENDIDIKANSENI' => 'PENDIDIKAN SENI VISUAL',
             'SENIVISUAL' => 'PENDIDIKAN SENI VISUAL',
             'PERNIAGA' => 'PERNIAGAAN',
+            'MATEMATIK' => 'MATHEMATICS',
+            'ADDITIONALMATHEMATICS' => 'ADDITIONAL MATHEMATICS',
+            'MATHEMATICSTAMBAHAN' => 'ADDITIONAL MATHEMATICS',
+            'GRAFIKKOMUNIKASITEKNIKAL' => 'GRAFIK KOMUNIKASI TEKNIKAL',
+            'PRINSIPPERAKAUNAN' => 'PRINSIP PERAKAUNAN',
+            'ASAHSAINSKOMPUTER' => 'ASAS SAINS KOMPUTER',
         ];
         
         foreach ($specialCases as $key => $value) {
@@ -632,7 +725,7 @@ class OCRController extends Controller
         }
 
         // Known non-subject table-header fragments
-        $ignoreFragments = ['NAMAMATA', 'GRED', 'KOD', 'GRADE'];
+        $ignoreFragments = ['NAMAMATA', 'GRED', 'KOD', 'GRADE', 'MATA PELAJARAN', 'SUBJECT'];
         foreach ($ignoreFragments as $fragment) {
             if (stripos($subject, $fragment) !== false) {
                 return null;
@@ -984,7 +1077,7 @@ class OCRController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'No verified data found.'
-            ], 404);
+            ], 400);
         }
 
         $grades = $verifiedData['grades'];
