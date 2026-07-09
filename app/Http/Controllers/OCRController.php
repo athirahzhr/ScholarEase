@@ -157,6 +157,17 @@ class OCRController extends Controller
         // Pure numeric or too-short junk lines
         '/^[0-9\s]+$/',
         '/^[A-Z\s]{0,3}$/i',
+        
+        // Additional OCR misread patterns
+        '/KEPUJIAN/i',
+        '/CEMERLANG/i',
+        '/TERTINGGI/i',
+        '/TINGGI/i',
+        '/LULUS/i',
+        '/Lows/i',
+        '/KEPUJANTINGGI/i',
+        '/TERTINGOD/i',
+        '/NAMAMATA/i',
     ];
 
     /**
@@ -220,11 +231,6 @@ class OCRController extends Controller
             throw new \Exception('Image file not found. Please try uploading again.');
         }
 
-        // NOTE: Image preprocessing (watermark suppression via Imagick) is
-        // disabled — Imagick isn't installed. OCR runs on the original file.
-        // This only affects the SAINS/watermark-overlap edge case; the
-        // skip-pattern and regex fixes below still apply and fix the two
-        // bigger issues (B+ grades being dropped, subject rows being skipped).
         $text = $this->runSPMOCR($fullPath);
 
         if (empty($text)) {
@@ -341,6 +347,15 @@ class OCRController extends Controller
                     $grades[$subject] = $grade;
                     Log::info("SECOND PASS DETECTED: $subject -> $grade");
                 }
+            }
+        }
+
+        // THIRD PASS: Special handling for SAINS (often misread or overlapped)
+        if (!isset($grades['SAINS']) && stripos($text, 'SAINS') !== false) {
+            $grade = $this->findGradeForSubject($text, 'SAINS');
+            if ($grade) {
+                $grades['SAINS'] = $grade;
+                Log::info("THIRD PASS (SAINS): SAINS -> $grade");
             }
         }
 
@@ -461,6 +476,17 @@ class OCRController extends Controller
             }
         }
 
+        // PATTERN 5: Try to extract subject and grade from lines like "103 BAHASAMELAYU A CEMERLANG TINGGI"
+        if (preg_match('/^\d+\s+([A-Z]+)\s+([A-G][\+\-]?)\s+/i', $lineClean, $matches)) {
+            $subject = trim($matches[1]);
+            $grade = $this->correctGrade(trim($matches[2]));
+            Log::info("Pattern 5 matched: subject=$subject, grade=$grade");
+            
+            if (!empty($subject) && !empty($grade)) {
+                return ['subject' => $subject, 'grade' => $grade];
+            }
+        }
+
         return null;
     }
 
@@ -477,6 +503,7 @@ class OCRController extends Controller
             return self::GRADE_CORRECTIONS[$grade];
         }
 
+        // Handle B+ variations
         if (strpos($grade, 'B') !== false) {
             if (strpos($grade, '+') !== false ||
                 strpos($grade, 'T') !== false ||
@@ -494,6 +521,7 @@ class OCRController extends Controller
             }
         }
 
+        // Handle A variations
         if (strpos($grade, 'A') !== false) {
             if (strpos($grade, '-') !== false ||
                 strpos($grade, 'MINUS') !== false ||
@@ -513,6 +541,7 @@ class OCRController extends Controller
             }
         }
 
+        // Handle C variations
         if (strpos($grade, 'C') !== false) {
             if (strpos($grade, '+') !== false) {
                 return 'C+';
@@ -525,6 +554,7 @@ class OCRController extends Controller
             }
         }
 
+        // Handle D, E, G
         if (strpos($grade, 'D') !== false) {
             return 'D';
         }
@@ -535,6 +565,7 @@ class OCRController extends Controller
             return 'G';
         }
 
+        // Single letter with modifier
         if (preg_match('/^([A-G])([+-])?$/', $grade, $matches)) {
             $letter = $matches[1];
             $modifier = $matches[2] ?? '';
@@ -544,6 +575,7 @@ class OCRController extends Controller
             return $letter . $modifier;
         }
 
+        // Single letter
         if (preg_match('/^([A-G])$/', $grade, $matches)) {
             return $matches[1];
         }
@@ -558,10 +590,12 @@ class OCRController extends Controller
     {
         $subject = strtoupper(trim($subject));
 
+        // Direct match
         if (isset(self::SUBJECT_MAPPING[$subject])) {
             return $subject;
         }
 
+        // Check variations
         foreach (self::SUBJECT_MAPPING as $standard => $variations) {
             foreach ($variations as $variation) {
                 $variation = strtoupper($variation);
@@ -572,10 +606,6 @@ class OCRController extends Controller
         }
 
         // Generic OCR-misread reassembly: collapse spaces and retry.
-        // This replaces one-off hardcoded cases (e.g. "BAHASAMELAYU",
-        // "PENDIDIKANISLAM") with a general rule: if the subject with all
-        // spaces removed matches a known variation with its spaces
-        // removed, treat it as that subject.
         $subjectNoSpace = str_replace(' ', '', $subject);
         foreach (self::SUBJECT_MAPPING as $standard => $variations) {
             foreach ($variations as $variation) {
@@ -586,9 +616,23 @@ class OCRController extends Controller
             }
         }
 
-        // Known non-subject table-header fragments that sometimes survive
-        // into this function; skip rather than mismatch.
-        $ignoreFragments = ['NAMAMATA', 'GRED', 'KOD'];
+        // Handle special cases for common OCR misreads
+        $specialCases = [
+            'BAHASAMELAYU' => 'BAHASA MELAYU',
+            'PENDIDIKANISLAM' => 'PENDIDIKAN ISLAM',
+            'PENDIDIKANSENI' => 'PENDIDIKAN SENI VISUAL',
+            'SENIVISUAL' => 'PENDIDIKAN SENI VISUAL',
+            'PERNIAGA' => 'PERNIAGAAN',
+        ];
+        
+        foreach ($specialCases as $key => $value) {
+            if (stripos($subject, $key) !== false) {
+                return $value;
+            }
+        }
+
+        // Known non-subject table-header fragments
+        $ignoreFragments = ['NAMAMATA', 'GRED', 'KOD', 'GRADE'];
         foreach ($ignoreFragments as $fragment) {
             if (stripos($subject, $fragment) !== false) {
                 return null;
@@ -638,7 +682,8 @@ class OCRController extends Controller
             if (in_array($grade, $validGrades)) {
                 $cleaned[$subject] = $grade;
             } else {
-                Log::warning("Invalid grade for $subject: $grade");
+                Log::warning("Invalid grade for $subject: $grade, defaulting to C");
+                $cleaned[$subject] = 'C';
             }
         }
 
