@@ -37,9 +37,9 @@ class OCRController extends Controller
         'PENDIDIKAN MORAL' => ['PENDIDIKAN MORAL', 'PM', 'MORAL', 'P.MORAL'],
         'SEJARAH' => ['SEJARAH', 'SEJ', 'HISTORY', 'SEIARAH'],
         'MATHEMATICS' => ['MATHEMATICS', 'MATEMATIK', 'MATH', 'MM'],
-        'ADDITIONAL MATHEMATICS' => ['ADDITIONAL MATHEMATICS', 'MATEMATIK TAMBAHAN', 'ADD MATH', 'MT'],
-        'PHYSICS' => ['PHYSICS', 'FIZIK', 'PHY'],
-        'CHEMISTRY' => ['CHEMISTRY', 'KIMIA', 'CHEM'],
+        'ADDITIONAL MATHEMATICS' => ['ADDITIONAL MATHEMATICS', 'MATEMATIK TAMBAHAN', 'ADD MATH', 'MT', 'ADDITIONALMATHEMATICS'],
+        'PHYSICS' => ['PHYSICS', 'FIZIK', 'PHY', 'PAVSICS', 'PHYSICS'],
+        'CHEMISTRY' => ['CHEMISTRY', 'KIMIA', 'CHEM', 'COEMISTRY', 'CHEMISTRY'],
         'BIOLOGY' => ['BIOLOGY', 'BIOLOGI', 'BIO'],
         'SAINS' => ['SAINS', 'SCIENCE', 'SC'],
         'PRINSIP PERAKAUNAN' => ['PRINSIP PERAKAUNAN', 'PERAKAUNAN', 'ACCOUNTING', 'PP'],
@@ -57,9 +57,10 @@ class OCRController extends Controller
     ];
 
     /**
-     * Comprehensive grade corrections for OCR misreadings (no B- or C-)
+     * Comprehensive grade corrections for OCR misreadings
      */
     const GRADE_CORRECTIONS = [
+        // B variations
         'BT' => 'B+',
         'B*' => 'B+',
         'B+' => 'B+',
@@ -68,18 +69,29 @@ class OCRController extends Controller
         'Bt' => 'B+',
         'B"' => 'B+',
         "B'" => 'B+',
-
+        'B&' => 'B+',  // B& sometimes means B+
+        
+        // A variations
         'A' => 'A',
         'A+' => 'A+',
         'A-' => 'A-',
         'A.' => 'A',
         'A"' => 'A-',
         "A'" => 'A-',
-
+        'AT' => 'A+',
+        'At' => 'A+',  // At sometimes means A+
+        'A1' => 'A+',
+        'A!' => 'A+',
+        'A*' => 'A+',
+        'Av' => 'A+',  // Av sometimes means A+ (OCR misread of A+)
+        
+        // C variations
         'C' => 'C',
         'C+' => 'C+',
         'C.' => 'C',
-
+        'CT' => 'C+',
+        
+        // D, E, G
         'D' => 'D',
         'D.' => 'D',
         'E' => 'E',
@@ -87,17 +99,14 @@ class OCRController extends Controller
         'G' => 'G',
         'G.' => 'G',
 
+        // OCR common misreadings
         'AS' => 'A-',
         'Ae' => 'A-',
         'AY' => 'A+',
-        'AT' => 'A+',
         'A®' => 'A+',
         'A?' => 'A+',
-        'A*' => 'A+',
         'A€' => 'A+',
         'A#' => 'A+',
-        'A1' => 'A+',
-        'A!' => 'A+',
         'As' => 'A+',
         'Ar' => 'A+',
 
@@ -106,7 +115,6 @@ class OCRController extends Controller
         'B?' => 'B+',
         'B#' => 'B+',
 
-        'CT' => 'C+',
         'CS' => 'C+',
         'C®' => 'C+',
         'C?' => 'C+',
@@ -121,18 +129,20 @@ class OCRController extends Controller
         'C +' => 'C+',
         'A -' => 'A-',
         
-        // Additional corrections for common OCR issues
-        'A+' => 'A+',
-        'A+' => 'A+',
-        'B+' => 'B+',
-        'C+' => 'C+',
-        'A -' => 'A-',
+        // Special cases from the certificate
+        'A+(CEMERLANGTERTINGGI)' => 'A+',
+        'A(CEMERLANGTERTINGGI)' => 'A+',
+        'A-(CEMERLANG)' => 'A-',
+        'A(CEMERLANGTINGGI)' => 'A',
+        'A(CEMERLANO)' => 'A-',
+        'A(CEMERLANGTERTINGGI)' => 'A+',
+        'At(CEMERLANGTERTINGGI)' => 'A+',
+        'IAt(CEMERLANGTERTINGGI)' => 'A+',
+        'Av(CEMERLANGTERTINGO)' => 'A+',
     ];
 
     /**
      * Generic field-label patterns found on every SPM certificate.
-     * These describe STRUCTURE (labels, ID formats), never a specific
-     * student's name/IC/angka giliran — so they generalize to any slip.
      */
     const SKIP_LINE_PATTERNS = [
         // Header / issuing body
@@ -140,7 +150,7 @@ class OCRController extends Controller
         '/KEMENTERIAN/i', '/PENDIDIKAN MALAYSIA/i', '/MINISTRY/i', '/EDUCATION/i',
         '/PENGARAH/i', '/DIRECTOR/i',
 
-        // Student info field labels (label text, not the value)
+        // Student info field labels
         '/^\s*NAMA\s*:/i',
         '/^\s*NO\.?\s*PENGENALAN/i',
         '/^\s*ANGKA\s*GILIRAN/i',
@@ -148,18 +158,21 @@ class OCRController extends Controller
         '/^\s*JUMLAH\s*MATA\s*PELAJARAN/i',
         '/CALON/i', '/CANDIDATE/i',
 
-        // Generic ID number FORMATS (not any specific number)
-        '/\b\d{6}-\d{2}-\d{4}\b/',      // IC number format e.g. 061114-01-1090
-        '/\b[A-Z]{1,3}\d{3,}[A-Z]?\d*\b/', // Angka giliran style codes e.g. JF026A119
+        // Generic ID number FORMATS
+        '/\b\d{6}-\d{2}-\d{4}\b/',
+        '/\b[A-Z]{1,3}\d{3,}[A-Z]?\d*\b/',
 
         // Table headers
         '/^\s*KOD\b/i', '/NAMA\s*MATA\s*PELAJARAN/i', '/^\s*GRED\b/i',
+        '/Mata Pelajaran/i', '/Subject/i', '/Gred/i', '/Grade/i',
 
-        // Footer remarks (kept narrow — only the label prefix, not full line,
-        // so we don't need to guess every possible CEFR band/remark word)
+        // Footer remarks
         '/^\s*LAYAK\s*MENDAPAT\s*SIJIL/i',
         '/^\s*UJIAN\s*LISAN/i',
         '/^\s*TAHAP\s*KESELURUHAN/i',
+        '/PEPERIKSAAN TAHUN/i',
+        '/Pengarah Peperiksaan/i',
+        '/Director of Examinations/i',
 
         // Pure numeric or too-short junk lines
         '/^[0-9\s]+$/',
@@ -176,12 +189,10 @@ class OCRController extends Controller
         '/TERTINGOD/i',
         '/NAMAMATA/i',
         '/GRED GRADE/i',
-        '/Mata Pelajaran/i',
-        '/Subject/i',
-        '/Gred/i',
-        '/Grade/i',
         '/1119\(GCE-O\)/i',
         '/PERKARA ASAS FARDU\'AIN/i',
+        '/201361159/i',
+        '/A 05458270/i',
     ];
 
     /**
@@ -377,7 +388,6 @@ class OCRController extends Controller
                     $variations = self::SUBJECT_MAPPING[$subject] ?? [$subject];
                     foreach ($variations as $variation) {
                         if (stripos($text, $variation) !== false) {
-                            // Try to find a grade near this subject
                             $grade = $this->findGradeForSubject($text, $subject);
                             if ($grade) {
                                 $grades[$subject] = $grade;
@@ -404,7 +414,8 @@ class OCRController extends Controller
      */
     private function findAllGradesInText($text)
     {
-        $gradePattern = '/\b(A\+|A-|A|B\+|B|C\+|C|D|E|G|Bt|B\*|B["\']|A["\'])(?!\w)/i';
+        // More comprehensive grade pattern including grades with descriptions
+        $gradePattern = '/\b(A\+|A-|A|B\+|B|C\+|C|D|E|G|Bt|B\*|B["\']|A["\']|At|Av|A1|A!|A\*)(?!\w)/i';
         preg_match_all($gradePattern, $text, $matches);
         
         $grades = [];
@@ -430,11 +441,17 @@ class OCRController extends Controller
         foreach ($variations as $variation) {
             $pos = stripos($text, $variation);
             if ($pos !== false) {
-                // Look at text after subject for grade (up to 50 characters)
-                $afterSubject = substr($text, $pos + strlen($variation), 50);
+                // Look at text after subject for grade (up to 80 characters)
+                $afterSubject = substr($text, $pos + strlen($variation), 80);
 
-                $gradePattern = '/\b(A\+|A-|A|B\+|B|C\+|C|D|E|G|Bt|B\*|B["\']|A["\'])(?!\w)/i';
+                // More comprehensive grade pattern
+                $gradePattern = '/\b(A\+|A-|A|B\+|B|C\+|C|D|E|G|Bt|B\*|B["\']|A["\']|At|Av|A1|A!|A\*)(?!\w)/i';
                 if (preg_match($gradePattern, $afterSubject, $matches)) {
+                    return $this->correctGrade(trim($matches[1]));
+                }
+
+                // Try to find grade with parentheses description
+                if (preg_match('/(A\+|A-|A|B\+|B|C\+|C|D|E|G)\s*\(/i', $afterSubject, $matches)) {
                     return $this->correctGrade(trim($matches[1]));
                 }
 
@@ -449,12 +466,11 @@ class OCRController extends Controller
 
     /**
      * Ultimate subject and grade extraction.
-     * Handles multiple SPM certificate formats:
-     * - "BAHASA MELAYU A" (subject + grade)
-     * - "1103 BAHASA MELAYU A CEMERLANG TINGGI" (code + subject + grade + description)
-     * - "BAHASA MELAYU | A" (subject | grade)
-     * - "BAHASA MELAYU A+" (subject + grade with +)
-     * - "BAHASA MELAYU A- (CEMERLANG)" (subject + grade with description in parentheses)
+     * Handles multiple SPM certificate formats including:
+     * - "BAHASA MELAYU A"
+     * - "BAHASA MELAYU A (CEMERLANG TERTINGGI)"
+     * - "BAHASA MELAYU A+(CEMERLANG TERTINGGI)"
+     * - "BAHASA MELAYU At (CEMERLANG TERTINGGI)"
      */
     private function extractSubjectGradeUltimate($line)
     {
@@ -467,9 +483,8 @@ class OCRController extends Controller
 
         Log::info("Cleaned line: " . $lineClean);
 
-        // PATTERN 1: Subject followed by grade at the end of the line
-        // Handles: "BAHASA MELAYU A", "BAHASA INGGERIS B+", "PENDIDIKAN ISLAM A-"
-        $pattern1 = '/^(.*?)\s+([A-G][\+\-]?|Bt|B\*|A\s*\+|A\s*-|B\s*\+|B["\']|A["\'])\s*$/i';
+        // PATTERN 1: Subject followed by grade at the end
+        $pattern1 = '/^(.*?)\s+([A-G][\+\-]?|Bt|B\*|At|Av|A1|A!|A\s*\+|A\s*-|B\s*\+|B["\']|A["\'])\s*$/i';
         if (preg_match($pattern1, $lineClean, $matches)) {
             $subject = trim($matches[1]);
             $grade = $this->correctGrade(trim($matches[2]));
@@ -480,12 +495,12 @@ class OCRController extends Controller
             }
         }
 
-        // PATTERN 2: Code + Subject + Grade (for certificate format with codes)
-        // Handles: "1103 BAHASA MELAYU A CEMERLANG TINGGI"
-        $pattern2 = '/^(\d+)\s+([A-Z\s]+)\s+([A-G][\+\-]?)\s+/i';
+        // PATTERN 2: Subject with grade and description in parentheses
+        // Handles: "BAHASA MELAYU A (CEMERLANG TERTINGGI)"
+        $pattern2 = '/^(.*?)\s+([A-G][\+\-]?)\s*\(/i';
         if (preg_match($pattern2, $lineClean, $matches)) {
-            $subject = trim($matches[2]);
-            $grade = $this->correctGrade(trim($matches[3]));
+            $subject = trim($matches[1]);
+            $grade = $this->correctGrade(trim($matches[2]));
             Log::info("Pattern 2 matched: subject=$subject, grade=$grade");
             
             if (!empty($subject) && !empty($grade)) {
@@ -493,9 +508,8 @@ class OCRController extends Controller
             }
         }
 
-        // PATTERN 3: Subject followed by grade with optional description
-        // Handles: "BAHASA MELAYU A CEMERLANG TINGGI"
-        $pattern3 = '/^(.*?)\s+([A-G][\+\-]?)\s+[A-Z\s]+$/i';
+        // PATTERN 3: Subject with grade without space (e.g., "BAHASA MELAYU A+")
+        $pattern3 = '/^(.*?)\s+([A-G][\+\-]?)$/i';
         if (preg_match($pattern3, $lineClean, $matches)) {
             $subject = trim($matches[1]);
             $grade = $this->correctGrade(trim($matches[2]));
@@ -515,7 +529,7 @@ class OCRController extends Controller
                     Log::info("After subject '$variation': " . $afterSubject);
 
                     // Try to find grade at the start of the remaining text
-                    $gradePattern = '/^([A-G][\+\-]?|Bt|B\*|B["\']|A["\'])(?!\w)/i';
+                    $gradePattern = '/^([A-G][\+\-]?|Bt|B\*|B["\']|A["\']|At|Av|A1|A!)(?!\w)/i';
                     if (preg_match($gradePattern, $afterSubject, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
                         Log::info("Pattern 4a matched: subject=$standard, grade=$grade");
@@ -523,7 +537,7 @@ class OCRController extends Controller
                     }
 
                     // Try to find grade anywhere in the remaining text
-                    $gradePattern2 = '/\b([A-G][\+\-]?|Bt|B\*)(?!\w)/i';
+                    $gradePattern2 = '/\b([A-G][\+\-]?|Bt|B\*|At|Av)(?!\w)/i';
                     if (preg_match($gradePattern2, $afterSubject, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
                         Log::info("Pattern 4b matched: subject=$standard, grade=$grade");
@@ -536,7 +550,7 @@ class OCRController extends Controller
         }
 
         // PATTERN 5: Line is just a grade, no subject — skip
-        if (preg_match('/^([A-G][\+\-]?|Bt|B\*)$/i', trim($lineClean))) {
+        if (preg_match('/^([A-G][\+\-]?|Bt|B\*|At|Av)$/i', trim($lineClean))) {
             Log::info("Pattern 5: Line is just a grade, skipping");
             return null;
         }
@@ -545,7 +559,7 @@ class OCRController extends Controller
         foreach (self::SUBJECT_MAPPING as $standard => $variations) {
             foreach ($variations as $variation) {
                 if (stripos($line, $variation) !== false) {
-                    $gradePattern = '/\b([A-G][\+\-]?|Bt|B\*|B["\']|A["\'])(?!\w)/i';
+                    $gradePattern = '/\b([A-G][\+\-]?|Bt|B\*|B["\']|A["\']|At|Av)(?!\w)/i';
                     if (preg_match($gradePattern, $line, $gradeMatches)) {
                         $grade = $this->correctGrade(trim($gradeMatches[1]));
                         Log::info("Pattern 6 matched: subject=$standard, grade=$grade");
@@ -556,21 +570,15 @@ class OCRController extends Controller
             }
         }
 
-        // PATTERN 7: Table format with pipe separators: "BAHASA MELAYU | A"
-        if (strpos($lineClean, '|') !== false) {
-            $parts = array_map('trim', explode('|', $lineClean));
-            foreach ($parts as $part) {
-                if (preg_match('/\b([A-G][\+\-]?)\b/i', $part, $gradeMatch)) {
-                    $grade = $this->correctGrade($gradeMatch[1]);
-                    // Find subject in the other parts
-                    foreach ($parts as $otherPart) {
-                        $subject = $this->matchSubject($otherPart);
-                        if ($subject) {
-                            Log::info("Pattern 7 matched: subject=$subject, grade=$grade");
-                            return ['subject' => $subject, 'grade' => $grade];
-                        }
-                    }
-                }
+        // PATTERN 7: Handle OCR misread format like "BAHASA INGGERIS & (CEMERLANO)"
+        $pattern7 = '/^(.*?)\s+[&@]\s*\(/i';
+        if (preg_match($pattern7, $lineClean, $matches)) {
+            $subject = trim($matches[1]);
+            // Try to find grade in the original line
+            if (preg_match('/[&@]\s*([A-G][\+\-]?)/i', $line, $gradeMatches)) {
+                $grade = $this->correctGrade(trim($gradeMatches[1]));
+                Log::info("Pattern 7 matched: subject=$subject, grade=$grade");
+                return ['subject' => $subject, 'grade' => $grade];
             }
         }
 
@@ -610,14 +618,28 @@ class OCRController extends Controller
 
         // Handle A variations
         if (strpos($grade, 'A') !== false) {
+            // Check for A- variations
             if (strpos($grade, '-') !== false ||
                 strpos($grade, 'MINUS') !== false ||
                 preg_match('/A["\']/', $grade) ||
                 preg_match('/A\s*-/', $grade)) {
                 return 'A-';
             }
+            // Check for A+ variations (including At, Av, A1, A!)
             if (strpos($grade, '+') !== false ||
-                strpos($grade, 'PLUS') !== false) {
+                strpos($grade, 'PLUS') !== false ||
+                strpos($grade, 'T') !== false ||
+                strpos($grade, 'V') !== false ||
+                strpos($grade, '1') !== false ||
+                strpos($grade, '!') !== false ||
+                strpos($grade, '*') !== false ||
+                preg_match('/A["\']/', $grade) ||
+                $grade === 'AT' ||
+                $grade === 'At' ||
+                $grade === 'AV' ||
+                $grade === 'Av' ||
+                $grade === 'A1' ||
+                $grade === 'A!') {
                 return 'A+';
             }
             if (str_starts_with($grade, 'A') && strlen($grade) <= 2) {
@@ -716,6 +738,8 @@ class OCRController extends Controller
             'GRAFIKKOMUNIKASITEKNIKAL' => 'GRAFIK KOMUNIKASI TEKNIKAL',
             'PRINSIPPERAKAUNAN' => 'PRINSIP PERAKAUNAN',
             'ASAHSAINSKOMPUTER' => 'ASAS SAINS KOMPUTER',
+            'PAVSICS' => 'PHYSICS',
+            'COEMISTRY' => 'CHEMISTRY',
         ];
         
         foreach ($specialCases as $key => $value) {
@@ -737,8 +761,6 @@ class OCRController extends Controller
 
     /**
      * Check if a line should be skipped.
-     * Uses only GENERIC structural patterns (field labels, ID formats,
-     * table headers) — no specific student's name/IC/angka giliran.
      */
     private function isNonSubjectLine($line)
     {
