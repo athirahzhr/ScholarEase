@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 class OCRController extends Controller
 {
     /**
-     * Allowed grade values
+     * Allowed grade values - REMOVED B- and C- (not in SPM)
      */
     const GRADE_POINTS = [
         'A+' => 12,
@@ -20,10 +20,8 @@ class OCRController extends Controller
         'A-' => 10,
         'B+' => 9,
         'B' => 8,
-        'B-' => 7,
         'C+' => 6,
         'C' => 5,
-        'C-' => 4,
         'D' => 3,
         'E' => 2,
         'G' => 1,
@@ -59,7 +57,7 @@ class OCRController extends Controller
     ];
 
     /**
-     * Comprehensive grade corrections for OCR misreadings
+     * Comprehensive grade corrections for OCR misreadings - REMOVED B- and C-
      */
     const GRADE_CORRECTIONS = [
         // From OCR debug output for this certificate
@@ -67,7 +65,6 @@ class OCRController extends Controller
         'B*' => 'B+',
         'B+' => 'B+',
         'B' => 'B',
-        'B-' => 'B-',
         'B.' => 'B',
         'Bt' => 'B+',
         'B"' => 'B+',  // B" often means B+
@@ -82,7 +79,6 @@ class OCRController extends Controller
         
         'C' => 'C',
         'C+' => 'C+',
-        'C-' => 'C-',
         'C.' => 'C',
         
         'D' => 'D',
@@ -128,18 +124,14 @@ class OCRController extends Controller
         'B +' => 'B+',
         'C +' => 'C+',
         'A -' => 'A-',
-        'B -' => 'B-',
-        'C -' => 'C-',
         
         // With parentheses
         'A+ ' => 'A+',
         'A- ' => 'A-',
         'A ' => 'A',
         'B+ ' => 'B+',
-        'B- ' => 'B-',
         'B ' => 'B',
         'C+ ' => 'C+',
-        'C- ' => 'C-',
         'C ' => 'C',
         'D ' => 'D',
         'E ' => 'E',
@@ -367,8 +359,8 @@ class OCRController extends Controller
                 // Look at text after subject for grade (up to 50 characters)
                 $afterSubject = substr($text, $pos + strlen($variation), 50);
                 
-                // Try to find grade pattern (including B" and A" for B+ and A-)
-                $gradePattern = '/\b(A\+|A-|A|B\+|B-|B|C\+|C-|C|D|E|G|Bt|B\*|B["\']|A["\'])\b/i';
+                // Try to find grade pattern (SPM grades only: A+, A, A-, B+, B, C+, C, D, E, G)
+                $gradePattern = '/\b(A\+|A-|A|B\+|B|C\+|C|D|E|G|Bt|B\*|B["\']|A["\'])\b/i';
                 if (preg_match($gradePattern, $afterSubject, $matches)) {
                     return $this->correctGrade(trim($matches[1]));
                 }
@@ -399,7 +391,7 @@ class OCRController extends Controller
         
         // PATTERN 1: Subject followed by grade at the end
         // Handles: "BAHASA MELAYU A", "BAHASA INGGERIS B", "PENDIDIKAN ISLAM B+"
-        $pattern1 = '/^(.*?)\s+([A-G][\+\-]?|Bt|B\*|A\s*\+|A\s*-|B\s*\+|B\s*-|B["\']|A["\'])\s*$/i';
+        $pattern1 = '/^(.*?)\s+([A-G][\+\-]?|Bt|B\*|A\s*\+|A\s*-|B\s*\+|B["\']|A["\'])\s*$/i';
         if (preg_match($pattern1, $lineClean, $matches)) {
             $subject = trim($matches[1]);
             $grade = $this->correctGrade(trim($matches[2]));
@@ -464,7 +456,7 @@ class OCRController extends Controller
     }
 
     /**
-     * Correct OCR misread grades - ENHANCED for SPM certificate
+     * Correct OCR misread grades - ENHANCED for SPM certificate (No B- or C-)
      */
     private function correctGrade($grade)
     {
@@ -489,10 +481,6 @@ class OCRController extends Controller
                 // Check for B followed by any non-letter (like B" or B‘)
                 preg_match('/B["\']/', $grade)) {
                 return 'B+';
-            }
-            // Check if it's B-
-            if (strpos($grade, '-') !== false || strpos($grade, 'MINUS') !== false) {
-                return 'B-';
             }
             // If it's just B or starts with B
             if (str_starts_with($grade, 'B') && strlen($grade) <= 2) {
@@ -535,9 +523,6 @@ class OCRController extends Controller
             if (strpos($grade, '+') !== false) {
                 return 'C+';
             }
-            if (strpos($grade, '-') !== false) {
-                return 'C-';
-            }
             if (str_starts_with($grade, 'C') && strlen($grade) <= 2) {
                 return 'C';
             }
@@ -561,6 +546,10 @@ class OCRController extends Controller
         if (preg_match('/^([A-G])([+-])?$/', $grade, $matches)) {
             $letter = $matches[1];
             $modifier = $matches[2] ?? '';
+            // Only allow A- and B+ for modifiers (no B- or C-)
+            if ($modifier === '-' && $letter !== 'A') {
+                return $letter;
+            }
             return $letter . $modifier;
         }
         
@@ -677,11 +666,12 @@ class OCRController extends Controller
     }
 
     /**
-     * Validate and clean grades - MODIFIED: Don't add fake subjects
+     * Validate and clean grades - MODIFIED: No B- or C-
      */
     private function validateGrades($grades)
     {
-        $validGrades = ['A+', 'A-', 'A', 'B+', 'B-', 'B', 'C+', 'C-', 'C', 'D', 'E', 'G'];
+        // SPM grades only (no B- or C-)
+        $validGrades = ['A+', 'A-', 'A', 'B+', 'B', 'C+', 'C', 'D', 'E', 'G'];
         $cleaned = [];
         
         foreach ($grades as $subject => $grade) {
@@ -747,7 +737,7 @@ class OCRController extends Controller
     {
         $request->validate([
             'grades' => 'required|array',
-            'grades.*' => 'required|in:A+,A,A-,B+,B,B-,C+,C,C-,D,E,G'
+            'grades.*' => 'required|in:A+,A,A-,B+,B,C+,C,D,E,G'
         ]);
 
         $tempData = Session::get('ocr_temp_data');
@@ -851,7 +841,7 @@ class OCRController extends Controller
     {
         $request->validate([
             'subject' => 'required|string|max:100',
-            'grade' => 'required|in:A+,A,A-,B+,B,B-,C+,C,C-,D,E,G'
+            'grade' => 'required|in:A+,A,A-,B+,B,C+,C,D,E,G'
         ]);
 
         $tempData = Session::get('ocr_temp_data');
