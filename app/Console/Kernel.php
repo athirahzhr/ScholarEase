@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
@@ -31,13 +32,16 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-protected function schedule(Schedule $schedule): void
-{
-    // Weekly Scraping
+    protected function schedule(Schedule $schedule): void
+    {
+    // Scraping
     $schedule->command('scrape:all')
-    ->weekly()
-    ->mondays()
-    ->at('02:00');
+        ->weekly()
+        ->mondays()
+        ->at('02:00')
+        ->when(function () {
+            return Carbon::now()->weekOfYear % 2 == 0;
+        });
 
     // Update Scholarship Status
     $schedule->command('scholarships:update-status')
