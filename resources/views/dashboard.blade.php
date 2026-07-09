@@ -220,7 +220,6 @@
         background: white;
         border-radius: 20px;
         padding: 1.5rem;
-        border-left: 4px solid var(--gold);
         box-shadow: var(--shadow);
         border-left: 6px solid var(--gold);
         background: linear-gradient(135deg, #ffffff, #fffdf7);
@@ -277,12 +276,13 @@
     }
     
     .guidance-card .step-item {
-        padding: 1rem;
+        padding: 1.25rem;
         border-radius: 16px;
         transition: all 0.3s ease;
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         border: 1px solid #f3f4f6;
+        height: 100%;
     }
     
     .guidance-card .step-item:hover {
@@ -350,6 +350,10 @@
         justify-content: center;
     }
 
+    .step-description {
+        min-height: 60px;
+    }
+
     @media (max-width: 768px) {
         .dashboard-header {
             padding: 1.5rem;
@@ -375,6 +379,10 @@
 
         .guidance-card .step-item {
             margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            min-height: auto;
         }
     }
 </style>
@@ -404,7 +412,7 @@
         </div>
     </div>
 
-    <!-- PROFILE STATUS BANNER - Moved to top for visibility -->
+    <!-- PROFILE STATUS BANNER -->
     <div class="welcome-banner mb-4" data-aos="fade-up">
         <div class="row align-items-center">
             <div class="col-md-8">
@@ -489,7 +497,7 @@
 
         <!-- Main Content -->
         <div class="col-lg-9 col-md-8">
-            <!-- USER GUIDELINE - Now at the top of main content -->
+            <!-- USER GUIDELINE - 3 Simple Steps -->
             <div class="guidance-card mb-4" data-aos="fade-up">
                 <div class="d-flex align-items-center mb-3">
                     <i class="fas fa-route me-2" style="color: var(--maroon); font-size: 1.5rem;"></i>
@@ -507,9 +515,9 @@
                                 <i class="fas fa-user-edit fa-lg"></i>
                             </div>
                             <h6 style="color: var(--maroon);">Complete Your Profile</h6>
-                            <p class="text-muted small mb-3">Fill in your SPM results and academic details to help us find the best matches</p>
+                            <p class="text-muted small mb-3 step-description">Fill in your SPM results and academic details to help us find the best matches</p>
                             @if(auth()->user()->profile)
-                                <span class="badge" style="background: #10b981; color: white;">
+                                <span class="badge" style="background: #10b981; color: white; padding: 0.5rem 1rem;">
                                     <i class="fas fa-check me-1"></i> Done
                                 </span>
                             @else
@@ -535,13 +543,13 @@
                                 <i class="fas fa-star fa-lg"></i>
                             </div>
                             <h6 style="color: var(--maroon);">View Recommendations</h6>
-                            <p class="text-muted small mb-3">See personalized scholarship suggestions tailored to your profile</p>
+                            <p class="text-muted small mb-3 step-description">See personalized scholarship suggestions tailored to your profile</p>
                             @if(auth()->user()->profile)
                                 <a href="{{ route('scholarship.recommendations') }}" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-eye me-1"></i> View Matches
                                 </a>
                             @else
-                                <button class="btn btn-secondary btn-sm" disabled>
+                                <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.6; cursor: not-allowed;">
                                     <i class="fas fa-lock me-1"></i> Complete Profile First
                                 </button>
                             @endif
@@ -563,45 +571,13 @@
                                 <i class="fas fa-bookmark fa-lg"></i>
                             </div>
                             <h6 style="color: var(--maroon);">Bookmark & Track</h6>
-                            <p class="text-muted small mb-3">Save scholarships and track deadlines so you never miss an opportunity</p>
+                            <p class="text-muted small mb-3 step-description">Save scholarships and track deadlines so you never miss an opportunity</p>
                             <a href="{{ route('bookmarks.index') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-bookmark me-1"></i> View Bookmarks
                                 @if(auth()->user()->bookmarks()->count() > 0)
                                     <span class="badge ms-1" style="background: var(--maroon); color: white;">{{ auth()->user()->bookmarks()->count() }}</span>
                                 @endif
                             </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Progress Indicator -->
-                <div class="mt-4 pt-3 border-top">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <small class="text-muted">Your Progress</small>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="progress" style="width: 200px; height: 8px;">
-                                    @php
-                                        $progress = 0;
-                                        if(auth()->user()->profile) $progress += 50;
-                                        if(auth()->user()->bookmarks()->count() > 0) $progress += 25;
-                                        if($recommendationCount ?? 0 > 0) $progress += 25;
-                                    @endphp
-                                    <div class="progress-bar progress-bar-custom" style="width: {{ $progress }}%;" role="progressbar"></div>
-                                </div>
-                                <span class="fw-bold" style="color: var(--maroon);">{{ $progress }}%</span>
-                            </div>
-                        </div>
-                        <div>
-                            @if(!auth()->user()->profile)
-                                <small class="text-warning">
-                                    <i class="fas fa-exclamation-circle me-1"></i> Start by completing your profile
-                                </small>
-                            @elseif($recommendationCount ?? 0 > 0)
-                                <small class="text-success">
-                                    <i class="fas fa-check-circle me-1"></i> {{ $recommendationCount }} scholarships match your profile!
-                                </small>
-                            @endif
                         </div>
                     </div>
                 </div>
