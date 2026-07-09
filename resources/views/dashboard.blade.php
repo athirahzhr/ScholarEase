@@ -222,23 +222,74 @@
         padding: 1.5rem;
         border-left: 4px solid var(--gold);
         box-shadow: var(--shadow);
+        border-left: 6px solid var(--gold);
+        background: linear-gradient(135deg, #ffffff, #fffdf7);
     }
     
     .step-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 25px;
+        width: 60px;
+        height: 60px;
+        border-radius: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 0.75rem;
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+        transition: all 0.3s ease;
     }
     
-    .step-icon.upload { background: linear-gradient(135deg, rgba(122,0,25,0.1), rgba(122,0,25,0.05)); color: var(--maroon); }
-    .step-icon.match { background: linear-gradient(135deg, rgba(244,197,66,0.15), rgba(244,197,66,0.08)); color: #92400e; }
-    .step-icon.view { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
-    .step-icon.bookmark { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+    .step-icon:hover {
+        transform: scale(1.1);
+    }
+    
+    .step-icon.complete { 
+        background: linear-gradient(135deg, rgba(122,0,25,0.12), rgba(122,0,25,0.05)); 
+        color: var(--maroon); 
+    }
+    
+    .step-icon.find { 
+        background: linear-gradient(135deg, rgba(244,197,66,0.2), rgba(244,197,66,0.08)); 
+        color: #92400e; 
+    }
+    
+    .step-icon.recommend { 
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0); 
+        color: #065f46; 
+    }
+    
+    .step-icon.bookmark { 
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe); 
+        color: #1e40af; 
+    }
+    
+    .step-number {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--maroon);
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 700;
+        line-height: 28px;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .guidance-card .step-item {
+        padding: 1rem;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #f3f4f6;
+    }
+    
+    .guidance-card .step-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        border-color: var(--gold);
+    }
     
     .progress-bar-custom {
         background: linear-gradient(90deg, var(--maroon), var(--gold));
@@ -267,6 +318,38 @@
         background: linear-gradient(115deg, #b91c1c, #991b1b);
     }
 
+    .welcome-banner {
+        background: linear-gradient(135deg, rgba(122,0,25,0.05), rgba(244,197,66,0.08));
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid rgba(244,197,66,0.2);
+    }
+
+    .profile-status-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .profile-status-badge.complete {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .profile-status-badge.incomplete {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .arrow-connector {
+        color: var(--gold);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     @media (max-width: 768px) {
         .dashboard-header {
             padding: 1.5rem;
@@ -283,6 +366,15 @@
         .btn-resource {
             width: 100%;
             justify-content: center;
+        }
+
+        .arrow-connector {
+            transform: rotate(90deg);
+            padding: 0.25rem 0;
+        }
+
+        .guidance-card .step-item {
+            margin-bottom: 0.5rem;
         }
     }
 </style>
@@ -312,6 +404,44 @@
         </div>
     </div>
 
+    <!-- PROFILE STATUS BANNER - Moved to top for visibility -->
+    <div class="welcome-banner mb-4" data-aos="fade-up">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <i class="fas fa-user-circle" style="font-size: 2.5rem; color: var(--maroon);"></i>
+                    <div>
+                        <h6 class="mb-1" style="color: var(--maroon);">Profile Status</h6>
+                        @if(auth()->user()->profile)
+                            <span class="profile-status-badge complete">
+                                <i class="fas fa-check-circle me-1"></i> Complete
+                            </span>
+                            <small class="text-muted ms-2">
+                                {{ auth()->user()->profile->academic_category ?? 'N/A' }} • 
+                                {{ auth()->user()->profile->study_level ?? 'N/A' }}
+                            </small>
+                        @else
+                            <span class="profile-status-badge incomplete">
+                                <i class="fas fa-exclamation-circle me-1"></i> Incomplete
+                            </span>
+                            <small class="text-muted ms-2">Complete your profile to get personalized recommendations</small>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                @if(!auth()->user()->profile)
+                    <a href="{{ route('scholarship.finder') }}" class="btn btn-primary">
+                        <i class="fas fa-upload me-1"></i> Complete Profile
+                    </a>
+                @else
+                    <a href="{{ route('scholarship.recommendations') }}" class="btn btn-primary">
+                        <i class="fas fa-star me-1"></i> View Recommendations
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <!-- Sidebar Navigation -->
@@ -359,6 +489,124 @@
 
         <!-- Main Content -->
         <div class="col-lg-9 col-md-8">
+            <!-- USER GUIDELINE - Now at the top of main content -->
+            <div class="guidance-card mb-4" data-aos="fade-up">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-route me-2" style="color: var(--maroon); font-size: 1.5rem;"></i>
+                    <h4 class="mb-0" style="color: var(--maroon);">Your Scholarship Journey</h4>
+                    <span class="ms-3 badge" style="background: var(--gold); color: var(--maroon); font-weight: 600;">3 Simple Steps</span>
+                </div>
+                <p class="text-muted mb-4">Follow these steps to find and track your perfect scholarship</p>
+                
+                <div class="row align-items-stretch">
+                    <!-- Step 1: Complete Profile -->
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="step-item text-center h-100">
+                            <div class="step-number mx-auto">1</div>
+                            <div class="step-icon complete mx-auto">
+                                <i class="fas fa-user-edit fa-lg"></i>
+                            </div>
+                            <h6 style="color: var(--maroon);">Complete Your Profile</h6>
+                            <p class="text-muted small mb-3">Fill in your SPM results and academic details to help us find the best matches</p>
+                            @if(auth()->user()->profile)
+                                <span class="badge" style="background: #10b981; color: white;">
+                                    <i class="fas fa-check me-1"></i> Done
+                                </span>
+                            @else
+                                <a href="{{ route('scholarship.finder') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-upload me-1"></i> Complete Now
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- Arrow Connector for Desktop -->
+                    <div class="col-md-1 d-none d-md-flex align-items-center justify-content-center">
+                        <div class="arrow-connector">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: View Recommendations -->
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="step-item text-center h-100">
+                            <div class="step-number mx-auto">2</div>
+                            <div class="step-icon recommend mx-auto">
+                                <i class="fas fa-star fa-lg"></i>
+                            </div>
+                            <h6 style="color: var(--maroon);">View Recommendations</h6>
+                            <p class="text-muted small mb-3">See personalized scholarship suggestions tailored to your profile</p>
+                            @if(auth()->user()->profile)
+                                <a href="{{ route('scholarship.recommendations') }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i> View Matches
+                                </a>
+                            @else
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    <i class="fas fa-lock me-1"></i> Complete Profile First
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- Arrow Connector for Desktop -->
+                    <div class="col-md-1 d-none d-md-flex align-items-center justify-content-center">
+                        <div class="arrow-connector">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Bookmark -->
+                    <div class="col-md-3">
+                        <div class="step-item text-center h-100">
+                            <div class="step-number mx-auto">3</div>
+                            <div class="step-icon bookmark mx-auto">
+                                <i class="fas fa-bookmark fa-lg"></i>
+                            </div>
+                            <h6 style="color: var(--maroon);">Bookmark & Track</h6>
+                            <p class="text-muted small mb-3">Save scholarships and track deadlines so you never miss an opportunity</p>
+                            <a href="{{ route('bookmarks.index') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-bookmark me-1"></i> View Bookmarks
+                                @if(auth()->user()->bookmarks()->count() > 0)
+                                    <span class="badge ms-1" style="background: var(--maroon); color: white;">{{ auth()->user()->bookmarks()->count() }}</span>
+                                @endif
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Indicator -->
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <small class="text-muted">Your Progress</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress" style="width: 200px; height: 8px;">
+                                    @php
+                                        $progress = 0;
+                                        if(auth()->user()->profile) $progress += 50;
+                                        if(auth()->user()->bookmarks()->count() > 0) $progress += 25;
+                                        if($recommendationCount ?? 0 > 0) $progress += 25;
+                                    @endphp
+                                    <div class="progress-bar progress-bar-custom" style="width: {{ $progress }}%;" role="progressbar"></div>
+                                </div>
+                                <span class="fw-bold" style="color: var(--maroon);">{{ $progress }}%</span>
+                            </div>
+                        </div>
+                        <div>
+                            @if(!auth()->user()->profile)
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-circle me-1"></i> Start by completing your profile
+                                </small>
+                            @elseif($recommendationCount ?? 0 > 0)
+                                <small class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i> {{ $recommendationCount }} scholarships match your profile!
+                                </small>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-md-6 col-lg-3 mb-4">
@@ -420,48 +668,6 @@
                         <p class="text-muted mb-0">Total Available</p>
                         <div class="progress mt-2" style="height: 6px;">
                             <div class="progress-bar" style="width: 85%; background: linear-gradient(90deg, var(--maroon), var(--gold));"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- User Guideline -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="guidance-card" data-aos="fade-up">
-                        <h4 class="mb-3">
-                            <i class="fas fa-info-circle me-2" style="color: var(--maroon);"></i>
-                            How to Use ScholarEase
-                        </h4>
-                        <div class="row">
-                            <div class="col-md-3 text-center mb-3">
-                                <div class="step-icon upload mx-auto">
-                                    <i class="fas fa-upload fa-lg"></i>
-                                </div>
-                                <h6>Step 1</h6>
-                                <p class="text-muted small">Upload SPM result / fill profile</p>
-                            </div>
-                            <div class="col-md-3 text-center mb-3">
-                                <div class="step-icon match mx-auto">
-                                    <i class="fas fa-cogs fa-lg"></i>
-                                </div>
-                                <h6>Step 2</h6>
-                                <p class="text-muted small">System auto-match scholarships</p>
-                            </div>
-                            <div class="col-md-3 text-center mb-3">
-                                <div class="step-icon view mx-auto">
-                                    <i class="fas fa-star fa-lg"></i>
-                                </div>
-                                <h6>Step 3</h6>
-                                <p class="text-muted small">View recommended scholarships</p>
-                            </div>
-                            <div class="col-md-3 text-center mb-3">
-                                <div class="step-icon bookmark mx-auto">
-                                    <i class="fas fa-bookmark fa-lg"></i>
-                                </div>
-                                <h6>Step 4</h6>
-                                <p class="text-muted small">Bookmark & track deadlines</p>
-                            </div>
                         </div>
                     </div>
                 </div>
