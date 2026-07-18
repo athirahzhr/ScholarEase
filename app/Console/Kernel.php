@@ -36,12 +36,8 @@ class Kernel extends ConsoleKernel
     {
     // Scraping
     $schedule->command('scrape:all')
-        ->weekly()
-        ->mondays()
-        ->at('02:00')
-        ->when(function () {
-            return Carbon::now()->weekOfYear % 2 == 0;
-        });
+    ->everyMinute(); 
+
 
     // Update Scholarship Status
     $schedule->command('scholarships:update-status')
