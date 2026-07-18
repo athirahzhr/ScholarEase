@@ -50,8 +50,8 @@ class Kernel extends ConsoleKernel
 
     // Deadline Notification
     $schedule->command('notify:scholarship-deadline')
-    ->everyMinute();
-
+        ->daily()
+        ->at('08:00');
 }
 
 
