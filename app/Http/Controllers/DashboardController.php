@@ -52,17 +52,16 @@ class DashboardController extends Controller
 
         }
 
-        // Latest approved feedback
+        // Latest feedback
         $feedbacks = Feedback::with('user')
-            ->where('approved', 1)
-            ->inRandomOrder()
+            ->latest()
             ->take(3)
             ->get();
 
         // Feedback statistics
-        $averageRating = Feedback::where('approved', 1)->avg('rating');
+        $averageRating = Feedback::avg('rating');
 
-        $totalFeedback = Feedback::where('approved', 1)->count();
+        $totalFeedback = Feedback::count();
 
         return view(
             'dashboard',

@@ -163,10 +163,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/notifications/deadline', [AdminController::class, 'sendDeadlineNotification'])->name('notify.deadline');
 
     // Feedback Management
-    Route::get('/feedbacks', [AdminController::class, 'feedbacks'])->name('feedbacks');
-    Route::post('/feedbacks/{id}/approve', [AdminController::class, 'approveFeedback'])->name('feedbacks.approve');
-    Route::delete('/feedbacks/{id}/reject', [AdminController::class, 'rejectFeedback'])->name('feedbacks.reject');
-    Route::post('/feedbacks/bulk-approve', [AdminController::class, 'bulkApproveFeedbacks'])->name('feedbacks.bulk-approve');
+    Route::get('/admin/feedbacks', [AdminController::class, 'feedbacks'])->name('admin.feedbacks');
+    Route::delete('/admin/feedbacks/{id}', [AdminController::class, 'deleteFeedback'])->name('admin.feedbacks.delete');
 
     // Scholarship Resource Centre
     Route::resource('resource-videos', ResourceVideoController::class);

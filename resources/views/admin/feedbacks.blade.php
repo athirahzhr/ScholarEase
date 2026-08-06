@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Manage Feedbacks')
+@section('title', 'Student Feedbacks')
 
 @section('content')
 <div class="container-fluid px-0">
@@ -10,15 +10,13 @@
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h5 class="mb-0">
                         <i class="fas fa-star me-2" style="color: #F4C542;"></i>
-                        Manage Feedbacks
+                        Student Feedbacks
                     </h5>
                     <div>
-                        <span class="badge" style="background: #fef3c7; color: #92400e;">
-                            <i class="fas fa-clock me-1"></i> Pending: {{ $pendingCount }}
-                        </span>
-                        <span class="badge ms-2" style="background: #d1fae5; color: #065f46;">
-                            <i class="fas fa-check-circle me-1"></i> Approved: {{ $approvedCount }}
-                        </span>
+                        <span class="badge bg-primary">
+                        <i class="fas fa-comments me-1"></i>
+                        Total Feedback: {{ $feedbacks->total() }}
+                    </span>
                     </div>
                 </div>
 
@@ -41,13 +39,9 @@
                         <table class="table table-hover mb-0" id="feedbacksTable">
                             <thead>
                                 <tr>
-                                    <th width="5%">
-                                        <input type="checkbox" id="selectAll">
-                                    </th>
                                     <th width="15%">User</th>
                                     <th width="10%">Rating</th>
                                     <th width="40%">Feedback</th>
-                                    <th width="10%">Status</th>
                                     <th width="10%">Date</th>
                                     <th width="10%">Actions</th>
                                 </tr>
@@ -55,9 +49,6 @@
                             <tbody>
                                 @forelse($feedbacks as $feedback)
                                 <tr>
-                                    <td>
-                                        <input type="checkbox" class="feedback-checkbox" value="{{ $feedback->id }}">
-                                    </td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-initial rounded-circle d-flex align-items-center justify-content-center me-2" 
@@ -89,46 +80,17 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @if($feedback->approved)
-                                            <span class="badge" style="background: #d1fae5; color: #065f46;">
-                                                <i class="fas fa-check-circle me-1"></i> Approved
-                                            </span>
-                                        @else
-                                            <span class="badge" style="background: #fef3c7; color: #92400e;">
-                                                <i class="fas fa-clock me-1"></i> Pending
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
                                         <div class="small">
                                             {{ $feedback->created_at->format('d M Y') }}
                                             <div class="text-muted">{{ $feedback->created_at->diffForHumans() }}</div>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            @if(!$feedback->approved)
-                                                <form action="{{ route('admin.feedbacks.approve', $feedback->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-sm btn-success" title="Approve">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            <form action="{{ route('admin.feedbacks.reject', $feedback->id) }}" method="POST" class="d-inline" 
-                                                  onsubmit="return confirm('Are you sure you want to delete this feedback?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
+                                    
+                                    
                                 </tr>
                                 @empty
                                 <td>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="4" class="text-center py-5">
                                         <i class="fas fa-star" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px; display: block;"></i>
                                         <h5 class="text-muted">No Feedbacks Yet</h5>
                                         <p class="text-muted">Feedbacks from users will appear here.</p>
@@ -141,11 +103,6 @@
 
                     <div class="card-footer bg-transparent">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div>
-                                <button class="btn btn-sm btn-primary" id="bulkApproveBtn" style="display: none;">
-                                    <i class="fas fa-check-double me-1"></i> Approve Selected
-                                </button>
-                            </div>
                             <div>
                                 {{ $feedbacks->links('pagination::bootstrap-5') }}
                             </div>
@@ -207,53 +164,7 @@
 @endpush
 
 @push('scripts')
-<script>
-    // Select All functionality
-    const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('.feedback-checkbox');
-    const bulkApproveBtn = document.getElementById('bulkApproveBtn');
-    
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAll.checked;
-            });
-            toggleBulkApproveBtn();
-        });
-    }
-    
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', toggleBulkApproveBtn);
-    });
-    
-    function toggleBulkApproveBtn() {
-        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-        bulkApproveBtn.style.display = anyChecked ? 'inline-block' : 'none';
-    }
-    
-    // Bulk Approve
-    if (bulkApproveBtn) {
-        bulkApproveBtn.addEventListener('click', function() {
-            const selectedIds = Array.from(checkboxes)
-                .filter(cb => cb.checked)
-                .map(cb => cb.value);
-            
-            if (selectedIds.length === 0) return;
-            
-            if (confirm(`Approve ${selectedIds.length} feedback(s)?`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("admin.feedbacks.bulk-approve") }}';
-                form.innerHTML = `
-                    @csrf
-                    <input type="hidden" name="ids" value='${JSON.stringify(selectedIds)}'>
-                `;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-    
+<script> 
     // View full comment modal
     document.querySelectorAll('.view-full').forEach(btn => {
         btn.addEventListener('click', function() {

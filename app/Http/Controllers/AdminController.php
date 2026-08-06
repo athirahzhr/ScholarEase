@@ -382,54 +382,26 @@ class AdminController extends Controller
         return back()->with('error', 'Failed: ' . $e->getMessage());
     }
     }
+    
     public function feedbacks()
     {
         $feedbacks = Feedback::with('user')
             ->latest()
             ->paginate(20);
-        
-        $pendingCount = Feedback::where('approved', 0)->count();
-        $approvedCount = Feedback::where('approved', 1)->count();
-        
-        return view('admin.feedbacks', compact('feedbacks', 'pendingCount', 'approvedCount'));
+
+        return view('admin.feedbacks', compact('feedbacks'));
     }
 
-    /**
-     * Approve a feedback
-     */
-    public function approveFeedback($id)
-    {
-        $feedback = Feedback::findOrFail($id);
-        $feedback->approved = 1;
-        $feedback->save();
-        
-        return redirect()->back()->with('success', 'Feedback approved successfully!');
-    }
-
+    
     /**
      * Reject/Delete a feedback
      */
-    public function rejectFeedback($id)
+    public function deleteFeedback($id)
     {
         $feedback = Feedback::findOrFail($id);
         $feedback->delete();
         
-        return redirect()->back()->with('success', 'Feedback rejected and removed.');
-    }
-
-    /**
-     * Bulk approve feedbacks
-     */
-    public function bulkApproveFeedbacks(Request $request)
-    {
-        $ids = $request->ids;
-        
-        if ($ids && count($ids) > 0) {
-            Feedback::whereIn('id', $ids)->update(['approved' => 1]);
-            return redirect()->back()->with('success', count($ids) . ' feedbacks approved successfully!');
-        }
-        
-        return redirect()->back()->with('error', 'No feedbacks selected.');
+        return redirect()->back()->with('success', 'Feedback deleted successfully.');
     }
 }
 

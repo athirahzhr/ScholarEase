@@ -23,7 +23,7 @@ class FeedbackController extends Controller
             'user_id' => auth()->id(),
             'rating' => $request->rating,
             'comment' => $request->comment,
-            'approved' => false,
+    
         ]);
 
         return redirect()
