@@ -100,7 +100,7 @@
                                 </tr>
                                 @empty
                                 <td>
-                                    <td colspan="4" class="text-center py-5">
+                                    <td colspan="5" class="text-center py-5">
                                         <i class="fas fa-star" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px; display: block;"></i>
                                         <h5 class="text-muted">No Feedbacks Yet</h5>
                                         <p class="text-muted">Feedbacks from users will appear here.</p>
@@ -158,17 +158,32 @@
 
             <div class="modal-body">
 
-                <p>
-                    Are you sure you want to delete feedback from
-                    <strong id="feedbackUser"></strong>?
-                </p>
+    <p>
+        Are you sure you want to permanently delete this feedback?
+    </p>
 
-                <div class="alert alert-danger">
-                    <strong>Warning:</strong>
-                    This action cannot be undone.
-                </div>
+    <div class="mb-3">
+        <strong>User</strong><br>
+        <span id="deleteFeedbackUser"></span>
+    </div>
 
-            </div>
+    <div class="mb-3">
+        <strong>Feedback</strong>
+
+        <div class="border rounded p-3 bg-light mt-2">
+            <span id="deleteFeedbackComment"></span>
+        </div>
+    </div>
+
+    <div class="alert alert-danger mb-0">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+
+        <strong>Warning:</strong>
+
+        This action cannot be undone.
+    </div>
+
+</div>
 
             <div class="modal-footer">
 
