@@ -55,7 +55,7 @@ class ScholarshipController extends Controller
     }
 
     /**
-     * Save student profile - FIXED VERSION
+     * Save student profile 
      * Now handles checkbox fields correctly
      */
     public function saveProfile(Request $request)
