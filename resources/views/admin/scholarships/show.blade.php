@@ -368,15 +368,111 @@
                         </a>
 
                         {{-- DELETE --}}
-                        <form method="POST" action="{{ route('admin.scholarships.destroy', $scholarship->id) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-action-delete w-100" onclick="return confirm('⚠️ Are you sure you want to delete this scholarship?\n\nThis action cannot be undone!')">
-                                <i class="fas fa-trash-alt me-2"></i>
-                                Delete Permanently
-                            </button>
-                        </form>
+                        <button
+                        type="button"
+                        class="btn btn-action-delete w-100"
+                        id="deleteScholarshipBtn">
+
+                        <i class="fas fa-trash-alt me-2"></i>
+                        Delete Permanently
+
+                    </button>
                     </div>
+                </div>
+            </div>
+            <!-- Delete Scholarship Modal -->
+            <div class="modal fade" id="deleteScholarshipModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+
+                    <div class="modal-content shadow">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title text-danger fw-bold">
+
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+
+                                Confirm Delete
+
+                            </h5>
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal">
+                            </button>
+
+                        </div>
+
+                        <div class="modal-body">
+
+                            <p>
+                                Are you sure you want to permanently delete
+                                <strong>"{{ $scholarship->title }}"</strong>?
+                            </p>
+
+                            <div class="alert alert-danger mb-0">
+
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+
+                                <strong>Warning:</strong>
+
+                                This action cannot be undone.
+                                All associated data will be permanently removed.
+
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+
+                                <i class="fas fa-times me-1"></i>
+
+                                Cancel
+
+                            </button>
+
+                            <form
+                                method="POST"
+                                action="{{ route('admin.scholarships.destroy', $scholarship->id) }}">
+
+                                @csrf
+                                @method('DELETE')
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger">
+
+                                    <i class="fas fa-trash me-1"></i>
+
+                                    Delete Permanently
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    @push('scripts')
+                    <script>
+
+                    document.getElementById('deleteScholarshipBtn').addEventListener('click', function () {
+
+                        new bootstrap.Modal(
+                            document.getElementById('deleteScholarshipModal')
+                        ).show();
+
+                    });
+
+                    </script>
+                    @endpush
+
                 </div>
             </div>
         </div>
