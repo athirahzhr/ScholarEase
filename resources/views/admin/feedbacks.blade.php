@@ -87,20 +87,15 @@
                                     </td>
 
                                     <td>
-                                        <form action="{{ route('admin.feedbacks.delete', $feedback->id) }}"
-                                            method="POST"
-                                            onsubmit="return confirm('Are you sure you want to delete this feedback?')">
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit"
-                                                    class="btn btn-danger btn-sm"
-                                                    title="Delete Feedback">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-
-                                        </form>
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-sm delete-feedback-btn"
+                                            data-id="{{ $feedback->id }}"
+                                            data-user="{{ $feedback->user->name ?? 'Unknown User' }}"
+                                            data-comment="{{ $feedback->comment }}"
+                                        >
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 @empty
@@ -147,6 +142,60 @@
     </div>
 </div>
 
+<!-- Delete Feedback Modal -->
+<div class="modal fade" id="deleteFeedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirm Delete
+                </h5>
+
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <p>
+                    Are you sure you want to delete feedback from
+                    <strong id="feedbackUser"></strong>?
+                </p>
+
+                <div class="alert alert-danger">
+                    <strong>Warning:</strong>
+                    This action cannot be undone.
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <form id="deleteFeedbackForm" method="POST">
+
+                    @csrf
+                    @method('DELETE')
+
+                    <button class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>
+                        Delete Permanently
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 @push('styles')
 <style>
     .table th {
@@ -179,15 +228,55 @@
 @endpush
 
 @push('scripts')
-<script> 
-    // View full comment modal
+<script>
+
+    // ===============================
+    // Full Feedback Modal
+    // ===============================
+
     document.querySelectorAll('.view-full').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const comment = this.dataset.comment;
-            document.getElementById('fullComment').textContent = comment;
-            new bootstrap.Modal(document.getElementById('commentModal')).show();
+
+        btn.addEventListener('click', function () {
+
+            document.getElementById('fullComment').textContent =
+                this.dataset.comment;
+
+            new bootstrap.Modal(
+                document.getElementById('commentModal')
+            ).show();
+
         });
+
     });
+
+
+    // ===============================
+    // Delete Feedback Modal
+    // ===============================
+
+    document.querySelectorAll('.delete-feedback-btn').forEach(btn => {
+
+        btn.addEventListener('click', function () {
+
+            const id = this.dataset.id;
+            const user = this.dataset.user;
+            const comment = this.dataset.comment;
+
+            document.getElementById('deleteFeedbackUser').textContent = user;
+
+            document.getElementById('deleteFeedbackComment').textContent = comment;
+
+            document.getElementById('deleteFeedbackForm').action =
+                "{{ url('/admin/feedbacks') }}/" + id;
+
+            new bootstrap.Modal(
+                document.getElementById('deleteFeedbackModal')
+            ).show();
+
+        });
+
+    });
+
 </script>
 @endpush
 @endsection
