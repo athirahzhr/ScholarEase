@@ -362,7 +362,7 @@ class ScholarshipController extends Controller
     }
 
     /**
-     * Eligibility update helper - FIXED VERSION
+     * Eligibility update helper 
      * Now correctly handles checkbox values
      */
     protected function getEligibilityCriteriaData(
