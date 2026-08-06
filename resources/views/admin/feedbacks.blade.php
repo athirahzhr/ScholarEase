@@ -85,8 +85,23 @@
                                             <div class="text-muted">{{ $feedback->created_at->diffForHumans() }}</div>
                                         </div>
                                     </td>
-                                    
-                                    
+
+                                    <td>
+                                        <form action="{{ route('admin.feedbacks.delete', $feedback->id) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('Are you sure you want to delete this feedback?')">
+
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit"
+                                                    class="btn btn-danger btn-sm"
+                                                    title="Delete Feedback">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+
+                                        </form>
+                                    </td>
                                 </tr>
                                 @empty
                                 <td>
