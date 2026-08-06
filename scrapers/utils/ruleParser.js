@@ -5,7 +5,8 @@ export function parseRules(rawText) {
 
   const minAs = detectMinAs(text);
 
-  return {
+return {
+
     // ===== Academic =====
     min_spm_as: minAs,
     max_spm_as: null,
@@ -13,8 +14,7 @@ export function parseRules(rawText) {
 
     // ===== Income =====
     max_monthly_income: detectMaxIncome(text),
-
-    income_categories:detectIncomeCategory(text),
+    income_categories: detectIncomeCategory(text),
 
     // ===== Study =====
     study_paths: detectStudyPath(text),
@@ -23,20 +23,44 @@ export function parseRules(rawText) {
 
     // ===== Demographic =====
     bumiputera_required: /bumiputera\s+(sahaja|only)/i.test(text),
+    bumiputera_priority: false,
+
+    gender_requirement: detectGender(text),
 
     citizenship_required:
-    /warganegara malaysia|malaysian citizen|malaysian citizens|citizen of malaysia/i.test(text)
-    ? 'Malaysian'
-    : null,
+        /warganegara malaysia|malaysian citizen|malaysian citizens|citizen of malaysia/i.test(text)
+            ? 'Malaysian'
+            : null,
 
     state_requirement: detectState(text),
+
+    rural_priority: false,
 
     // ===== Age =====
     min_age: detectMinAge(text),
     max_age: detectMaxAge(text),
 
     // ===== Merit =====
-    leadership_required: /mesti.*kepimpinan|required.*leadership/i.test(text),
+    leadership_required:
+        /mesti.*kepimpinan|required.*leadership/i.test(text),
+
+    leadership_priority: false,
+
+    sports_achievement: false,
+
+    min_community_hours: detectCommunityHours(text),
+
+    bond_required:
+        /bond|ikatan|berkhidmat/i.test(text),
+
+    bond_years: detectBondYears(text),
+
+    priority_weight: 0,
+
+    max_score: 100,
+
+    notes: buildNotes(text)
+
 
   };
 }
